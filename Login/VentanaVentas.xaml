@@ -1,0 +1,88 @@
+<Window x:Class="LoginApp.VentanaVentas"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="FERCO - Punto de Venta"
+        Height="500" Width="800"
+        WindowStartupLocation="CenterScreen"
+        Background="#1E2A38">
+
+	<Window.Resources>
+		<Style TargetType="TextBlock">
+			<Setter Property="Foreground" Value="White"/>
+		</Style>
+	</Window.Resources>
+
+	<Grid Margin="20">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+
+		<TextBlock Text="FERCO - Punto de Venta"
+                   FontSize="24"
+                   FontWeight="Bold"
+                   HorizontalAlignment="Center"
+                   Margin="0,0,0,20"/>
+
+		<Grid Grid.Row="1">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="2*"/>
+				<ColumnDefinition Width="3*"/>
+			</Grid.ColumnDefinitions>
+
+			<!-- Panel izquierdo -->
+			<Border Background="White"
+                    CornerRadius="10"
+                    Padding="20"
+                    Margin="0,0,20,0"
+                    Grid.Column="0">
+				<Border.Effect>
+					<DropShadowEffect BlurRadius="10" ShadowDepth="4" Opacity="0.3"/>
+				</Border.Effect>
+				<StackPanel>
+					<TextBlock Text="Producto:" FontWeight="Bold" Margin="0,0,0,5" Foreground="Black"/>
+					<ComboBox x:Name="cmbProducto"
+                              Background="#ECF0F1"
+                              Foreground="#2C3E50"
+                              BorderBrush="#BDC3C7"
+                              Margin="0,0,0,15"/>
+
+					<TextBlock Text="Cantidad:" FontWeight="Bold" Margin="0,0,0,5" Foreground="Black"/>
+					<TextBox x:Name="txtCantidad"
+                             Background="#ECF0F1"
+                             Foreground="#2C3E50"
+                             BorderBrush="#BDC3C7"
+                             Margin="0,0,0,15"/>
+
+					<Button Content="Registrar venta"
+                            Background="#4A90E2"
+                            Foreground="White"
+                            BorderBrush="#4A90E2"
+                            Height="40"
+                            FontWeight="Bold"
+                            Click="BtnRegistrarVenta_Click"
+                            Margin="0,0,0,10"/>
+
+					<TextBlock x:Name="lblMensaje" Foreground="Salmon"/>
+				</StackPanel>
+			</Border>
+
+			<!-- Panel derecho -->
+			<Border Background="White"
+                    CornerRadius="10"
+                    Padding="20"
+                    Grid.Column="1">
+				<Border.Effect>
+					<DropShadowEffect BlurRadius="10" ShadowDepth="4" Opacity="0.3"/>
+				</Border.Effect>
+				<StackPanel>
+					<TextBlock Text="Ventas registradas:" FontWeight="Bold" Margin="0,0,0,5"/>
+					<ListBox x:Name="lstVentas" Background="#F8F9FA" Foreground="#2C3E50" Height="180"/>
+
+					<TextBlock Text="Stock disponible:" FontWeight="Bold" Margin="0,15,0,5"/>
+					<ListBox x:Name="lstStock" Background="#F8F9FA" Foreground="#2C3E50"/>
+				</StackPanel>
+			</Border>
+		</Grid>
+	</Grid>
+</Window>
