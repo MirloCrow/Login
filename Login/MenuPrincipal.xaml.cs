@@ -13,5 +13,12 @@ namespace LoginApp
         {
             InitializeComponent();
         }
+
+        private void BtnIrAVentas_Click(object sender, RoutedEventArgs e)
+        {
+            VentanaVentas ventana = new VentanaVentas();
+            ventana.Show();
+            this.Close();
+        }
     }
 }
