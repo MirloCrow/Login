@@ -20,5 +20,33 @@ namespace LoginApp
             ventana.Show();
             this.Close();
         }
+
+        private void btnVentas_Click(object sender, RoutedEventArgs e)
+        {
+            VentanaVentas ventana = new VentanaVentas();
+            ventana.Show();
+            this.Close();
+        }
+
+        private void TB(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void TBShow(object sender, RoutedEventArgs e)
+        {
+            GridContent.Opacity = 0.5;
+        }
+
+        private void TBHide(object sender, RoutedEventArgs e)
+        {
+            GridContent.Opacity = 1;
+        }
+
+
+        private void PreviewMouseLeftButtomDownBG(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            BtnShowHide.IsChecked = false;
+        }
     }
 }

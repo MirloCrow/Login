@@ -9,7 +9,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="SCS\IMG\about.png" />
+    <None Remove="SCS\IMG\cerrar.png" />
+    <None Remove="SCS\IMG\menu.png" />
+    <None Remove="SCS\IMG\micuenta.png" />
+    <None Remove="SCS\IMG\minimizar.png" />
     <None Remove="usuarios.db" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="SCS\IMG\cerrar.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
   <ItemGroup>
@@ -24,7 +35,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="SCS\IMG\" />
+    <Resource Include="SCS\IMG\about.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="SCS\IMG\menu.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="SCS\IMG\micuenta.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="SCS\IMG\minimizar.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
 </Project>
