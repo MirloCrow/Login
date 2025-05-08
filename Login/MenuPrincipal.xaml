@@ -1,4 +1,4 @@
-<Window x:Class="LoginApp.MenuPrincipal"
+﻿<Window x:Class="LoginApp.MenuPrincipal"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="FERCO"
@@ -9,7 +9,7 @@
         AllowsTransparency="True"
         Background="{StaticResource PrimaryBackgroundBrush}">
     <Window.Resources>
-        
+
     </Window.Resources>
 
 
@@ -20,116 +20,94 @@
                   Background="Transparent">
             <!--#REGION HEADER-->
             <Grid Name="Header"
-                    Height="35"
-                    VerticalAlignment="Top"
-                     Background="Transparent">
+      Height="35"
+      VerticalAlignment="Top"
+      Background="Transparent">
+
                 <Border CornerRadius="10,10,0,0"
-                        Background="{StaticResource AccentBrush}"/>
+            Background="{StaticResource AccentBrush}"/>
 
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
-                        <ColumnDefinition Width="200"/>
-                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <!--#REGION TITLE-->
-                    <TextBlock Text="FERCO"
-                                       Grid.Column="0"
-                                       Foreground="{StaticResource PrimaryTextBrush}"
-                                       FontSize="15"
-                                       Margin="10,0,0,0"
-                                       VerticalAlignment="Center"/>
-                    <!--#ENDREGION-->
-                    <!--#region Mi Cuenta-->
-                    <Button Style="{DynamicResource BTNHEADERSTYLE}" x:Name="BtnCuenta"
-                            Grid.Column="1"
-                            Background="Transparent"
-                            BorderBrush="Transparent"
-                            FontSize="15"
-                            Foreground="{StaticResource PrimaryTextBrush}"
-                            VerticalAlignment="Center"
-                            HorizontalAlignment="Left"
-                            Cursor="Hand">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="15"/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="1"
-                                       Text="Mi Cuenta"
-                                       Foreground="{StaticResource PrimaryTextBrush}"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"
-                                       Margin="5,0,0,0"/>
-                            <Image Grid.Column="0"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"
-                                   Source="pack://application:,,,/SCS/IMG/micuenta.png"/>
-                        </Grid>
+                    <!-- Título + botones Mi Cuenta / Acerca de -->
+                    <StackPanel Orientation="Horizontal"
+                    VerticalAlignment="Center"
+                    Margin="10,0,0,0"
+                    HorizontalAlignment="Left">
 
-                    </Button>
-                    <!--#endregion-->
-                    <!--#region INFO-->
-                    <Button Style="{DynamicResource BTNHEADERSTYLE}" x:Name="BtnInfo"
-                            Grid.Column="1"
-                            Background="Transparent"
-                            BorderBrush="Transparent"
-                            Foreground="{StaticResource PrimaryTextBrush}"
-                            FontSize="15"
-                            VerticalAlignment="Center"
-                            HorizontalAlignment="Right"
-                            Cursor="Hand">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="15"/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <Image Source="/SCS/IMG/about.png"
-                                   Grid.Column="0"
-                                   VerticalAlignment="Center"/>
-                            <TextBlock
-                                       Text="Acerca de"
-                                       Foreground="{StaticResource PrimaryTextBrush}"
-                                       Grid.Column="1"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"
-                                       Margin="5,0,0,0"/>
+                        <!-- Título -->
+                        <TextBlock Text="FERCO"
+                       FontSize="15"
+                       Foreground="{StaticResource PrimaryTextBrush}"
+                       VerticalAlignment="Center"
+                       Margin="0,0,20,0"/>
 
-                        </Grid>
+                        <!-- Mi Cuenta -->
+                        <Button Style="{StaticResource BTNHEADERSTYLE}" x:Name="BtnCuenta"
+                    Background="Transparent"
+                    BorderBrush="Transparent"
+                    FontSize="15"
+                    Foreground="{StaticResource PrimaryTextBrush}"
+                    Cursor="Hand"
+                    VerticalAlignment="Center"
+                    Margin="0,0,10,0">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock FontFamily="Segoe MDL2 Assets"
+                                           Text=""
+                                           FontSize="16"
+                                           VerticalAlignment="Center"/> 
+                                <TextBlock Text="Mi Cuenta"
+                               Foreground="{StaticResource PrimaryTextBrush}"
+                               Margin="5,0,0,0"
+                               VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
 
-                    </Button>
-                    <!--#endregion-->
-                    <!--#region MINIMIZAR-->
-                    <Button Style="{StaticResource WindowControlButtonStyle}" x:Name="BtnMinimizar"
-                            Grid.Column="2"
-                            Background="Transparent"
-                            BorderBrush="Transparent"
-                            Height="25"
-                            Width="25"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Top"
-                            Margin="0,5,30,0" Cursor="Hand" Click="Minimizar">
-                        <Image Source="pack://application:,,,/SCS/IMG/minimizar.png"
-                               Cursor="Hand"/>
+                        <!-- Acerca de -->
+                        <Button Style="{StaticResource BTNHEADERSTYLE}" x:Name="BtnInfo"
+                    Background="Transparent"
+                    BorderBrush="Transparent"
+                    FontSize="15"
+                    Foreground="{StaticResource PrimaryTextBrush}"
+                    Cursor="Hand"
+                    VerticalAlignment="Center"
+                    Margin="0,0,10,0">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock FontFamily="Segoe MDL2 Assets"
+                                           Text=""
+                                           FontSize="16"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Text="Acerca de"
+                                           Foreground="{StaticResource PrimaryTextBrush}"
+                                           Margin="5,0,0,0"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
 
-                    </Button>
-                    <!--#endregion-->
-                    <!--#region Cerrar -->
-                    <Button Style="{StaticResource WindowControlButtonStyle}" x:Name="BtnCerrar"
-                            Grid.Column="2"
-                            Background="Transparent"
-                            BorderBrush="Transparent"
-                            Height="25"
-                            Width="25"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Top"
-                            Margin="0,5,5,0" Click="Cerrar">
-                        <Image Source="pack://application:,,,/SCS/IMG/cerrar.png"
-                               Cursor="Hand"/>
-
-                    </Button>
-                    <!--#endregion-->
+                    <!-- Botones minimizar y cerrar -->
+                    <Grid Grid.Column="1"
+              HorizontalAlignment="Right"
+              VerticalAlignment="Top"
+              Margin="0,5,5,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Style="{StaticResource WindowControlButtonStyle}"
+                        Click="Minimizar"
+                        ToolTip="Minimizar"
+                        Margin="0,0,5,0">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="14"/>
+                            </Button>
+                            <Button Style="{StaticResource WindowControlButtonStyle}"
+                        Click="Cerrar"
+                        ToolTip="Cerrar">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="14"/>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
                 </Grid>
             </Grid>
             <!--#ENDREGION -->
@@ -353,7 +331,7 @@
 
 
             <!--ENDREGION-->
-           
+
         </Grid>
     </Border>
 </Window>
