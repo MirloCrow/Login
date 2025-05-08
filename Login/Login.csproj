@@ -14,13 +14,11 @@
     <None Remove="SCS\IMG\menu.png" />
     <None Remove="SCS\IMG\micuenta.png" />
     <None Remove="SCS\IMG\minimizar.png" />
+    <None Remove="SCS\IMG\productos.png" />
+    <None Remove="SCS\IMG\proveedor.png" />
+    <None Remove="SCS\IMG\side-bar.png" />
+    <None Remove="SCS\IMG\venta.png" />
     <None Remove="usuarios.db" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="SCS\IMG\cerrar.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
   </ItemGroup>
 
   <ItemGroup>
@@ -38,6 +36,9 @@
     <Resource Include="SCS\IMG\about.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="SCS\IMG\cerrar.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="SCS\IMG\menu.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
@@ -45,6 +46,18 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="SCS\IMG\minimizar.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="SCS\IMG\productos.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="SCS\IMG\proveedor.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="SCS\IMG\side-bar.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="SCS\IMG\venta.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
