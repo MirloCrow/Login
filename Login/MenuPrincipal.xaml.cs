@@ -48,5 +48,15 @@ namespace LoginApp
         {
             BtnShowHide.IsChecked = false;
         }
+
+        private void Minimizar(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Minimized;
+        }
+
+        private void Cerrar(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
     }
 }

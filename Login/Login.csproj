@@ -14,13 +14,11 @@
     <None Remove="SCS\IMG\menu.png" />
     <None Remove="SCS\IMG\micuenta.png" />
     <None Remove="SCS\IMG\minimizar.png" />
+    <None Remove="SCS\IMG\productos.png" />
+    <None Remove="SCS\IMG\proveedor.png" />
+    <None Remove="SCS\IMG\side-bar.png" />
+    <None Remove="SCS\IMG\venta.png" />
     <None Remove="usuarios.db" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="SCS\IMG\cerrar.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
   </ItemGroup>
 
   <ItemGroup>
@@ -31,11 +29,15 @@
 
   <ItemGroup>
     <PackageReference Include="MahApps.Metro" Version="2.4.10" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.119" />
   </ItemGroup>
 
   <ItemGroup>
     <Resource Include="SCS\IMG\about.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="SCS\IMG\cerrar.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="SCS\IMG\menu.png">
@@ -47,6 +49,25 @@
     <Resource Include="SCS\IMG\minimizar.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="SCS\IMG\productos.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="SCS\IMG\proveedor.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="SCS\IMG\side-bar.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="SCS\IMG\venta.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resources\Icons\" />
+    <Folder Include="Resources\Images\" />
+    <Folder Include="ViewModel\" />
+    <Folder Include="View\" />
   </ItemGroup>
 
 </Project>
