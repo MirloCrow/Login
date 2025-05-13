@@ -2,11 +2,11 @@
 using Login.Data;
 using Login.Model;
 
-namespace LoginApp
+namespace Login
 {
-    public partial class Login : Window
+    public partial class LoginView : Window
     {
-        public Login()
+        public LoginView()
         {
             InitializeComponent();
         }
@@ -16,11 +16,11 @@ namespace LoginApp
             string usuario = txtUsuario.Text;
             string password = txtPassword.Password;
 
-            var usuarioValido = UsuarioDAO.ValidarLogin(usuario, password);
+            var usuarioValido = UsuarioDAO.ObtenerPorCredenciales(usuario, password);
 
             if (usuarioValido != null && usuarioValido.Rol == "admin")
             {
-                var menu = new MenuPrincipal(); // asegúrate de tener esta ventana
+                var menu = new MenuPrincipal();
                 menu.Show();
                 this.Close();
             }
@@ -28,6 +28,7 @@ namespace LoginApp
             {
                 lblMensaje.Text = "Credenciales incorrectas.";
             }
+
         }
     }
 }

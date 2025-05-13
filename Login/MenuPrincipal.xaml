@@ -1,337 +1,151 @@
-﻿<Window x:Class="LoginApp.MenuPrincipal"
+﻿<Window x:Class="Login.MenuPrincipal"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:view="clr-namespace:Login.View"
+        xmlns:local="clr-namespace:Login"
+        xmlns:converters="clr-namespace:Login.Converters"
         Title="FERCO"
         Height="600"
         Width="1000"
         WindowStartupLocation="CenterScreen"
         WindowStyle="None"
         AllowsTransparency="True"
-        Background="{StaticResource PrimaryBackgroundBrush}">
-    <Window.Resources>
+        Background="Transparent">
 
+    <Window.Resources>
+        <Storyboard x:Key="ExpandSidebar">
+            <DoubleAnimation Storyboard.TargetName="GridMenu"
+                             Storyboard.TargetProperty="Width"
+                             To="200" Duration="0:0:0.3"/>
+        </Storyboard>
+        <Storyboard x:Key="CollapseSidebar">
+            <DoubleAnimation Storyboard.TargetName="GridMenu"
+                             Storyboard.TargetProperty="Width"
+                             To="75" Duration="0:0:0.3"/>
+        </Storyboard>
+        <converters:WidthToVisibilityConverter x:Key="WidthToVisibilityConverter"/>
+        <converters:WidthToMarginConverter x:Key="WidthToMarginConverter"/>
     </Window.Resources>
 
+    <Border CornerRadius="10" Background="{StaticResource PrimaryBackgroundBrush}">
+        <Grid Name="Principal" Background="Transparent">
 
-    <Border CornerRadius="10"
-            Background="{StaticResource PrimaryBackgroundBrush}">
-
-        <Grid Name="Principal"
-                  Background="Transparent">
-            <!--#REGION HEADER-->
-            <Grid Name="Header"
-      Height="35"
-      VerticalAlignment="Top"
-      Background="Transparent">
-
-                <Border CornerRadius="10,10,0,0"
-            Background="{StaticResource AccentBrush}"/>
-
+            <!-- HEADER -->
+            <Grid Name="Header" Height="35" VerticalAlignment="Top" Background="Transparent">
+                <Border CornerRadius="10,10,0,0" Background="{StaticResource AccentBrush}"/>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Título + botones Mi Cuenta / Acerca de -->
-                    <StackPanel Orientation="Horizontal"
-                    VerticalAlignment="Center"
-                    Margin="10,0,0,0"
-                    HorizontalAlignment="Left">
-
-                        <!-- Título -->
-                        <TextBlock Text="FERCO"
-                       FontSize="15"
-                       Foreground="{StaticResource PrimaryTextBrush}"
-                       VerticalAlignment="Center"
-                       Margin="0,0,20,0"/>
-
-                        <!-- Mi Cuenta -->
-                        <Button Style="{StaticResource BTNHEADERSTYLE}" x:Name="BtnCuenta"
-                    Background="Transparent"
-                    BorderBrush="Transparent"
-                    FontSize="15"
-                    Foreground="{StaticResource PrimaryTextBrush}"
-                    Cursor="Hand"
-                    VerticalAlignment="Center"
-                    Margin="0,0,10,0">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock FontFamily="Segoe MDL2 Assets"
-                                           Text=""
-                                           FontSize="16"
-                                           VerticalAlignment="Center"/> 
-                                <TextBlock Text="Mi Cuenta"
-                               Foreground="{StaticResource PrimaryTextBrush}"
-                               Margin="5,0,0,0"
-                               VerticalAlignment="Center"/>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0" HorizontalAlignment="Left">
+                        <TextBlock Text="FERCO" FontSize="15" Foreground="{StaticResource PrimaryTextBrush}" VerticalAlignment="Center" Margin="0,0,20,0"/>
+                        <Button x:Name="BtnCuenta" Style="{StaticResource BTNHEADERSTYLE}" Background="Transparent" BorderBrush="Transparent" FontSize="15" Foreground="{StaticResource PrimaryTextBrush}" Cursor="Hand" VerticalAlignment="Center" Margin="0,0,10,0">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="16"/>
+                                <TextBlock Text="Mi Cuenta" Margin="5,0,0,0"/>
                             </StackPanel>
                         </Button>
-
-                        <!-- Acerca de -->
-                        <Button Style="{StaticResource BTNHEADERSTYLE}" x:Name="BtnInfo"
-                    Background="Transparent"
-                    BorderBrush="Transparent"
-                    FontSize="15"
-                    Foreground="{StaticResource PrimaryTextBrush}"
-                    Cursor="Hand"
-                    VerticalAlignment="Center"
-                    Margin="0,0,10,0">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock FontFamily="Segoe MDL2 Assets"
-                                           Text=""
-                                           FontSize="16"
-                                           VerticalAlignment="Center"/>
-                                <TextBlock Text="Acerca de"
-                                           Foreground="{StaticResource PrimaryTextBrush}"
-                                           Margin="5,0,0,0"
-                                           VerticalAlignment="Center"/>
+                        <Button x:Name="BtnInfo" Style="{StaticResource BTNHEADERSTYLE}" Background="Transparent" BorderBrush="Transparent" FontSize="15" Foreground="{StaticResource PrimaryTextBrush}" Cursor="Hand" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="16"/>
+                                <TextBlock Text="Acerca de" Margin="5,0,0,0"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
 
-                    <!-- Botones minimizar y cerrar -->
-                    <Grid Grid.Column="1"
-              HorizontalAlignment="Right"
-              VerticalAlignment="Top"
-              Margin="0,5,5,0">
+                    <Grid Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,5,5,0">
                         <StackPanel Orientation="Horizontal">
-                            <Button Style="{StaticResource WindowControlButtonStyle}"
-                        Click="Minimizar"
-                        ToolTip="Minimizar"
-                        Margin="0,0,5,0">
+                            <Button Style="{StaticResource WindowControlButtonStyle}" Click="Minimizar" ToolTip="Minimizar" Margin="0,0,5,0">
                                 <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="14"/>
                             </Button>
-                            <Button Style="{StaticResource WindowControlButtonStyle}"
-                        Click="Cerrar"
-                        ToolTip="Cerrar">
+                            <Button Style="{StaticResource WindowControlButtonStyle}" Click="Cerrar" ToolTip="Cerrar">
                                 <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="14"/>
                             </Button>
                         </StackPanel>
                     </Grid>
                 </Grid>
             </Grid>
-            <!--#ENDREGION -->
-            <!--#region CONTENIDO-->
-            <Grid x:Name="GridContent"
-       Background="Transparent"
-       VerticalAlignment="Bottom"
-       HorizontalAlignment="Right"
-       Height="565"
-       Width="925" PreviewMouseLeftButtonDown="PreviewMouseLeftButtomDownBG">
-                <Border CornerRadius="0,0,0,10"
-             Background="{StaticResource SecondaryBackgroundBrush}"
-                        Padding="20"/>
-                <TextBlock Text="TallerFERCO"
-                           Foreground="{StaticResource PrimaryTextBrush}"
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Center"
-                           FontSize="50"/>
 
-
-            </Grid>
-            <!--#endregion-->
-            <!--#REGION SIDEBAR-->
-            <Grid x:Name="GridMenu"
-                  Background="Transparent"
-                  Width="75"
-                  HorizontalAlignment="Left"
-                  Margin="0,35,0,0">
-                <!--#region Menu-->
-                <Border Background="{StaticResource AccentBrush}"
-                        CornerRadius="0,0,0,10"/>
-
-
-                <!--#region Menu-->
-                <StackPanel Background="Transparent"
-                            VerticalAlignment="Top">
-                    <!--#region sHOW/HIDE-->
-                    <Grid Background="Transparent"
-                          VerticalAlignment="Top"
-                          HorizontalAlignment="Right"
-                          Margin="0,10,10,0">
-                        <ToggleButton Style="{StaticResource BtnShowHide}" x:Name="BtnShowHide"
-                                      Width="30"
-                                      Height="30"
-                                      BorderBrush="Transparent" 
-                                      Checked="TBShow" 
-                                      Unchecked="TBHide"
-                                      Cursor="Hand">
-                            <ToggleButton.Background>
-                                <ImageBrush ImageSource="/SCS/IMG/side-bar.png"/>
-                            </ToggleButton.Background>
+            <!-- SIDEBAR -->
+            <Grid x:Name="GridMenu" Background="Transparent" Width="75" HorizontalAlignment="Left" Margin="0,35,0,0">
+                <Border Background="{StaticResource AccentBrush}" CornerRadius="0,0,0,10"/>
+                <StackPanel Background="Transparent" VerticalAlignment="Top">
+                    <Grid Background="Transparent" VerticalAlignment="Top" Margin="0,10,10,0" HorizontalAlignment="Right">
+                        <ToggleButton x:Name="BtnShowHide" Width="30" Height="30" Cursor="Hand"
+                                      Style="{StaticResource BtnShowHide}"
+                                      Checked="BtnShowHide_Checked" Unchecked="BtnShowHide_Unchecked"
+                                      BorderBrush="Transparent">
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             <ToggleButton.Triggers>
-                                <!--#region HIDE-->
                                 <EventTrigger RoutedEvent="ToggleButton.Unchecked">
-                                    <BeginStoryboard>
-                                        <Storyboard x:Name="HidePanel">
-                                            <DoubleAnimation Storyboard.TargetName="GridMenu"
-                                                             Storyboard.TargetProperty="Width"
-                                                             BeginTime="0:0:0"
-                                                             From="200" To=" 75"
-                                                             Duration="0:0:0:0.5"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-
-
+                                    <BeginStoryboard Storyboard="{StaticResource CollapseSidebar}"/>
                                 </EventTrigger>
-
-                                <!--#endregion-->
-                                <!--#region SHOW-->
                                 <EventTrigger RoutedEvent="ToggleButton.Checked">
-                                    <BeginStoryboard>
-                                        <Storyboard x:Name="ShowPanel">
-                                            <DoubleAnimation Storyboard.TargetName="GridMenu"
-                                                             Storyboard.TargetProperty="Width"
-                                                             BeginTime="0:0:0"
-                                                            From="75" To=" 200"
-                                                            Duration="0:0:0:0.5"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-
-
+                                    <BeginStoryboard Storyboard="{StaticResource ExpandSidebar}"/>
                                 </EventTrigger>
-                                <!--#endregion-->
                             </ToggleButton.Triggers>
-
                         </ToggleButton>
-
                     </Grid>
-                    <!--#endregion-->
-                    <!--#region LISTA-->
-                    <ListView Background="Transparent"
-                              BorderBrush="Transparent"
-                              Margin="0,30,0,0"
-                              ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                        <!--#region INICIO-->
+
+                    <ListView Background="Transparent" BorderBrush="Transparent" Margin="0,30,0,0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                         <ListViewItem Style="{StaticResource ListViewStyle}" Height="70">
-                            <Button Style="{StaticResource BtnListaStyle}" x:Name="BtnInicio"
-                                    Height="70"
-                                    Width="200"
-                                    HorizontalAlignment="Left"
-                                    Cursor="Hand"
-                                    Background="Transparent"
-                                    BorderBrush="Transparent">
-                                <Grid Width="200">
+                            <Button x:Name="BtnInicio" Style="{StaticResource BtnListaStyle}" Height="70" Click="BtnInicio_Click">
+                                <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="60"/>
-                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <Image Width="50"
-                                           Grid.Column="0"
-                                           HorizontalAlignment="Center"
-                                           Source="/SCS/IMG/menu.png"/>
-                                    <TextBlock Grid.Column="1"
-                                               Text="Inicio"
-                                               Foreground="{StaticResource PrimaryTextBrush}"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"
-                                               FontSize="15"
-                                               FontWeight="SemiBold"/>
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="20" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1" Text="Inicio" Foreground="{StaticResource PrimaryTextBrush}" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold" Margin="5,0,0,0" Visibility="{Binding ElementName=GridMenu, Path=Width, Converter={StaticResource WidthToVisibilityConverter}, ConverterParameter=100}"/>
                                 </Grid>
                             </Button>
                         </ListViewItem>
-                        <!--#endregion-->
-                        <!--#region  POS-->
                         <ListViewItem Style="{StaticResource ListViewStyle}" Height="70">
-                            <Button Style="{StaticResource BtnListaStyle}" x:Name="BtnPOS"
-                                    Height="70"
-                                    Width="200"
-                                    HorizontalAlignment="Left"
-                                    Cursor="Hand"
-                                    Background="Transparent"
-                                    BorderBrush="Transparent">
-                                <Grid Width="200">
+                            <Button x:Name="BtnProductos" Style="{StaticResource BtnListaStyle}" Height="70" Click="BtnInventario_Click">
+                                <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="60"/>
-                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <Image Width="50"
-                                            Grid.Column="0"
-                                            HorizontalAlignment="Center"
-                                            Source="/SCS/IMG/venta.png"/>
-                                    <TextBlock Grid.Column="1"
-                                                Text="Punto de Ventas"
-                                                Foreground="{StaticResource PrimaryTextBrush}"
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center"
-                                                FontSize="15"
-                                                FontWeight="SemiBold"/>
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="20" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1" Text="Inventario" Foreground="{StaticResource PrimaryTextBrush}" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold" Margin="5,0,0,0" Visibility="{Binding ElementName=GridMenu, Path=Width, Converter={StaticResource WidthToVisibilityConverter}, ConverterParameter=100}"/>
                                 </Grid>
                             </Button>
                         </ListViewItem>
-                        <!--#endregion-->
-                        <!--#region BtnProductos-->
                         <ListViewItem Style="{StaticResource ListViewStyle}" Height="70">
-                            <Button Style="{StaticResource BtnListaStyle}" x:Name="BtnProductos"
-                                    Height="70"
-                                    Width="200"
-                                    HorizontalAlignment="Left"
-                                    Cursor="Hand"
-                                    Background="Transparent"
-                                    BorderBrush="Transparent">
-                                <Grid Width="200">
+                            <Button x:Name="BtnPOS" Style="{StaticResource BtnListaStyle}" Height="70" Click="BtnPOS_Click">
+                                <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="60"/>
-                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <Image Width="50"
-                                            Grid.Column="0"
-                                            HorizontalAlignment="Center"
-                                            Source="/SCS/IMG/productos.png"/>
-                                    <TextBlock Grid.Column="1"
-                                                Text="Productos"
-                                                Foreground="{StaticResource PrimaryTextBrush}"
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center"
-                                                FontSize="15"
-                                                FontWeight="SemiBold"/>
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="20" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1" Text="Punto de Venta" Foreground="{StaticResource PrimaryTextBrush}" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold" Margin="5,0,0,0" Visibility="{Binding ElementName=GridMenu, Path=Width, Converter={StaticResource WidthToVisibilityConverter}, ConverterParameter=100}"/>
                                 </Grid>
                             </Button>
                         </ListViewItem>
-                        <!--#endregion-->
-                        <!--#region Proveedores-->
-                        <ListViewItem Style="{StaticResource ListViewStyle}" Height="70">
-                            <Button Style="{StaticResource BtnListaStyle}" x:Name="BtnProveedores"
-                                    Height="70"
-                                    Width="200"
-                                    HorizontalAlignment="Left"
-                                    Cursor="Hand"
-                                    Background="Transparent"
-                                    BorderBrush="Transparent">
-                                <Grid Width="200">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="60"/>
-                                        <ColumnDefinition/>
-                                    </Grid.ColumnDefinitions>
-                                    <Image Width="50"
-                                            Grid.Column="0"
-                                            HorizontalAlignment="Center"
-                                            Source="/SCS/IMG/proveedor.png"/>
-                                    <TextBlock Grid.Column="1"
-                                                Text="Proveedores"
-                                                Foreground="{StaticResource PrimaryTextBrush}"
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center"
-                                                FontSize="15"
-                                                FontWeight="SemiBold"/>
-                                </Grid>
-                            </Button>
-                        </ListViewItem>
-                        <!--#endregion-->
                     </ListView>
-                    <!--#endregion-->
-
-
                 </StackPanel>
-
-
-                <!--#endregion-->
-
             </Grid>
 
-
-            <!--ENDREGION-->
+            <!-- CONTENIDO DINÁMICO -->
+            <Grid x:Name="GridContent" Background="Transparent"
+                  VerticalAlignment="Bottom"
+                  HorizontalAlignment="Stretch"
+                  Height="565"
+                  Margin="{Binding ElementName=GridMenu, Path=Width, Converter={StaticResource WidthToMarginConverter}}"
+                  PreviewMouseLeftButtonDown="PreviewMouseLeftButtomDownBG">
+                <Border CornerRadius="0,0,10,0" Background="{StaticResource SecondaryBackgroundBrush}" Padding="20">
+                    <ContentControl x:Name="ContenidoPrincipal">
+                        <TextBlock Text="TallerFERCO" Foreground="{StaticResource PrimaryTextBrush}" FontSize="50" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    </ContentControl>
+                </Border>
+            </Grid>
 
         </Grid>
     </Border>
 </Window>
+
+

@@ -1,30 +1,31 @@
-﻿using Microsoft.Data.SqlClient;
-using Login.Model;
+﻿using Login.Model;
+using Microsoft.Data.SqlClient;
 
 namespace Login.Data
 {
-    public class UsuarioDAO
+    public static class UsuarioDAO
     {
-        public static Usuario ValidarLogin(string nombre, string contrasena)
+        public static Usuario? ObtenerPorCredenciales(string usuario, string contrasena)
         {
-            using var con = ConexionBD.ObtenerConexion();
-            var cmd = new SqlCommand("SELECT * FROM Usuario WHERE nombre_usuario = @nombre AND contrasena = @clave", con);
-            cmd.Parameters.AddWithValue("@nombre", nombre);
-            cmd.Parameters.AddWithValue("@clave", contrasena);
+            using SqlConnection conn = ConexionBD.ObtenerConexion();
+            string query = "SELECT nombre_usuario, contrasena, rol FROM Usuario WHERE nombre_usuario = @usuario AND contrasena = @contrasena";
 
-            using var reader = cmd.ExecuteReader();
+            using SqlCommand cmd = new(query, conn);
+            cmd.Parameters.AddWithValue("@usuario", usuario);
+            cmd.Parameters.AddWithValue("@contrasena", contrasena);
+
+            using SqlDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
             {
                 return new Usuario
                 {
-                    IdUsuario = (int)reader["id_usuario"],
-                    NombreUsuario = reader["nombre_usuario"].ToString(),
-                    Contrasena = reader["contrasena"].ToString(),
-                    Rol = reader["rol"].ToString()
+                    NombreUsuario = reader["nombre_usuario"].ToString() ?? "",
+                    Contrasena = reader["contrasena"].ToString() ?? "",
+                    Rol = reader["rol"].ToString() ?? ""
                 };
             }
-            return null;
+
+            return null; // ✅ válido ahora porque el tipo de retorno es Usuario?
         }
     }
 }
-

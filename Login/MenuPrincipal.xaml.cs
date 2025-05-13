@@ -4,8 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
+using Login.View;
+using Login;
 
-namespace LoginApp
+namespace Login
 {
     public partial class MenuPrincipal : Window
     {
@@ -16,21 +21,33 @@ namespace LoginApp
 
         private void BtnIrAVentas_Click(object sender, RoutedEventArgs e)
         {
-            VentanaVentas ventana = new VentanaVentas();
-            ventana.Show();
-            this.Close();
+            ContenidoPrincipal.Content = new VentasControl();
         }
 
         private void btnVentas_Click(object sender, RoutedEventArgs e)
         {
-            VentanaVentas ventana = new VentanaVentas();
-            ventana.Show();
-            this.Close();
+            ContenidoPrincipal.Content = new VentasControl();
         }
-
         private void TB(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void BtnInicio_Click(object sender, RoutedEventArgs e)
+        {
+            ContenidoPrincipal.Content = new TextBlock
+            {
+                Text = "TallerFERCO",
+                FontSize = 50,
+                Foreground = (Brush)FindResource("PrimaryTextBrush"),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+        }
+
+        private void BtnInventario_Click(object sender, RoutedEventArgs e)
+        {
+            ContenidoPrincipal.Content = new InventarioControl();
         }
 
         private void TBShow(object sender, RoutedEventArgs e)
@@ -49,6 +66,23 @@ namespace LoginApp
             BtnShowHide.IsChecked = false;
         }
 
+
+        private void BtnShowHide_Checked(object sender, RoutedEventArgs e)
+        {
+            var expand = (Storyboard)FindResource("ExpandSidebar");
+            expand.Begin();
+        }
+
+        private void BtnShowHide_Unchecked(object sender, RoutedEventArgs e)
+        {
+            var collapse = (Storyboard)FindResource("CollapseSidebar");
+            collapse.Begin();
+        }
+
+        private void BtnPOS_Click(object sender, RoutedEventArgs e)
+        {
+            ContenidoPrincipal.Content = new VentasControl();
+        }
         private void Minimizar(object sender, RoutedEventArgs e)
         {
             this.WindowState = WindowState.Minimized;

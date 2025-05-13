@@ -1,0 +1,81 @@
+﻿<Window x:Class="Login.LoginView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="FERCO"
+        Height="500"
+        Width="350"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent">
+
+    <Border CornerRadius="10" Background="Transparent">
+        <Grid>
+            <!-- Encabezado -->
+            <Grid Height="35" VerticalAlignment="Top" Background="Transparent">
+                <Border CornerRadius="10,10,0,0" Background="{StaticResource AccentBrush}"/>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0">
+                    <TextBlock Text="FERCO"
+                               FontSize="16"
+                               Foreground="{StaticResource PrimaryTextBrush}"
+                               FontWeight="Bold"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Cuerpo principal -->
+            <Border Background="{StaticResource SecondaryBackgroundBrush}" CornerRadius="0,0,10,10" Padding="20" Margin="0,35,0,0">
+                <StackPanel VerticalAlignment="Center">
+
+                    <TextBlock Text="Iniciar Sesión"
+                               FontSize="24"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource PrimaryTextBrush}"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,20"/>
+
+                    <!-- Usuario -->
+                    <StackPanel Margin="0,0,0,15">
+                        <TextBlock Text="Usuario" Foreground="{StaticResource PrimaryTextBrush}" FontSize="14"/>
+                        <TextBox x:Name="txtUsuario"
+                                 Height="30"
+                                 Background="Transparent"
+                                 Foreground="{StaticResource PrimaryTextBrush}"
+                                 BorderBrush="{StaticResource PrimaryTextBrush}"
+                                 BorderThickness="0,0,0,1"
+                                 FontSize="14"/>
+                    </StackPanel>
+
+                    <!-- Contraseña -->
+                    <StackPanel Margin="0,0,0,25">
+                        <TextBlock Text="Contraseña" Foreground="{StaticResource PrimaryTextBrush}" FontSize="14"/>
+                        <PasswordBox x:Name="txtPassword"
+                                     Height="30"
+                                     Background="Transparent"
+                                     Foreground="{StaticResource PrimaryTextBrush}"
+                                     BorderBrush="{StaticResource PrimaryTextBrush}"
+                                     BorderThickness="0,0,0,1"
+                                     FontSize="14"/>
+                    </StackPanel>
+
+                    <!-- Botón login -->
+                    <Button Content="Iniciar"
+                            Height="40"
+                            Background="{StaticResource AccentBrush}"
+                            Foreground="White"
+                            BorderThickness="0"
+                            FontWeight="Bold"
+                            FontFamily="Segoe UI"
+                            Cursor="Hand"
+                            Click="BtnLogin_Click"/>
+
+                    <TextBlock x:Name="lblMensaje"
+                               Foreground="OrangeRed"
+                               FontSize="12"
+                               Margin="0,15,0,0"
+                               TextAlignment="Center"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
+</Window>
+
