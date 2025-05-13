@@ -1,78 +1,130 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Data;
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.Data.SqlClient;
+using Login.Data;
 
 namespace LoginApp
 {
     public partial class VentanaVentas : Window
     {
-        public class Producto
-        {
-            public string Nombre { get; set; }
-            public double Precio { get; set; }
-            public int Stock { get; set; }
-
-            public override string ToString() => $"{Nombre} - Stock: {Stock}";
-        }
-
-        private List<Producto> productos = new();
-
         public VentanaVentas()
         {
             InitializeComponent();
-            InicializarProductos();
-            ActualizarListas();
+            CargarProductos();
+            CargarStock();
         }
 
-        private void InicializarProductos()
+        private void CargarProductos()
         {
-            productos.Add(new Producto { Nombre = "Cámara de aire", Precio = 3000, Stock = 20 });
-            productos.Add(new Producto { Nombre = "Pastillas de freno", Precio = 5000, Stock = 15 });
-            productos.Add(new Producto { Nombre = "Lubricante", Precio = 2500, Stock = 10 });
-            productos.Add(new Producto { Nombre = "Cadena 6v", Precio = 8000, Stock = 8 });
+            try
+            {
+                using (SqlConnection conexion = ConexionBD.ObtenerConexion())
+                {
+                    string query = "SELECT id_producto, nombre_producto FROM Producto";
+                    SqlCommand comando = new SqlCommand(query, conexion);
+                    SqlDataReader lector = comando.ExecuteReader();
 
-            cmbProducto.ItemsSource = productos;
-            cmbProducto.DisplayMemberPath = "Nombre";
-        }
+                    while (lector.Read())
+                    {
+                        cmbProducto.Items.Add(new
+                        {
+                            Id = lector["id_producto"],
+                            Nombre = lector["nombre_producto"].ToString()
+                        });
+                    }
 
-        private void ActualizarListas()
-        {
-            lstStock.Items.Clear();
-            foreach (var p in productos)
-                lstStock.Items.Add(p.ToString());
+                    cmbProducto.DisplayMemberPath = "Nombre";
+                    cmbProducto.SelectedValuePath = "Id";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al cargar productos: " + ex.Message);
+            }
         }
 
         private void BtnRegistrarVenta_Click(object sender, RoutedEventArgs e)
         {
-            if (cmbProducto.SelectedItem is Producto productoSeleccionado)
+            if (cmbProducto.SelectedItem == null || string.IsNullOrWhiteSpace(txtCantidad.Text))
             {
-                if (int.TryParse(txtCantidad.Text, out int cantidad))
+                lblMensaje.Text = "Seleccione un producto y cantidad válida.";
+                return;
+            }
+
+            if (!int.TryParse(txtCantidad.Text, out int cantidad) || cantidad <= 0)
+            {
+                lblMensaje.Text = "Cantidad no válida.";
+                return;
+            }
+
+            int idProducto = (int)cmbProducto.SelectedValue;
+
+            try
+            {
+                using (SqlConnection conexion = ConexionBD.ObtenerConexion())
                 {
-                    if (cantidad > 0 && cantidad <= productoSeleccionado.Stock)
+                    // Primero, verificar stock actual
+                    string consultaStock = "SELECT stock_producto FROM Producto WHERE id_producto = @id";
+                    SqlCommand cmdVerificar = new SqlCommand(consultaStock, conexion);
+                    cmdVerificar.Parameters.AddWithValue("@id", idProducto);
+                    int stockActual = Convert.ToInt32(cmdVerificar.ExecuteScalar());
+
+                    if (cantidad > stockActual)
                     {
-                        productoSeleccionado.Stock -= cantidad;
-                        lstVentas.Items.Add($"Vendiste {cantidad} x {productoSeleccionado.Nombre} - Total: ${productoSeleccionado.Precio * cantidad}");
-                        lblMensaje.Text = "Venta registrada correctamente.";
-                        lblMensaje.Foreground = System.Windows.Media.Brushes.LightGreen;
-                        ActualizarListas();
+                        lblMensaje.Text = $"Stock insuficiente. Stock disponible: {stockActual}";
+                        return;
+                    }
+
+                    // Restar stock
+                    string updateStock = "UPDATE Producto SET stock_producto = stock_producto - @cantidad WHERE id_producto = @id";
+                    SqlCommand cmdStock = new SqlCommand(updateStock, conexion);
+                    cmdStock.Parameters.AddWithValue("@cantidad", cantidad);
+                    cmdStock.Parameters.AddWithValue("@id", idProducto);
+                    int filasAfectadas = cmdStock.ExecuteNonQuery();
+
+                    if (filasAfectadas > 0)
+                    {
+                        lstVentas.Items.Add($"Venta: Producto #{idProducto}, Cantidad: {cantidad}");
+                        lblMensaje.Text = "Venta registrada exitosamente.";
+                        CargarStock(); // actualiza la lista de stock
+                        txtCantidad.Clear();
+                        cmbProducto.SelectedIndex = -1;
                     }
                     else
                     {
-                        lblMensaje.Text = "Cantidad inválida o mayor al stock disponible.";
-                        lblMensaje.Foreground = System.Windows.Media.Brushes.Salmon;
+                        lblMensaje.Text = "No se pudo registrar la venta.";
                     }
                 }
-                else
+            }
+            catch (Exception ex)
+            {
+                lblMensaje.Text = "Error: " + ex.Message;
+            }
+        }
+
+        private void CargarStock()
+        {
+            lstStock.Items.Clear();
+
+            try
+            {
+                using (SqlConnection conexion = ConexionBD.ObtenerConexion())
                 {
-                    lblMensaje.Text = "Ingrese un número válido.";
-                    lblMensaje.Foreground = System.Windows.Media.Brushes.Salmon;
+                    string query = "SELECT nombre_producto, stock_producto FROM Producto";
+                    SqlCommand comando = new SqlCommand(query, conexion);
+                    SqlDataReader lector = comando.ExecuteReader();
+
+                    while (lector.Read())
+                    {
+                        lstStock.Items.Add($"{lector["nombre_producto"]}: {lector["stock_producto"]} unidades");
+                    }
                 }
             }
-            else
+            catch (Exception ex)
             {
-                lblMensaje.Text = "Seleccione un producto.";
-                lblMensaje.Foreground = System.Windows.Media.Brushes.Salmon;
+                MessageBox.Show("Error al cargar stock: " + ex.Message);
             }
         }
     }

@@ -239,7 +239,8 @@
                                     HorizontalAlignment="Left"
                                     Cursor="Hand"
                                     Background="Transparent"
-                                    BorderBrush="Transparent">
+                                    BorderBrush="Transparent"
+                                    Click="BtnPOS_Click">
                                 <Grid Width="200">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="60"/>
