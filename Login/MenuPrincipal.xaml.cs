@@ -58,5 +58,13 @@ namespace LoginApp
         {
             Close();
         }
+
+
+        private void BtnPOS_Click(object sender, RoutedEventArgs e)
+        {
+            VentanaVentas ventanaVentas = new VentanaVentas();
+            ventanaVentas.ShowDialog();
+        }
     }
 }
+
