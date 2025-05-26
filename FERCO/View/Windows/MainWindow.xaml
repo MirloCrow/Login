@@ -90,6 +90,7 @@
                     </Grid>
 
                     <ListView Background="Transparent" BorderBrush="Transparent" Margin="0,30,0,0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <!-- INICIO -->
                         <ListViewItem Style="{StaticResource ListViewStyle}" Height="70">
                             <Button x:Name="BtnInicio" Style="{StaticResource BtnListaStyle}" Height="70" Click="BtnInicio_Click">
                                 <Grid>
@@ -102,6 +103,8 @@
                                 </Grid>
                             </Button>
                         </ListViewItem>
+
+                        <!-- PRODUCTOS -->
                         <ListViewItem Style="{StaticResource ListViewStyle}" Height="70">
                             <Button x:Name="BtnProductos" Style="{StaticResource BtnListaStyle}" Height="70" Click="BtnProducto_Click">
                                 <Grid>
@@ -110,10 +113,12 @@
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="20" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                    <TextBlock Grid.Column="1" Text="Inventario" Foreground="{StaticResource PrimaryTextBrush}" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold" Margin="5,0,0,0" Visibility="{Binding ElementName=GridMenu, Path=Width, Converter={StaticResource WidthToVisibilityConverter}, ConverterParameter=100}"/>
+                                    <TextBlock Grid.Column="1" Text="Productos" Foreground="{StaticResource PrimaryTextBrush}" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold" Margin="5,0,0,0" Visibility="{Binding ElementName=GridMenu, Path=Width, Converter={StaticResource WidthToVisibilityConverter}, ConverterParameter=100}"/>
                                 </Grid>
                             </Button>
                         </ListViewItem>
+
+                        <!-- PUNTO DE VENTA -->
                         <ListViewItem Style="{StaticResource ListViewStyle}" Height="70">
                             <Button x:Name="BtnPOS" Style="{StaticResource BtnListaStyle}" Height="70" Click="BtnPOS_Click">
                                 <Grid>
@@ -123,6 +128,34 @@
                                     </Grid.ColumnDefinitions>
                                     <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="20" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     <TextBlock Grid.Column="1" Text="Punto de Venta" Foreground="{StaticResource PrimaryTextBrush}" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold" Margin="5,0,0,0" Visibility="{Binding ElementName=GridMenu, Path=Width, Converter={StaticResource WidthToVisibilityConverter}, ConverterParameter=100}"/>
+                                </Grid>
+                            </Button>
+                        </ListViewItem>
+
+                        <!-- INVENTARIO -->
+                        <ListViewItem Style="{StaticResource ListViewStyle}" Height="70">
+                            <Button x:Name="BtnInventario" Style="{StaticResource BtnListaStyle}" Height="70" Click="BtnInventario_Click">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="60"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="20" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1" Text="Inventario" Foreground="{StaticResource PrimaryTextBrush}" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold" Margin="5,0,0,0" Visibility="{Binding ElementName=GridMenu, Path=Width, Converter={StaticResource WidthToVisibilityConverter}, ConverterParameter=100}"/>
+                                </Grid>
+                            </Button>
+                        </ListViewItem>
+
+                        <!-- PROVEEDORES -->
+                        <ListViewItem Style="{StaticResource ListViewStyle}" Height="70">
+                            <Button x:Name="BtnProveedores" Style="{StaticResource BtnListaStyle}" Height="70" Click="BtnProveedores_Click">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="60"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="20" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1" Text="Proveedores" Foreground="{StaticResource PrimaryTextBrush}" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold" Margin="5,0,0,0" Visibility="{Binding ElementName=GridMenu, Path=Width, Converter={StaticResource WidthToVisibilityConverter}, ConverterParameter=100}"/>
                                 </Grid>
                             </Button>
                         </ListViewItem>

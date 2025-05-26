@@ -19,15 +19,6 @@ namespace FERCO
             InitializeComponent();
         }
 
-        private void BtnIrAVentas_Click(object sender, RoutedEventArgs e)
-        {
-            ContenidoPrincipal.Content = new VentaControl();
-        }
-
-        private void BtnVentas_Click(object sender, RoutedEventArgs e)
-        {
-            ContenidoPrincipal.Content = new VentaControl();
-        }
         private void TB(object sender, RoutedEventArgs e)
         {
 
@@ -48,6 +39,20 @@ namespace FERCO
         private void BtnProducto_Click(object sender, RoutedEventArgs e)
         {
             ContenidoPrincipal.Content = new ProductoControl();
+        }
+        private void BtnInventario_Click(object sender, RoutedEventArgs e)
+        {
+            ContenidoPrincipal.Content = new InventarioControl();
+        }
+
+        private void BtnProveedores_Click(object sender, RoutedEventArgs e)
+        {
+            ContenidoPrincipal.Content = new ProveedorControl();
+        }
+
+        private void BtnPOS_Click(object sender, RoutedEventArgs e)
+        {
+            ContenidoPrincipal.Content = new VentaControl();
         }
 
         private void TBShow(object sender, RoutedEventArgs e)
@@ -79,10 +84,6 @@ namespace FERCO
             collapse.Begin();
         }
 
-        private void BtnPOS_Click(object sender, RoutedEventArgs e)
-        {
-            ContenidoPrincipal.Content = new VentaControl();
-        }
         private void Minimizar(object sender, RoutedEventArgs e)
         {
             this.WindowState = WindowState.Minimized;
