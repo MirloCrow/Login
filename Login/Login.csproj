@@ -64,4 +64,10 @@
     <Folder Include="ViewModel\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="View\CategoriaDialog.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
 </Project>

@@ -2,15 +2,13 @@
 
 namespace Login.Data
 {
-    public class ConexionBD
+    public static class ConexionBD
     {
         private static string cadena = ConexionLocal.ObtenerCadenaConexion();
 
         public static SqlConnection ObtenerConexion()
         {
-            SqlConnection conexion = new SqlConnection(cadena);
-            conexion.Open();
-            return conexion;
+            return new SqlConnection(cadena);
         }
     }
 }

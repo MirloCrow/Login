@@ -8,6 +8,8 @@ namespace Login.Data
         public static Usuario? ObtenerPorCredenciales(string usuario, string contrasena)
         {
             using SqlConnection conn = ConexionBD.ObtenerConexion();
+            conn.Open();
+
             string query = "SELECT nombre_usuario, contrasena, rol FROM Usuario WHERE nombre_usuario = @usuario AND contrasena = @contrasena";
 
             using SqlCommand cmd = new(query, conn);
@@ -25,7 +27,7 @@ namespace Login.Data
                 };
             }
 
-            return null; // ✅ válido ahora porque el tipo de retorno es Usuario?
+            return null;
         }
     }
 }

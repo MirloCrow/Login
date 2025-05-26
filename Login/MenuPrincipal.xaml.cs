@@ -45,9 +45,9 @@ namespace Login
             };
         }
 
-        private void BtnInventario_Click(object sender, RoutedEventArgs e)
+        private void BtnProducto_Click(object sender, RoutedEventArgs e)
         {
-            ContenidoPrincipal.Content = new InventarioControl();
+            ContenidoPrincipal.Content = new ProductoControl();
         }
 
         private void TBShow(object sender, RoutedEventArgs e)

@@ -9,6 +9,7 @@ namespace Login.Data
         public static int RegistrarVenta(Venta venta)
         {
             using SqlConnection conn = ConexionBD.ObtenerConexion();
+            conn.Open();
             string query = "INSERT INTO Ventas (id_cliente, fecha_venta, total_venta) OUTPUT INSERTED.id_venta VALUES (@cliente, @fecha, @total)";
             using SqlCommand cmd = new(query, conn);
             cmd.Parameters.AddWithValue("@cliente", venta.IdCliente);
@@ -21,6 +22,7 @@ namespace Login.Data
         public static void RegistrarDetalle(DetalleVenta detalle)
         {
             using SqlConnection conn = ConexionBD.ObtenerConexion();
+            conn.Open();
             string query = "INSERT INTO Detalle_Venta (id_venta, id_producto, precio_unitario, cantidad_detalle, subtotal_detalle) " +
                            "VALUES (@venta, @producto, @precio, @cantidad, @subtotal)";
             using SqlCommand cmd = new(query, conn);

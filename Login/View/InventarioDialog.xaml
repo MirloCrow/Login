@@ -1,0 +1,15 @@
+﻿<Window x:Class="Login.View.InventarioDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Nuevo inventario" Height="180" Width="300" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+    <StackPanel Margin="10">
+        <Label Content="ID Producto"/>
+        <TextBox x:Name="txtIdProducto" Margin="0,0,0,5"/>
+
+        <Label Content="Cantidad"/>
+        <TextBox x:Name="txtCantidad" Margin="0,0,0,10"/>
+
+        <Button Content="Guardar" Click="BtnGuardar_Click"/>
+    </StackPanel>
+
+</Window>

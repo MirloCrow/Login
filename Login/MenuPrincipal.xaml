@@ -103,7 +103,7 @@
                             </Button>
                         </ListViewItem>
                         <ListViewItem Style="{StaticResource ListViewStyle}" Height="70">
-                            <Button x:Name="BtnProductos" Style="{StaticResource BtnListaStyle}" Height="70" Click="BtnInventario_Click">
+                            <Button x:Name="BtnProductos" Style="{StaticResource BtnListaStyle}" Height="70" Click="BtnProducto_Click">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="60"/>
