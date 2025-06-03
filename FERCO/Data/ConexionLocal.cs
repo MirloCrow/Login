@@ -3,7 +3,7 @@
     public static class ConexionLocal
     {
         // En Servidor se debe poner la dirección local según el dispositivo
-        public static string Servidor = "R5\\SQLEXPRESS";
+        public static string Servidor = "localhost\\SQLEXPRESS";
         public static string BaseDatos = "test";
 
         public static string ObtenerCadenaConexion()
