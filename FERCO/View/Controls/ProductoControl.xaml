@@ -4,77 +4,104 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             d:DesignHeight="400" d:DesignWidth="600">
+             d:DesignHeight="600" d:DesignWidth="1000">
 
-    <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Vertical" Margin="0,0,0,10">
+            <!-- ZONA SUPERIOR: FORMULARIO + LISTA LADO A LADO -->
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
 
-            <!-- Nombre -->
-            <Label Content="Nombre del producto"/>
-            <TextBox x:Name="txtNombre" Width="300"/>
+                <!-- FORMULARIO -->
+                <GroupBox Header="Agregar / Editar Producto" Padding="10" Grid.Column="0" Margin="0,0,10,0">
+                    <StackPanel Orientation="Vertical">
+                        <Label Content="Nombre del producto"/>
+                        <TextBox x:Name="txtNombre" Width="300"/>
 
-            <!-- Descripción -->
-            <Label Content="Descripción"/>
-            <TextBox x:Name="txtDescripcion" Width="300"/>
+                        <Label Content="Descripción"/>
+                        <TextBox x:Name="txtDescripcion" Width="300"/>
 
-            <!-- Precio -->
-            <Label Content="Precio"/>
-            <TextBox x:Name="txtPrecio" Width="100"/>
+                        <Label Content="Precio"/>
+                        <TextBox x:Name="txtPrecio" Width="100"/>
 
-            <!-- Stock inicial -->
-            <Label Content="Stock inicial"/>
-            <TextBox x:Name="txtStock" Width="100"/>
+                        <Label Content="Stock inicial"/>
+                        <TextBox x:Name="txtStock" Width="100"/>
 
-            <!-- Categoría -->
-            <Label Content="Categoría"/>
-            <StackPanel Orientation="Horizontal">
-                <ComboBox x:Name="cmbCategoria" Width="200"/>
-                <Button Content="+" Width="30" Margin="5,0" Click="BtnAgregarCategoria_Click"/>
-                <Button Content="✎" Width="30" Margin="2,0" Click="BtnEditarCategoria_Click"/>
-                <Button Content="🗑" Width="30" Margin="2,0" Click="BtnEliminarCategoria_Click"/>
-            </StackPanel>
+                        <Label Content="Categoría"/>
+                        <StackPanel Orientation="Horizontal">
+                            <ComboBox x:Name="cmbCategoria" Width="200"/>
+                            <Button Content="+" Width="30" Margin="5,0" Click="BtnAgregarCategoria_Click"/>
+                            <Button Content="✎" Width="30" Margin="2,0" Click="BtnEditarCategoria_Click"/>
+                            <Button Content="🗑" Width="30" Margin="2,0" Click="BtnEliminarCategoria_Click"/>
+                        </StackPanel>
 
+                        <Label Content="Proveedor"/>
+                        <StackPanel Orientation="Horizontal">
+                            <ComboBox x:Name="cmbProveedor" Width="200"/>
+                            <Button Content="+" Width="30" Margin="5,0" Click="BtnAgregarProveedor_Click"/>
+                            <Button Content="✎" Width="30" Margin="2,0" Click="BtnEditarProveedor_Click"/>
+                            <Button Content="🗑" Width="30" Margin="2,0" Click="BtnEliminarProveedor_Click"/>
+                        </StackPanel>
 
-            <!-- Proveedor -->
-            <Label Content="Proveedor"/>
-            <StackPanel Orientation="Horizontal">
-                <ComboBox x:Name="cmbProveedor" Width="200"/>
-                <Button Content="+" Width="30" Margin="5,0" Click="BtnAgregarProveedor_Click"/>
-                <Button Content="✎" Width="30" Margin="2,0" Click="BtnEditarProveedor_Click"/>
-                <Button Content="🗑" Width="30" Margin="2,0" Click="BtnEliminarProveedor_Click"/>
-            </StackPanel>
+                        <Label Content="Inventario"/>
+                        <StackPanel Orientation="Horizontal">
+                            <ComboBox x:Name="cmbInventario" Width="200"/>
+                            <Button Content="+" Width="30" Margin="5,0" Click="BtnAgregarInventario_Click"/>
+                            <Button Content="✎" Width="30" Margin="2,0" Click="BtnEditarInventario_Click"/>
+                            <Button Content="🗑" Width="30" Margin="2,0" Click="BtnEliminarInventario_Click"/>
+                        </StackPanel>
 
-            <!-- Inventario -->
-            <Label Content="Inventario"/>
-            <StackPanel Orientation="Horizontal">
-                <ComboBox x:Name="cmbInventario" Width="200"/>
-                <Button Content="+" Width="30" Margin="5,0" Click="BtnAgregarInventario_Click"/>
-                <Button Content="✎" Width="30" Margin="2,0" Click="BtnEditarInventario_Click"/>
-                <Button Content="🗑" Width="30" Margin="2,0" Click="BtnEliminarInventario_Click"/>
-            </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,10">
+                            <Button Content="Agregar producto" Width="150" Margin="5" Click="BtnAgregarProducto_Click"/>
+                            <Button Content="Editar producto" Width="150" Margin="5" Click="BtnEditarProducto_Click"/>
+                            <Button Content="Eliminar producto" Width="150" Margin="5" Click="BtnEliminarProducto_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
 
+                <!-- LISTA DE PRODUCTOS AL LADO -->
+                <GroupBox Header="Productos actuales" Grid.Column="1" Padding="10">
+                    <DataGrid x:Name="dgProductos"
+                              AutoGenerateColumns="True"
+                              Height="400"
+                              SelectionChanged="DgProductos_SelectionChanged"/>
+                </GroupBox>
+            </Grid>
 
-            <!-- Botón agregar -->
-            <Button Content="Agregar producto" Width="150" Margin="0,10" Click="BtnAgregarProducto_Click"/>
+            <!-- FILTROS -->
+            <GroupBox Header="Filtrar productos" Grid.Row="1" Margin="0,10,0,0" Padding="10">
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Vertical" Margin="0,0,10,0">
+                        <Label Content="Por nombre"/>
+                        <TextBox x:Name="txtFiltroNombre" Width="150"/>
+                    </StackPanel>
 
-            <StackPanel Orientation="Horizontal" Margin="0,10">
-                <Button Content="Editar producto" Width="150" Margin="5" Click="BtnEditarProducto_Click"/>
-                <Button Content="Eliminar producto" Width="150" Margin="5" Click="BtnEliminarProducto_Click"/>
-            </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="0,0,10,0">
+                        <Label Content="Por categoría"/>
+                        <ComboBox x:Name="cmbFiltroCategoria" Width="150"
+                                  DisplayMemberPath="Nombre"
+                                  SelectedValuePath="IdCategoria"/>
+                    </StackPanel>
 
-        </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="0,0,10,0" VerticalAlignment="Bottom">
+                        <Button Content="Filtrar" Width="100" Click="BtnFiltrar_Click"/>
+                    </StackPanel>
 
-        <DataGrid x:Name="dgProductos"
-          Grid.Row="1"
-          AutoGenerateColumns="True"
-          SelectionChanged="DgProductos_SelectionChanged"/>
-
-    </Grid>
+                    <StackPanel Orientation="Vertical" Margin="0,0,0,0" VerticalAlignment="Bottom">
+                        <Button Content="Refrescar lista" Width="120" Click="BtnRefrescarProductos_Click"/>
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+        </Grid>
+    </ScrollViewer>
 
 </UserControl>
-

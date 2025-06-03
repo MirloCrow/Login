@@ -25,6 +25,7 @@ namespace FERCO.View
         {
             InitializeComponent();
             CargarCombos();
+            CargarProductos();
         }
 
         // LOADERS
@@ -41,6 +42,8 @@ namespace FERCO.View
             cmbInventario.ItemsSource = InventarioDAO.ObtenerInventario();
             cmbInventario.DisplayMemberPath = "Nombre";
             cmbInventario.SelectedValuePath = "IdInventario";
+
+            cmbFiltroCategoria.ItemsSource = CategoriaDAO.ObtenerTodas();
         }
 
         private void CargarProductos()
@@ -289,6 +292,29 @@ namespace FERCO.View
                     MessageBox.Show("Error al eliminar el producto.");
                 }
             }
+        }
+
+        private void BtnRefrescarProductos_Click(object sender, RoutedEventArgs e)
+        {
+            CargarProductos();
+            txtFiltroNombre.Clear();
+            cmbFiltroCategoria.SelectedIndex = -1;
+        }
+
+        private void BtnFiltrar_Click(object sender, RoutedEventArgs e)
+        {
+            string filtroNombre = txtFiltroNombre.Text.Trim().ToLower();
+            int? idCategoria = cmbFiltroCategoria.SelectedItem is Categoria cat ? cat.IdCategoria : (int?)null;
+
+            var productos = ProductoDAO.ObtenerTodos();
+
+            if (!string.IsNullOrWhiteSpace(filtroNombre))
+                productos = [.. productos.Where(p => p.NombreProducto.Contains(filtroNombre, StringComparison.CurrentCultureIgnoreCase))];
+
+            if (idCategoria.HasValue)
+                productos = [.. productos.Where(p => p.IdCategoria == idCategoria.Value)];
+
+            dgProductos.ItemsSource = productos;
         }
 
         // CRUD INVENTARIO

@@ -39,7 +39,7 @@ namespace FERCO.View
         {
             if (int.TryParse(txtTelefono.Text, out int telefono))
             {
-                Proveedor proveedor = new Proveedor
+                Proveedor proveedor = new()
                 {
                     Nombre = txtNombre.Text.Trim(),
                     Email = txtEmail.Text.Trim(),
@@ -138,6 +138,7 @@ namespace FERCO.View
         public ProveedorControl()
         {
             InitializeComponent();
+            CargarProveedores();
         }
 
     }
