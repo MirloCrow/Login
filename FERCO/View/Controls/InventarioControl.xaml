@@ -9,33 +9,47 @@
              Background="{StaticResource AccentBrush}">
 
     <Grid Margin="10">
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,10" VerticalAlignment="Top">
-            <!-- ID Inventario -->
-            <StackPanel Margin="0,0,10,0">
-                <TextBlock Text="ID Inventario" Foreground="White" FontSize="12"/>
-                <TextBox x:Name="txtId" Width="100" Height="25"/>
-            </StackPanel>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-            <!-- ID Producto -->
-            <StackPanel Margin="0,0,10,0">
-                <TextBlock Text="ID Producto" Foreground="White" FontSize="12"/>
-                <TextBox x:Name="txtProducto" Width="100" Height="25"/>
-            </StackPanel>
+        <!-- Zona de entradas y botones -->
+        <StackPanel Orientation="Vertical" Margin="0,0,0,10">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
 
-            <!-- Cantidad -->
-            <StackPanel Margin="0,0,10,0">
-                <TextBlock Text="Cantidad" Foreground="White" FontSize="12"/>
-                <TextBox x:Name="txtCantidad" Width="100" Height="25"/>
+                <StackPanel Margin="5">
+                    <Label Content="ID Inventario"/>
+                    <TextBox x:Name="txtId" Width="120"/>
+                </StackPanel>
+
+                <StackPanel Margin="5">
+                    <Label Content="ID Producto"/>
+                    <TextBox x:Name="txtProducto" Width="120"/>
+                </StackPanel>
+
+                <StackPanel Margin="5">
+                    <Label Content="Cantidad"/>
+                    <TextBox x:Name="txtCantidad" Width="120"/>
+                </StackPanel>
             </StackPanel>
 
             <!-- Botones -->
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
-                <Button Content="Agregar" Width="80" Height="30" Margin="0,0,10,0" Click="BtnAgregar_Click"/>
-                <Button Content="Editar" Width="80" Height="30" Margin="0,0,10,0" Click="BtnEditar_Click"/>
-                <Button Content="Eliminar" Width="80" Height="30" Click="BtnEliminar_Click"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="5,10,0,0">
+                <Button Style="{StaticResource BTNHEADERSTYLE}" Content="Agregar" Click="BtnAgregar_Click" Margin="5"/>
+                <Button Style="{StaticResource BTNHEADERSTYLE}" Content="Editar" Click="BtnEditar_Click" Margin="5"/>
+                <Button Style="{StaticResource BTNHEADERSTYLE}" Content="Eliminar" Click="BtnEliminar_Click" Margin="5"/>
             </StackPanel>
         </StackPanel>
 
-        <DataGrid x:Name="dgInventario" AutoGenerateColumns="True" Height="300" />
+        <!-- DataGrid -->
+        <DataGrid x:Name="dgInventario"
+                  Grid.Row="1"
+                  AutoGenerateColumns="True"
+                  Foreground="Black"
+                  Background="White"
+                  FontWeight="SemiBold"
+                  RowBackground="White"
+                  AlternatingRowBackground="#F0F0F0"/>
     </Grid>
 </UserControl>

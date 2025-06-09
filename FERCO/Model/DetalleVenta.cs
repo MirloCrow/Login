@@ -8,5 +8,6 @@
         public int PrecioUnitario { get; set; }
         public int CantidadDetalle { get; set; }
         public int SubtotalDetalle { get; set; }
+        public string ProductoNombre { get; set; } = string.Empty;
     }
 }

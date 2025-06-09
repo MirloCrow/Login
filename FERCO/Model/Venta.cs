@@ -6,5 +6,6 @@
         public int IdCliente { get; set; }
         public DateTime FechaVenta { get; set; }
         public int TotalVenta { get; set; }
+        public string? ProductoNombre { get; set; }
     }
 }
