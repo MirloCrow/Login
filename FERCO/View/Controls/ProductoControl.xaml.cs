@@ -1,17 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using FERCO.Data;
 using FERCO.Model;
 
@@ -28,7 +19,6 @@ namespace FERCO.View
             CargarProductos();
         }
 
-        // LOADERS
         private void CargarCombos()
         {
             cmbProveedor.ItemsSource = ProveedorDAO.ObtenerTodos();
@@ -39,8 +29,8 @@ namespace FERCO.View
             cmbCategoria.DisplayMemberPath = "Nombre";
             cmbCategoria.SelectedValuePath = "IdCategoria";
 
-            cmbInventario.ItemsSource = InventarioDAO.ObtenerInventario();
-            cmbInventario.DisplayMemberPath = "Nombre";
+            cmbInventario.ItemsSource = InventarioDAO.ObtenerUbicacionesConProductos();
+            cmbInventario.DisplayMemberPath = "Descripcion";
             cmbInventario.SelectedValuePath = "IdInventario";
 
             cmbFiltroCategoria.ItemsSource = CategoriaDAO.ObtenerTodas();
@@ -48,7 +38,6 @@ namespace FERCO.View
 
         private void CargarProductos()
         {
-            dgProductos.ItemsSource = null;
             dgProductos.ItemsSource = ProductoDAO.ObtenerTodos();
         }
 
@@ -61,169 +50,46 @@ namespace FERCO.View
                 txtNombre.Text = productoSeleccionado.NombreProducto;
                 txtDescripcion.Text = productoSeleccionado.DescripcionProducto;
                 txtPrecio.Text = productoSeleccionado.PrecioProducto.ToString();
-                txtStock.Text = productoSeleccionado.StockProducto.ToString();
 
                 cmbCategoria.SelectedValue = productoSeleccionado.IdCategoria;
                 cmbProveedor.SelectedValue = productoSeleccionado.IdProveedor;
             }
         }
 
-        // CRUD CATEGORÍA
-        private void BtnAgregarCategoria_Click(object sender, RoutedEventArgs e)
-        {
-            var dialog = new CategoriaDialog
-            {
-                Owner = Window.GetWindow(this)
-            };
-
-            if (dialog.ShowDialog() == true && dialog.CategoriaEditada != null)
-            {
-                cmbCategoria.ItemsSource = CategoriaDAO.ObtenerTodas();
-                cmbCategoria.SelectedItem = dialog.CategoriaEditada;
-            }
-        }
-
-        private void BtnEditarCategoria_Click(object sender, RoutedEventArgs e)
-        {
-            if (cmbCategoria.SelectedItem is not Categoria categoria)
-            {
-                MessageBox.Show("Seleccione una categoría.");
-                return;
-            }
-
-            var dialog = new CategoriaDialog(categoria);
-            if (dialog.ShowDialog() == true)
-            {
-                cmbCategoria.ItemsSource = CategoriaDAO.ObtenerTodas();
-                cmbCategoria.SelectedItem = dialog.CategoriaEditada;
-            }
-        }
-
-        private void BtnEliminarCategoria_Click(object sender, RoutedEventArgs e)
-        {
-            if (cmbCategoria.SelectedItem is not Categoria categoria)
-            {
-                MessageBox.Show("Seleccione una categoría.");
-                return;
-            }
-
-            var confirmar = MessageBox.Show(
-                $"¿Eliminar categoría \"{categoria.Nombre}\"?",
-                "Confirmar",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning
-            );
-
-            if (confirmar == MessageBoxResult.Yes)
-            {
-                // Aquí debes implementar CategoriaDAO.Eliminar(id)
-                if (CategoriaDAO.Eliminar(categoria.IdCategoria))
-                {
-                    MessageBox.Show("Categoría eliminada.");
-                    cmbCategoria.ItemsSource = CategoriaDAO.ObtenerTodas();
-                }
-                else
-                {
-                    MessageBox.Show("No se pudo eliminar la categoría.");
-                }
-            }
-        }
-
-        // CRUD PROVEEDOR
-        private void BtnAgregarProveedor_Click(object sender, RoutedEventArgs e)
-        {
-            var dialog = new ProveedorDialog
-            {
-                Owner = Window.GetWindow(this)
-            };
-
-            if (dialog.ShowDialog() == true && dialog.ProveedorEditado != null)
-            {
-                cmbProveedor.ItemsSource = ProveedorDAO.ObtenerTodos();
-                cmbProveedor.SelectedItem = dialog.ProveedorEditado;
-            }
-        }
-
-        private void BtnEditarProveedor_Click(object sender, RoutedEventArgs e)
-        {
-            if (cmbProveedor.SelectedItem is not Proveedor proveedor)
-            {
-                MessageBox.Show("Seleccione un proveedor.");
-                return;
-            }
-
-            var dialog = new ProveedorDialog(proveedor);
-            if (dialog.ShowDialog() == true)
-            {
-                cmbProveedor.ItemsSource = ProveedorDAO.ObtenerTodos();
-                cmbProveedor.SelectedItem = dialog.ProveedorEditado;
-            }
-        }
-
-        private void BtnEliminarProveedor_Click(object sender, RoutedEventArgs e)
-        {
-            if (cmbProveedor.SelectedItem is not Proveedor proveedor)
-            {
-                MessageBox.Show("Seleccione un proveedor.");
-                return;
-            }
-
-            var confirmar = MessageBox.Show(
-                $"¿Eliminar proveedor \"{proveedor.Nombre}\"?",
-                "Confirmar",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning
-            );
-
-            if (confirmar == MessageBoxResult.Yes)
-            {
-                if (ProveedorDAO.Eliminar(proveedor.IdProveedor))
-                {
-                    MessageBox.Show("Proveedor eliminado.");
-                    cmbProveedor.ItemsSource = ProveedorDAO.ObtenerTodos();
-                }
-                else
-                {
-                    MessageBox.Show("No se pudo eliminar el proveedor.");
-                }
-            }
-        }
-
-        // CRUD PRODUCTO
         private void BtnAgregarProducto_Click(object sender, RoutedEventArgs e)
         {
-            if (int.TryParse(txtPrecio.Text, out int precio) &&
-                int.TryParse(txtStock.Text, out int stock) &&
-                cmbCategoria.SelectedItem is Categoria categoria &&
-                cmbProveedor.SelectedItem is Proveedor proveedor)
+            if (!ValidarDatosProducto(out int precio, out int stock, out Categoria categoria, out Proveedor proveedor, out UbicacionInventario ubicacion)) return;
+
+            Producto nuevo = new()
             {
-                Producto nuevo = new()
-                {
-                    NombreProducto = txtNombre.Text.Trim(),
-                    DescripcionProducto = txtDescripcion.Text.Trim(),
-                    PrecioProducto = precio,
-                    StockProducto = stock,
-                    IdCategoria = categoria.IdCategoria,
-                    IdProveedor = proveedor.IdProveedor
-                };
+                NombreProducto = txtNombre.Text.Trim(),
+                DescripcionProducto = txtDescripcion.Text.Trim(),
+                PrecioProducto = precio,
+                IdCategoria = categoria.IdCategoria,
+                IdProveedor = proveedor.IdProveedor
+            };
 
-                if (ProductoDAO.Agregar(nuevo))
-                {
-                    int idProducto = ProductoDAO.ObtenerUltimoId(); // o podrías devolverlo desde el INSERT
-                    InventarioDAO.Agregar(new Inventario { IdProducto = idProducto, CantidadProducto = stock });
+            if (ProductoDAO.Agregar(nuevo))
+            {
+                int idProducto = ProductoDAO.ObtenerUltimoId();
 
-                    MessageBox.Show("Producto agregado.");
-                    LimpiarCampos();
-                    CargarProductos();
-                }
-                else
+                if (!InventarioProductoDAO.Agregar(new InventarioProducto
                 {
-                    MessageBox.Show("Error al agregar producto.");
+                    IdInventario = ubicacion.IdInventario,
+                    IdProducto = idProducto,
+                    Cantidad = stock
+                }))
+                {
+                    MessageBox.Show("Error al asignar inventario al producto.");
                 }
+
+                MessageBox.Show("Producto agregado correctamente.");
+                LimpiarCampos();
+                CargarProductos();
             }
             else
             {
-                MessageBox.Show("Revisa los datos ingresados.");
+                MessageBox.Show("Error al agregar el producto.");
             }
         }
 
@@ -235,145 +101,188 @@ namespace FERCO.View
                 return;
             }
 
-            if (int.TryParse(txtPrecio.Text, out int precio) &&
-                int.TryParse(txtStock.Text, out int stock) &&
-                cmbCategoria.SelectedItem is Categoria categoria &&
-                cmbProveedor.SelectedItem is Proveedor proveedor)
-            {
-                productoSeleccionado.NombreProducto = txtNombre.Text.Trim();
-                productoSeleccionado.DescripcionProducto = txtDescripcion.Text.Trim();
-                productoSeleccionado.PrecioProducto = precio;
-                productoSeleccionado.StockProducto = stock;
-                productoSeleccionado.IdCategoria = categoria.IdCategoria;
-                productoSeleccionado.IdProveedor = proveedor.IdProveedor;
+            if (!ValidarDatosProducto(out int precio, out int stock, out Categoria categoria, out Proveedor proveedor, out UbicacionInventario ubicacion)) return;
 
-                if (ProductoDAO.Actualizar(productoSeleccionado))
-                {
-                    MessageBox.Show("Producto actualizado.");
-                    CargarProductos();
-                    LimpiarCampos();
-                }
-                else
-                {
-                    MessageBox.Show("Error al actualizar el producto.");
-                }
+            productoSeleccionado.NombreProducto = txtNombre.Text.Trim();
+            productoSeleccionado.DescripcionProducto = txtDescripcion.Text.Trim();
+            productoSeleccionado.PrecioProducto = precio;
+            productoSeleccionado.IdCategoria = categoria.IdCategoria;
+            productoSeleccionado.IdProveedor = proveedor.IdProveedor;
+
+            var productosEnUbicacion = InventarioProductoDAO.ObtenerProductosPorUbicacion(ubicacion.IdInventario);
+            var existente = productosEnUbicacion.FirstOrDefault(ip => ip.IdProducto == productoSeleccionado.IdProducto);
+
+            if (existente != null)
+            {
+                existente.Cantidad = stock;
+                InventarioProductoDAO.Actualizar(existente);
             }
             else
             {
+                InventarioProductoDAO.Agregar(new InventarioProducto
+                {
+                    IdInventario = ubicacion.IdInventario,
+                    IdProducto = productoSeleccionado.IdProducto,
+                    Cantidad = stock
+                });
+            }
+
+            if (ProductoDAO.Actualizar(productoSeleccionado))
+            {
+                MessageBox.Show("Producto actualizado.");
+                CargarProductos();
+                LimpiarCampos();
+            }
+            else
+            {
+                MessageBox.Show("Error al actualizar el producto.");
+            }
+        }
+
+        private bool ValidarDatosProducto(out int precio, out int stock, out Categoria categoria, out Proveedor proveedor, out UbicacionInventario ubicacion)
+        {
+            precio = 0; stock = 0; categoria = null!; proveedor = null!; ubicacion = null!;
+
+            if (string.IsNullOrWhiteSpace(txtNombre.Text) ||
+                string.IsNullOrWhiteSpace(txtDescripcion.Text) ||
+                !int.TryParse(txtPrecio.Text, out precio) ||
+                !int.TryParse(txtStock.Text, out stock) ||
+                cmbCategoria.SelectedItem is not Categoria cat ||
+                cmbProveedor.SelectedItem is not Proveedor prov ||
+                cmbInventario.SelectedItem is not UbicacionInventario inv)
+            {
                 MessageBox.Show("Revisa los datos ingresados.");
+                return false;
             }
+
+            categoria = cat;
+            proveedor = prov;
+            ubicacion = inv;
+            return true;
         }
 
-        private void BtnEliminarProducto_Click(object sender, RoutedEventArgs e)
+        private void BtnAgregarCategoria_Click(object sender, RoutedEventArgs e)
         {
-            if (productoSeleccionado == null)
+            var dialog = new CategoriaDialog();
+            if (dialog.ShowDialog() == true)
             {
-                MessageBox.Show("Seleccione un producto para eliminar.");
-                return;
+                CargarCombos(); // Refresca el ComboBox
+                cmbCategoria.SelectedValue = dialog.CategoriaEditada.IdCategoria;
             }
+        }
 
-            var resultado = MessageBox.Show(
-                $"¿Está seguro que desea eliminar el producto \"{productoSeleccionado.NombreProducto}\"?",
-                "Confirmar eliminación",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning
-            );
-
-            if (resultado == MessageBoxResult.Yes)
+        private void BtnEditarCategoria_Click(object sender, RoutedEventArgs e)
+        {
+            if (cmbCategoria.SelectedItem is Categoria categoria)
             {
-                if (ProductoDAO.Eliminar(productoSeleccionado.IdProducto))
+                var dialog = new CategoriaDialog(categoria);
+                if (dialog.ShowDialog() == true)
                 {
-                    MessageBox.Show("Producto eliminado.");
-                    CargarProductos();
-                    LimpiarCampos();
-                }
-                else
-                {
-                    MessageBox.Show("Error al eliminar el producto.");
+                    CargarCombos();
+                    cmbCategoria.SelectedValue = dialog.CategoriaEditada.IdCategoria;
                 }
             }
         }
 
-        private void BtnRefrescarProductos_Click(object sender, RoutedEventArgs e)
+        private void BtnEliminarCategoria_Click(object sender, RoutedEventArgs e)
         {
-            CargarProductos();
-            txtFiltroNombre.Clear();
-            cmbFiltroCategoria.SelectedIndex = -1;
+            if (cmbCategoria.SelectedItem is Categoria categoria)
+            {
+                if (MessageBox.Show($"¿Seguro que deseas eliminar la categoría '{categoria.Nombre}'?",
+                    "Confirmar eliminación", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                {
+                    if (CategoriaDAO.Eliminar(categoria.IdCategoria))
+                    {
+                        CargarCombos();
+                    }
+                    else
+                    {
+                        MessageBox.Show("No se pudo eliminar la categoría.");
+                    }
+                }
+            }
         }
 
-        private void BtnFiltrar_Click(object sender, RoutedEventArgs e)
+        private void BtnAgregarProveedor_Click(object sender, RoutedEventArgs e)
         {
-            string filtroNombre = txtFiltroNombre.Text.Trim().ToLower();
-            int? idCategoria = cmbFiltroCategoria.SelectedItem is Categoria cat ? cat.IdCategoria : (int?)null;
-
-            var productos = ProductoDAO.ObtenerTodos();
-
-            if (!string.IsNullOrWhiteSpace(filtroNombre))
-                productos = [.. productos.Where(p => p.NombreProducto.Contains(filtroNombre, StringComparison.CurrentCultureIgnoreCase))];
-
-            if (idCategoria.HasValue)
-                productos = [.. productos.Where(p => p.IdCategoria == idCategoria.Value)];
-
-            dgProductos.ItemsSource = productos;
+            var dialog = new ProveedorDialog();
+            if (dialog.ShowDialog() == true)
+            {
+                CargarCombos();
+                cmbProveedor.SelectedValue = dialog.ProveedorEditado.IdProveedor;
+            }
         }
 
-        // CRUD INVENTARIO
+        private void BtnEditarProveedor_Click(object sender, RoutedEventArgs e)
+        {
+            if (cmbProveedor.SelectedItem is Proveedor proveedor)
+            {
+                var dialog = new ProveedorDialog(proveedor);
+                if (dialog.ShowDialog() == true)
+                {
+                    CargarCombos();
+                    cmbProveedor.SelectedValue = dialog.ProveedorEditado.IdProveedor;
+                }
+            }
+        }
+
+        private void BtnEliminarProveedor_Click(object sender, RoutedEventArgs e)
+        {
+            if (cmbProveedor.SelectedItem is Proveedor proveedor)
+            {
+                if (MessageBox.Show($"¿Seguro que deseas eliminar al proveedor '{proveedor.Nombre}'?",
+                    "Confirmar eliminación", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                {
+                    if (ProveedorDAO.Eliminar(proveedor.IdProveedor))
+                    {
+                        CargarCombos();
+                    }
+                    else
+                    {
+                        MessageBox.Show("No se pudo eliminar el proveedor.");
+                    }
+                }
+            }
+        }
+
         private void BtnAgregarInventario_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new InventarioDialog
+            var dialog = new InventarioDialog();
+            if (dialog.ShowDialog() == true)
             {
-                Owner = Window.GetWindow(this)
-            };
-
-            if (dialog.ShowDialog() == true && dialog.InventarioEditado != null)
-            {
-                cmbInventario.ItemsSource = InventarioDAO.ObtenerInventario();
-                cmbInventario.SelectedItem = dialog.InventarioEditado;
+                CargarCombos();
+                cmbInventario.SelectedValue = dialog.InventarioEditado.IdInventario;
             }
         }
-
 
         private void BtnEditarInventario_Click(object sender, RoutedEventArgs e)
         {
-            if (cmbInventario.SelectedItem is not Inventario inventario)
+            if (cmbInventario.SelectedItem is UbicacionInventario inv)
             {
-                MessageBox.Show("Seleccione un inventario.");
-                return;
-            }
-
-            var dialog = new InventarioDialog(inventario);
-            if (dialog.ShowDialog() == true)
-            {
-                cmbInventario.ItemsSource = InventarioDAO.ObtenerInventario();
-                cmbInventario.SelectedItem = dialog.InventarioEditado;
+                var dialog = new InventarioDialog(inv);
+                if (dialog.ShowDialog() == true)
+                {
+                    CargarCombos();
+                    cmbInventario.SelectedValue = dialog.InventarioEditado.IdInventario;
+                }
             }
         }
 
         private void BtnEliminarInventario_Click(object sender, RoutedEventArgs e)
         {
-            if (cmbInventario.SelectedItem is not Inventario inventario)
+            if (cmbInventario.SelectedItem is UbicacionInventario inv)
             {
-                MessageBox.Show("Seleccione un inventario.");
-                return;
-            }
-
-            var confirmar = MessageBox.Show(
-                $"¿Eliminar inventario ID {inventario.IdInventario}?",
-                "Confirmar",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning
-            );
-
-            if (confirmar == MessageBoxResult.Yes)
-            {
-                if (InventarioDAO.Eliminar(inventario.IdInventario))
+                if (MessageBox.Show($"¿Seguro que deseas eliminar la ubicación '{inv.Descripcion}'?",
+                    "Confirmar eliminación", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
                 {
-                    MessageBox.Show("Inventario eliminado.");
-                    cmbInventario.ItemsSource = InventarioDAO.ObtenerInventario();
-                }
-                else
-                {
-                    MessageBox.Show("Error al eliminar el inventario.");
+                    if (InventarioDAO.EliminarUbicacion(inv.IdInventario))
+                    {
+                        CargarCombos();
+                    }
+                    else
+                    {
+                        MessageBox.Show("No se pudo eliminar la ubicación.");
+                    }
                 }
             }
         }
@@ -386,7 +295,108 @@ namespace FERCO.View
             txtStock.Text = "";
             cmbCategoria.SelectedIndex = -1;
             cmbProveedor.SelectedIndex = -1;
+            cmbInventario.SelectedIndex = -1;
+
             productoSeleccionado = null;
+            dgProductos.UnselectAll();
         }
+        private void BtnEliminarProducto_Click(object sender, RoutedEventArgs e)
+        {
+            if (productoSeleccionado == null)
+            {
+                MessageBox.Show("Seleccione un producto a eliminar.");
+                return;
+            }
+
+            var ubicacionesConStock = ObtenerUbicacionesConStock(productoSeleccionado.IdProducto);
+
+            if (ubicacionesConStock.Any())
+            {
+                string mensaje = "No se puede eliminar el producto porque tiene stock en las siguientes ubicaciones:\n\n";
+                foreach (var (ubicacion, cantidad) in ubicacionesConStock)
+                {
+                    mensaje += $"- {ubicacion}: {cantidad} unidades\n";
+                }
+                MessageBox.Show(mensaje, "Producto con stock asignado", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            if (MessageBox.Show($"¿Seguro que deseas eliminar el producto '{productoSeleccionado.NombreProducto}'?",
+                "Confirmar eliminación", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+            {
+                InventarioProductoDAO.EliminarPorProducto(productoSeleccionado.IdProducto);
+
+                if (ProductoDAO.Eliminar(productoSeleccionado.IdProducto))
+                {
+                    MessageBox.Show("Producto eliminado correctamente.");
+                    LimpiarCampos();
+                    CargarProductos();
+                }
+                else
+                {
+                    MessageBox.Show("Error al eliminar el producto.");
+                }
+            }
+        }
+
+
+        private void BtnFiltrar_Click(object sender, RoutedEventArgs e)
+        {
+            string nombreFiltro = txtFiltroNombre.Text.Trim().ToLower();
+            int? idCategoria = cmbFiltroCategoria.SelectedValue as int?;
+
+            var productos = ProductoDAO.ObtenerTodos();
+
+            var filtrados = productos.Where(p =>
+                (string.IsNullOrEmpty(nombreFiltro) || p.NombreProducto.ToLower().Contains(nombreFiltro)) &&
+                (!idCategoria.HasValue || p.IdCategoria == idCategoria.Value)
+            ).ToList();
+
+            dgProductos.ItemsSource = filtrados;
+        }
+        private void BtnRefrescarProductos_Click(object sender, RoutedEventArgs e)
+        {
+            txtFiltroNombre.Text = "";
+            cmbFiltroCategoria.SelectedIndex = -1;
+            CargarProductos();
+        }
+        private bool ProductoTieneStockAsignado(int idProducto)
+        {
+            var ubicaciones = InventarioDAO.ObtenerUbicacionesConProductos();
+
+            foreach (var ubicacion in ubicaciones)
+            {
+                var productos = InventarioProductoDAO.ObtenerProductosPorUbicacion(ubicacion.IdInventario);
+                var encontrado = productos.FirstOrDefault(p => p.IdProducto == idProducto);
+
+                if (encontrado != null && encontrado.Cantidad > 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        private List<(string ubicacion, int cantidad)> ObtenerUbicacionesConStock(int idProducto)
+        {
+            var ubicacionesConStock = new List<(string, int)>();
+
+            var ubicaciones = InventarioDAO.ObtenerUbicacionesConProductos();
+
+            foreach (var ubicacion in ubicaciones)
+            {
+                var productos = InventarioProductoDAO.ObtenerProductosPorUbicacion(ubicacion.IdInventario);
+                var encontrado = productos.FirstOrDefault(p => p.IdProducto == idProducto);
+
+                if (encontrado != null && encontrado.Cantidad > 0)
+                {
+                    ubicacionesConStock.Add((ubicacion.Descripcion, encontrado.Cantidad));
+                }
+            }
+
+            return ubicacionesConStock;
+        }
+
+
     }
 }

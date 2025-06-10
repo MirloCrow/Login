@@ -24,7 +24,11 @@ namespace FERCO.Data
         {
             try
             {
-                return Convert.ToInt32(cmd.ExecuteScalar());
+                object result = cmd.ExecuteScalar();
+                if (result == null || result == DBNull.Value)
+                    return 0;
+
+                return Convert.ToInt32(result);
             }
             catch (Exception ex)
             {

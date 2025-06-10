@@ -6,52 +6,46 @@ namespace FERCO.View
 {
     public partial class InventarioDialog : Window
     {
-        public Inventario InventarioEditado { get; private set; }
+        public UbicacionInventario? InventarioEditado { get; private set; }
 
-        public InventarioDialog(Inventario? inventario = null)
+        public InventarioDialog(UbicacionInventario? inventario = null)
         {
             InitializeComponent();
 
             if (inventario != null)
             {
-                txtIdProducto.Text = inventario.IdProducto.ToString();
-                txtCantidad.Text = inventario.CantidadProducto.ToString();
+                txtDescripcion.Text = inventario.Descripcion;
                 InventarioEditado = inventario;
-                this.Title = "Editar Inventario";
+                this.Title = "Editar Ubicación";
             }
             else
             {
-                InventarioEditado = new Inventario();
-                this.Title = "Nuevo Inventario";
+                InventarioEditado = new UbicacionInventario();
+                this.Title = "Nueva Ubicación";
             }
         }
 
         private void BtnGuardar_Click(object sender, RoutedEventArgs e)
         {
-            if (!int.TryParse(txtIdProducto.Text, out int idProd) || idProd <= 0)
+            string descripcion = txtDescripcion.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(descripcion))
             {
-                MessageBox.Show("ID de producto inválido.");
+                MessageBox.Show("Debe ingresar una descripción.");
                 return;
             }
 
-            if (!int.TryParse(txtCantidad.Text, out int cantidad) || cantidad < 0)
-            {
-                MessageBox.Show("Cantidad inválida.");
-                return;
-            }
-
-            InventarioEditado.IdProducto = idProd;
-            InventarioEditado.CantidadProducto = cantidad;
+            InventarioEditado!.Descripcion = descripcion;
 
             bool exito;
+
             if (InventarioEditado.IdInventario == 0)
             {
-                exito = InventarioDAO.Agregar(InventarioEditado);
-                InventarioEditado = InventarioDAO.ObtenerUltimo()!;
+                exito = InventarioDAO.AgregarUbicacion(InventarioEditado);
             }
             else
             {
-                exito = InventarioDAO.Actualizar(InventarioEditado);
+                exito = InventarioDAO.ActualizarUbicacion(InventarioEditado);
             }
 
             if (exito)
@@ -61,7 +55,7 @@ namespace FERCO.View
             }
             else
             {
-                MessageBox.Show("Error al guardar el inventario.");
+                MessageBox.Show("Error al guardar la ubicación.");
             }
         }
     }

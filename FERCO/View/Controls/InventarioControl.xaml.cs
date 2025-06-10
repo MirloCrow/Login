@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using FERCO.Model;
 using FERCO.Data;
+using System.Collections.Generic;
 
 namespace FERCO.View
 {
@@ -15,66 +16,108 @@ namespace FERCO.View
 
         private void CargarDatos()
         {
-            dgInventario.ItemsSource = InventarioDAO.ObtenerInventario();
+            dgInventario.ItemsSource = InventarioDAO.ObtenerUbicacionesConProductos();
         }
 
         private void BtnAgregar_Click(object sender, RoutedEventArgs e)
         {
-            if (CamposValidos(out int id, out int prod, out int cantidad))
+            if (string.IsNullOrWhiteSpace(txtIdInventario.Text) || string.IsNullOrWhiteSpace(txtDescripcion.Text))
             {
-                var inv = new Inventario
-                {
-                    IdInventario = id,
-                    IdProducto = prod,
-                    CantidadProducto = cantidad
-                };
-                InventarioDAO.Agregar(inv);
+                MessageBox.Show("Completa ID y descripción.");
+                return;
+            }
+
+            if (!int.TryParse(txtIdInventario.Text, out int idInventario))
+            {
+                MessageBox.Show("ID Inventario debe ser numérico.");
+                return;
+            }
+
+            var ubicacion = new UbicacionInventario
+            {
+                IdInventario = idInventario,
+                Descripcion = txtDescripcion.Text.Trim()
+            };
+
+            if (InventarioDAO.AgregarUbicacion(ubicacion))
+            {
+                MessageBox.Show("Ubicación agregada.");
+                LimpiarCampos();
                 CargarDatos();
+            }
+            else
+            {
+                MessageBox.Show("No se pudo agregar la ubicación.");
             }
         }
 
         private void BtnEditar_Click(object sender, RoutedEventArgs e)
         {
-            if (CamposValidos(out int id, out int prod, out int cantidad))
+            if (!int.TryParse(txtIdInventario.Text, out int idInventario) || string.IsNullOrWhiteSpace(txtDescripcion.Text))
             {
-                var inv = new Inventario
-                {
-                    IdInventario = id,
-                    IdProducto = prod,
-                    CantidadProducto = cantidad
-                };
-                InventarioDAO.Actualizar(inv);
+                MessageBox.Show("ID y descripción válidos requeridos.");
+                return;
+            }
+
+            var ubicacion = new UbicacionInventario
+            {
+                IdInventario = idInventario,
+                Descripcion = txtDescripcion.Text.Trim()
+            };
+
+            if (InventarioDAO.ActualizarUbicacion(ubicacion))
+            {
+                MessageBox.Show("Ubicación actualizada.");
+                LimpiarCampos();
                 CargarDatos();
+            }
+            else
+            {
+                MessageBox.Show("No se pudo actualizar.");
             }
         }
 
         private void BtnEliminar_Click(object sender, RoutedEventArgs e)
         {
-            if (int.TryParse(txtId.Text, out int id))
+            if (!int.TryParse(txtIdInventario.Text, out int idInventario))
             {
-                InventarioDAO.Eliminar(id);
-                CargarDatos();
+                MessageBox.Show("ID válido requerido.");
+                return;
             }
-            else
+
+            var confirmar = MessageBox.Show("¿Eliminar esta ubicación?", "Confirmar", MessageBoxButton.YesNo);
+            if (confirmar == MessageBoxResult.Yes)
             {
-                MessageBox.Show("Ingrese un ID válido para eliminar.");
+                if (InventarioDAO.EliminarUbicacion(idInventario))
+                {
+                    MessageBox.Show("Ubicación eliminada.");
+                    LimpiarCampos();
+                    CargarDatos();
+                }
+                else
+                {
+                    MessageBox.Show("No se pudo eliminar.");
+                }
             }
         }
 
-        private bool CamposValidos(out int id, out int prod, out int cantidad)
+        private void dgInventario_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            id = prod = cantidad = 0;
-            if (string.IsNullOrWhiteSpace(txtId.Text) ||
-                string.IsNullOrWhiteSpace(txtProducto.Text) ||
-                string.IsNullOrWhiteSpace(txtCantidad.Text))
+            if (dgInventario.SelectedItem is UbicacionInventario ubicacion)
             {
-                MessageBox.Show("Todos los campos son obligatorios.");
-                return false;
-            }
+                txtIdInventario.Text = ubicacion.IdInventario.ToString();
+                txtDescripcion.Text = ubicacion.Descripcion;
 
-            return int.TryParse(txtId.Text, out id) &&
-                   int.TryParse(txtProducto.Text, out prod) &&
-                   int.TryParse(txtCantidad.Text, out cantidad);
+                // Mostrar productos en la ubicación seleccionada
+                dgProductosEnUbicacion.ItemsSource = InventarioDAO.ObtenerProductosPorUbicacion(ubicacion.IdInventario);
+            }
+        }
+
+        private void LimpiarCampos()
+        {
+            txtIdInventario.Text = "";
+            txtDescripcion.Text = "";
+            dgProductosEnUbicacion.ItemsSource = null;
         }
     }
 }

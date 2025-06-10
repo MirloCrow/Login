@@ -36,6 +36,13 @@
                     <TextBlock Text="Producto:" FontWeight="Bold" Margin="0,0,0,5" Foreground="Black"/>
                     <ComboBox x:Name="cmbProducto" Background="#ECF0F1" Foreground="#2C3E50" BorderBrush="#BDC3C7" Margin="0,0,0,15"/>
 
+                    <ComboBox x:Name="cmbUbicacion"
+                      DisplayMemberPath="Descripcion"
+                      SelectedValuePath="IdInventario"
+                      Margin="0,5,0,5"
+                      Width="200"
+                      HorizontalAlignment="Left"/>
+
                     <TextBlock Text="Cantidad:" FontWeight="Bold" Margin="0,0,0,5" Foreground="Black"/>
                     <TextBox x:Name="txtCantidad" Background="#ECF0F1" Foreground="#2C3E50" BorderBrush="#BDC3C7" Margin="0,0,0,15"/>
 

@@ -8,34 +8,42 @@
              d:DesignHeight="450" d:DesignWidth="800"
              Background="{StaticResource AccentBrush}">
 
-    <Grid Margin="10">
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,10" VerticalAlignment="Top">
-            <!-- ID Inventario -->
-            <StackPanel Margin="0,0,10,0">
-                <TextBlock Text="ID Inventario" Foreground="White" FontSize="12"/>
-                <TextBox x:Name="txtId" Width="100" Height="25"/>
-            </StackPanel>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-            <!-- ID Producto -->
-            <StackPanel Margin="0,0,10,0">
-                <TextBlock Text="ID Producto" Foreground="White" FontSize="12"/>
-                <TextBox x:Name="txtProducto" Width="100" Height="25"/>
-            </StackPanel>
+            <!-- FORMULARIO -->
+            <GroupBox Header="Agregar / Editar Ubicación" Grid.Row="0" Padding="10">
+                <StackPanel Orientation="Vertical">
+                    <!-- ID Inventario -->
+                    <TextBlock Text="ID Inventario" Foreground="White" FontSize="12"/>
+                    <TextBox x:Name="txtIdInventario" Width="200" Height="25"/>
 
-            <!-- Cantidad -->
-            <StackPanel Margin="0,0,10,0">
-                <TextBlock Text="Cantidad" Foreground="White" FontSize="12"/>
-                <TextBox x:Name="txtCantidad" Width="100" Height="25"/>
-            </StackPanel>
+                    <!-- Descripción Ubicación -->
+                    <TextBlock Text="Descripción Ubicación" Foreground="White" FontSize="12" Margin="0,10,0,0"/>
+                    <TextBox x:Name="txtDescripcion" Width="400" Height="25"/>
 
-            <!-- Botones -->
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
-                <Button Content="Agregar" Width="80" Height="30" Margin="0,0,10,0" Click="BtnAgregar_Click"/>
-                <Button Content="Editar" Width="80" Height="30" Margin="0,0,10,0" Click="BtnEditar_Click"/>
-                <Button Content="Eliminar" Width="80" Height="30" Click="BtnEliminar_Click"/>
-            </StackPanel>
-        </StackPanel>
+                    <!-- Productos en la Ubicación -->
+                    <TextBlock Text="Productos en esta ubicación (ID Producto - Cantidad)" Foreground="White" FontSize="12" Margin="0,10,0,0"/>
+                    <DataGrid x:Name="dgProductosEnUbicacion" AutoGenerateColumns="True" Height="100"/>
 
-        <DataGrid x:Name="dgInventario" AutoGenerateColumns="True" Height="300" />
-    </Grid>
+                    <!-- Botones -->
+                    <StackPanel Orientation="Horizontal" Margin="0,10">
+                        <Button Content="Agregar ubicación" Width="130" Margin="5" Click="BtnAgregar_Click"/>
+                        <Button Content="Editar ubicación" Width="130" Margin="5" Click="BtnEditar_Click"/>
+                        <Button Content="Eliminar ubicación" Width="130" Margin="5" Click="BtnEliminar_Click"/>
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- LISTA GENERAL -->
+            <GroupBox Header="Ubicaciones con productos" Grid.Row="1" Margin="0,10,0,0" Padding="10">
+                <DataGrid x:Name="dgInventario" AutoGenerateColumns="True" Height="300"/>
+            </GroupBox>
+        </Grid>
+    </ScrollViewer>
 </UserControl>
+
