@@ -1,10 +1,9 @@
 ﻿<UserControl x:Class="FERCO.View.InventarioControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:FERCO.View"
-             mc:Ignorable="d" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
              Background="{StaticResource AccentBrush}">
 
@@ -14,35 +13,22 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Zona de entradas y botones -->
+        <!-- Formulario de entrada -->
         <StackPanel Orientation="Vertical" Margin="0,0,0,10">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
 
-                <StackPanel Margin="5">
-                    <Label Content="ID Inventario"/>
-                    <TextBox x:Name="txtId" Width="120"/>
-                </StackPanel>
-
-                <StackPanel Margin="5">
-                    <Label Content="ID Producto"/>
-                    <TextBox x:Name="txtProducto" Width="120"/>
-                </StackPanel>
-
-                <StackPanel Margin="5">
-                    <Label Content="Cantidad"/>
-                    <TextBox x:Name="txtCantidad" Width="120"/>
-                </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="5">
+                <Label Content="Descripción del inventario" VerticalAlignment="Center"/>
+                <TextBox x:Name="txtDescripcion" Width="300" Margin="10,0"/>
             </StackPanel>
 
-            <!-- Botones -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="5,10,0,0">
+            <StackPanel Orientation="Horizontal" Margin="5,10,0,0">
                 <Button Style="{StaticResource BTNHEADERSTYLE}" Content="Agregar" Click="BtnAgregar_Click" Margin="5"/>
                 <Button Style="{StaticResource BTNHEADERSTYLE}" Content="Editar" Click="BtnEditar_Click" Margin="5"/>
                 <Button Style="{StaticResource BTNHEADERSTYLE}" Content="Eliminar" Click="BtnEliminar_Click" Margin="5"/>
             </StackPanel>
         </StackPanel>
 
-        <!-- DataGrid -->
+        <!-- Lista de ubicaciones -->
         <DataGrid x:Name="dgInventario"
                   Grid.Row="1"
                   AutoGenerateColumns="True"
@@ -50,6 +36,7 @@
                   Background="White"
                   FontWeight="SemiBold"
                   RowBackground="White"
-                  AlternatingRowBackground="#F0F0F0"/>
+                  AlternatingRowBackground="#F0F0F0"
+                  SelectionChanged="DgInventario_SelectionChanged"/>
     </Grid>
 </UserControl>

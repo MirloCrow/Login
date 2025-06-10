@@ -33,7 +33,7 @@ namespace FERCO.View
             lstStock.Items.Clear();
             foreach (var p in productos)
             {
-                lstStock.Items.Add(p.ToString());
+                lstStock.Items.Add($"{p.NombreProducto} | Precio: ${p.PrecioProducto} | Stock total: {p.StockTotal}");
             }
         }
 
@@ -43,7 +43,12 @@ namespace FERCO.View
                 int.TryParse(txtCantidad.Text, out int cantidad) &&
                 cantidad > 0)
             {
-                int stockActual = ProductoDAO.ObtenerStockPorId(productoSeleccionado.IdProducto);
+                if (productoSeleccionado.UbicacionesConStock == null)
+                {
+                    MostrarMensaje("Error: no se pudo obtener el stock del producto.", false);
+                    return;
+                }
+                int stockActual = productoSeleccionado.UbicacionesConStock?.Sum(u => u.Cantidad) ?? 0;
                 if (cantidad > stockActual)
                 {
                     MostrarMensaje($"Stock insuficiente. Disponible: {stockActual}", false);
@@ -124,8 +129,7 @@ namespace FERCO.View
                 detalle.IdVenta = idVenta;
                 VentaDAO.RegistrarDetalle(detalle);
 
-                int stockActual = ProductoDAO.ObtenerStockPorId(detalle.IdProducto);
-                ProductoDAO.ActualizarStock(detalle.IdProducto, stockActual - detalle.CantidadDetalle);
+                DescontarStock(detalle.IdProducto, detalle.CantidadDetalle);
             }
 
             lstVentas.Items.Add($"Venta registrada - Total: ${totalVenta}");
@@ -159,7 +163,8 @@ namespace FERCO.View
             {
                 if (int.TryParse(txt.Text, out int nuevaCantidad) && nuevaCantidad > 0)
                 {
-                    int stock = ProductoDAO.ObtenerStockPorId(detalle.IdProducto);
+                    int stock = InventarioProductoDAO.ObtenerUbicacionesPorProducto(detalle.IdProducto)
+                                                     .Sum(u => u.Cantidad);
 
                     if (nuevaCantidad > stock)
                     {
@@ -179,5 +184,23 @@ namespace FERCO.View
                 }
             }
         }
+
+        private void DescontarStock(int idProducto, int cantidad)
+        {
+            var ubicaciones = InventarioProductoDAO.ObtenerUbicacionesPorProducto(idProducto);
+            int cantidadARestar = cantidad;
+
+            foreach (var u in ubicaciones)
+            {
+                if (cantidadARestar <= 0) break;
+
+                int descontar = Math.Min(cantidadARestar, u.Cantidad);
+                u.Cantidad -= descontar;
+                cantidadARestar -= descontar;
+
+                InventarioProductoDAO.Actualizar(u);
+            }
+        }
+
     }
 }

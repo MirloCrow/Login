@@ -14,8 +14,7 @@ namespace FERCO.View
 
             if (inventario != null)
             {
-                txtIdProducto.Text = inventario.IdProducto.ToString();
-                txtCantidad.Text = inventario.CantidadProducto.ToString();
+                txtDescripcion.Text = inventario.Descripcion;
                 InventarioEditado = inventario;
                 this.Title = "Editar Inventario";
             }
@@ -28,20 +27,15 @@ namespace FERCO.View
 
         private void BtnGuardar_Click(object sender, RoutedEventArgs e)
         {
-            if (!int.TryParse(txtIdProducto.Text, out int idProd) || idProd <= 0)
+            string descripcion = txtDescripcion.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(descripcion))
             {
-                MessageBox.Show("ID de producto inválido.");
+                MessageBox.Show("La descripción no puede estar vacía.");
                 return;
             }
 
-            if (!int.TryParse(txtCantidad.Text, out int cantidad) || cantidad < 0)
-            {
-                MessageBox.Show("Cantidad inválida.");
-                return;
-            }
-
-            InventarioEditado.IdProducto = idProd;
-            InventarioEditado.CantidadProducto = cantidad;
+            InventarioEditado.Descripcion = descripcion;
 
             bool exito;
             if (InventarioEditado.IdInventario == 0)

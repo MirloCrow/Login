@@ -7,14 +7,14 @@ namespace FERCO.Data
 {
     public static class InventarioDAO
     {
-        public static List<Inventario> ObtenerInventario()
+        public static List<Inventario> ObtenerInventarios()
         {
             var inventarios = new List<Inventario>();
 
             try
             {
                 using var conn = DAOHelper.AbrirConexionSegura();
-                string query = "SELECT id_inventario, id_producto, cantidad_producto FROM Inventario";
+                string query = "SELECT id_inventario, descripcion FROM Inventario";
                 using var cmd = new SqlCommand(query, conn);
                 using var reader = cmd.ExecuteReader();
 
@@ -22,16 +22,14 @@ namespace FERCO.Data
                 {
                     inventarios.Add(new Inventario
                     {
-                        IdInventario = (int)reader["id_inventario"],
-                        IdProducto = (int)reader["id_producto"],
-                        CantidadProducto = (int)reader["cantidad_producto"],
-                        Nombre = $"Inventario ID {reader["id_inventario"]} (Stock: {reader["cantidad_producto"]})"
+                        IdInventario = reader.GetInt32(0),
+                        Descripcion = reader.GetString(1)
                     });
                 }
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"[ERROR][InventarioDAO.ObtenerInventario] {ex.Message}");
+                Console.Error.WriteLine($"[ERROR][InventarioDAO.ObtenerInventarios] {ex.Message}");
             }
 
             return inventarios;
@@ -42,7 +40,7 @@ namespace FERCO.Data
             try
             {
                 using var conn = DAOHelper.AbrirConexionSegura();
-                string query = "SELECT TOP 1 * FROM Inventario ORDER BY id_inventario DESC";
+                string query = "SELECT TOP 1 id_inventario, descripcion FROM Inventario ORDER BY id_inventario DESC";
                 using var cmd = new SqlCommand(query, conn);
                 using var reader = cmd.ExecuteReader();
 
@@ -50,10 +48,8 @@ namespace FERCO.Data
                 {
                     return new Inventario
                     {
-                        IdInventario = (int)reader["id_inventario"],
-                        IdProducto = (int)reader["id_producto"],
-                        CantidadProducto = (int)reader["cantidad_producto"],
-                        Nombre = $"Stock: {reader["cantidad_producto"]} (ID {reader["id_inventario"]})"
+                        IdInventario = reader.GetInt32(0),
+                        Descripcion = reader.GetString(1)
                     };
                 }
             }
@@ -67,17 +63,16 @@ namespace FERCO.Data
 
         public static bool Agregar(Inventario inventario)
         {
-            if (inventario.IdProducto <= 0 || inventario.CantidadProducto < 0)
+            if (string.IsNullOrWhiteSpace(inventario.Descripcion))
                 return false;
 
             try
             {
                 using var conn = DAOHelper.AbrirConexionSegura();
-                string query = @"INSERT INTO Inventario (id_producto, cantidad_producto)
-                                 VALUES (@id_producto, @cantidad)";
+                string query = @"INSERT INTO Inventario (descripcion)
+                                 VALUES (@descripcion)";
                 using var cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@id_producto", inventario.IdProducto);
-                cmd.Parameters.AddWithValue("@cantidad", inventario.CantidadProducto);
+                cmd.Parameters.AddWithValue("@descripcion", inventario.Descripcion);
 
                 return DAOHelper.EjecutarNoQuery(cmd);
             }
@@ -90,21 +85,18 @@ namespace FERCO.Data
 
         public static bool Actualizar(Inventario inventario)
         {
-            if (inventario.IdInventario <= 0 || inventario.IdProducto <= 0 || inventario.CantidadProducto < 0)
+            if (inventario.IdInventario <= 0 || string.IsNullOrWhiteSpace(inventario.Descripcion))
                 return false;
 
             try
             {
                 using var conn = DAOHelper.AbrirConexionSegura();
                 string query = @"UPDATE Inventario 
-                                 SET id_producto = @id_producto, 
-                                     cantidad_producto = @cantidad 
-                                 WHERE id_inventario = @id_inventario";
-
+                                 SET descripcion = @descripcion 
+                                 WHERE id_inventario = @id";
                 using var cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@id_inventario", inventario.IdInventario);
-                cmd.Parameters.AddWithValue("@id_producto", inventario.IdProducto);
-                cmd.Parameters.AddWithValue("@cantidad", inventario.CantidadProducto);
+                cmd.Parameters.AddWithValue("@descripcion", inventario.Descripcion);
+                cmd.Parameters.AddWithValue("@id", inventario.IdInventario);
 
                 return DAOHelper.EjecutarNoQuery(cmd);
             }

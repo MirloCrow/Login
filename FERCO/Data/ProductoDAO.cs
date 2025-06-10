@@ -14,19 +14,24 @@ namespace FERCO.Data
             try
             {
                 using var conn = DAOHelper.AbrirConexionSegura();
-                string query = "SELECT id_producto, nombre_producto, precio_producto, stock_producto FROM Producto";
+                string query = "SELECT id_producto, nombre_producto, descripcion_producto, precio_producto, id_proveedor, id_categoria FROM Producto";
                 using var cmd = new SqlCommand(query, conn);
                 using var reader = cmd.ExecuteReader();
 
                 while (reader.Read())
                 {
-                    productos.Add(new Producto
+                    var producto = new Producto
                     {
                         IdProducto = reader.GetInt32(0),
                         NombreProducto = reader.GetString(1),
-                        PrecioProducto = reader.GetInt32(2),
-                        StockProducto = reader.GetInt32(3)
-                    });
+                        DescripcionProducto = reader.GetString(2),
+                        PrecioProducto = reader.GetInt32(3),
+                        IdProveedor = reader.GetInt32(4),
+                        IdCategoria = reader.GetInt32(5),
+                        UbicacionesConStock = InventarioProductoDAO.ObtenerUbicacionesPorProducto(reader.GetInt32(0))
+                    };
+
+                    productos.Add(producto);
                 }
             }
             catch (Exception ex)
@@ -36,23 +41,45 @@ namespace FERCO.Data
 
             return productos;
         }
+        public static Producto? BuscarPorNombre(string nombre)
+        {
+            using var conn = DAOHelper.AbrirConexionSegura();
+            SqlCommand cmd = new("SELECT * FROM Producto WHERE nombre_producto = @nombre", conn);
+            cmd.Parameters.AddWithValue("@nombre", nombre);
+
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                return new Producto
+                {
+                    IdProducto = (int)reader["id_producto"],
+                    NombreProducto = reader["nombre_producto"].ToString() ?? "",
+                    DescripcionProducto = reader["descripcion_producto"].ToString() ?? "",
+                    PrecioProducto = (int)reader["precio_producto"],
+                    IdCategoria = (int)reader["id_categoria"],
+                    IdProveedor = (int)reader["id_proveedor"]
+                };
+            }
+            return null;
+        }
+
+
 
         public static bool Agregar(Producto producto)
         {
-            if (string.IsNullOrWhiteSpace(producto.NombreProducto) || producto.PrecioProducto < 0 || producto.StockProducto < 0)
+            if (string.IsNullOrWhiteSpace(producto.NombreProducto) || producto.PrecioProducto < 0)
                 return false;
 
             try
             {
                 using var conn = DAOHelper.AbrirConexionSegura();
-                string query = @"INSERT INTO Producto (id_proveedor, id_categoria, nombre_producto, descripcion_producto, stock_producto, precio_producto)
-                                 VALUES (@proveedor, @categoria, @nombre, @descripcion, @stock, @precio)";
+                string query = @"INSERT INTO Producto (id_proveedor, id_categoria, nombre_producto, descripcion_producto, precio_producto)
+                         VALUES (@proveedor, @categoria, @nombre, @descripcion, @precio)";
                 using var cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@proveedor", producto.IdProveedor);
                 cmd.Parameters.AddWithValue("@categoria", producto.IdCategoria);
                 cmd.Parameters.AddWithValue("@nombre", producto.NombreProducto);
                 cmd.Parameters.AddWithValue("@descripcion", producto.DescripcionProducto);
-                cmd.Parameters.AddWithValue("@stock", producto.StockProducto);
                 cmd.Parameters.AddWithValue("@precio", producto.PrecioProducto);
 
                 return DAOHelper.EjecutarNoQuery(cmd);
@@ -64,10 +91,11 @@ namespace FERCO.Data
             }
         }
 
+
         public static bool Actualizar(Producto producto)
         {
             if (producto.IdProducto <= 0 || string.IsNullOrWhiteSpace(producto.NombreProducto) ||
-                producto.PrecioProducto < 0 || producto.StockProducto < 0)
+                producto.PrecioProducto < 0)
                 return false;
 
             try
@@ -78,7 +106,6 @@ namespace FERCO.Data
                                      id_categoria = @categoria,
                                      nombre_producto = @nombre,
                                      descripcion_producto = @descripcion,
-                                     stock_producto = @stock,
                                      precio_producto = @precio
                                  WHERE id_producto = @id";
                 using var cmd = new SqlCommand(query, conn);
@@ -87,7 +114,6 @@ namespace FERCO.Data
                 cmd.Parameters.AddWithValue("@categoria", producto.IdCategoria);
                 cmd.Parameters.AddWithValue("@nombre", producto.NombreProducto);
                 cmd.Parameters.AddWithValue("@descripcion", producto.DescripcionProducto);
-                cmd.Parameters.AddWithValue("@stock", producto.StockProducto);
                 cmd.Parameters.AddWithValue("@precio", producto.PrecioProducto);
 
                 return DAOHelper.EjecutarNoQuery(cmd);
@@ -114,44 +140,6 @@ namespace FERCO.Data
             catch (Exception ex)
             {
                 Console.Error.WriteLine($"[ERROR][ProductoDAO.Eliminar] {ex.Message}");
-                return false;
-            }
-        }
-
-        public static int ObtenerStockPorId(int idProducto)
-        {
-            try
-            {
-                using var conn = DAOHelper.AbrirConexionSegura();
-                string query = "SELECT stock_producto FROM Producto WHERE id_producto = @id";
-                using var cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@id", idProducto);
-                object result = cmd.ExecuteScalar();
-                return result != null ? Convert.ToInt32(result) : 0;
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"[ERROR][ProductoDAO.ObtenerStockPorId] {ex.Message}");
-                return 0;
-            }
-        }
-
-        public static bool ActualizarStock(int idProducto, int nuevoStock)
-        {
-            if (idProducto <= 0 || nuevoStock < 0) return false;
-
-            try
-            {
-                using var conn = DAOHelper.AbrirConexionSegura();
-                string query = "UPDATE Producto SET stock_producto = @stock WHERE id_producto = @id";
-                using var cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@stock", nuevoStock);
-                cmd.Parameters.AddWithValue("@id", idProducto);
-                return DAOHelper.EjecutarNoQuery(cmd);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"[ERROR][ProductoDAO.ActualizarStock] {ex.Message}");
                 return false;
             }
         }
