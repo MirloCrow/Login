@@ -33,6 +33,18 @@
                     <DropShadowEffect BlurRadius="10" ShadowDepth="4" Opacity="0.3"/>
                 </Border.Effect>
                 <StackPanel>
+                    <TextBlock Text="Cliente:" FontWeight="Bold" Margin="0,0,0,5" Foreground="Black"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                        <ComboBox x:Name="cmbCliente"
+                          Width="200"
+                          Background="#ECF0F1"
+                          Foreground="#2C3E50"
+                          BorderBrush="#BDC3C7"
+                          DisplayMemberPath="NombreCliente"
+                          SelectedIndex="-1"/>
+                        <Button Content="+" Width="30" Margin="5,0" Click="BtnAgregarCliente_Click"/>
+                    </StackPanel>
+
                     <TextBlock Text="Producto:" FontWeight="Bold" Margin="0,0,0,5" Foreground="Black"/>
                     <ComboBox x:Name="cmbProducto" Background="#ECF0F1" Foreground="#2C3E50" BorderBrush="#BDC3C7" Margin="0,0,0,15"/>
 

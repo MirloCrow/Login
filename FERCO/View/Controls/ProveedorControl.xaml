@@ -42,7 +42,7 @@
         <DataGrid x:Name="dgProveedores"
                   Grid.Row="1"
                   AutoGenerateColumns="True"
-                  SelectionChanged="dgProveedores_SelectionChanged"
+                  SelectionChanged="DgProveedores_SelectionChanged"
                   Foreground="Black"
                   Background="White"
                   FontWeight="SemiBold"

@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using FERCO.Model;
 
-namespace FERCO.Utilidades
+namespace FERCO.Utilities
 {
     public static class BoletaHTMLGenerator
     {

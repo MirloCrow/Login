@@ -17,14 +17,11 @@ using FERCO.Model;
 
 namespace FERCO.View
 {
-    /// <summary>
-    /// Interaction logic for ProveedorControl.xaml
-    /// </summary>
     public partial class ProveedorControl : UserControl
     {
         private Proveedor? proveedorSeleccionado;
 
-        private void dgProveedores_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void DgProveedores_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             proveedorSeleccionado = dgProveedores.SelectedItem as Proveedor;
             if (proveedorSeleccionado != null)
@@ -50,7 +47,7 @@ namespace FERCO.View
             }
 
             // Validar email básico
-            if (!email.Contains("@") || !email.Contains(".") || email.StartsWith("@") || email.EndsWith("@"))
+            if (!email.Contains('@') || !email.Contains('.') || email.StartsWith('@') || email.EndsWith('@'))
             {
                 MessageBox.Show("El correo electrónico no es válido. Debe tener formato texto@texto.com");
                 return;
@@ -64,7 +61,7 @@ namespace FERCO.View
             }
 
             // Crear objeto y agregar
-            Proveedor proveedor = new Proveedor
+            Proveedor proveedor = new()
             {
                 Nombre = nombre,
                 Email = email,

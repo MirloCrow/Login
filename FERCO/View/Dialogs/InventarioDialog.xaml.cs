@@ -2,7 +2,7 @@
 using FERCO.Data;
 using FERCO.Model;
 
-namespace FERCO.View
+namespace FERCO.View.Dialogs
 {
     public partial class InventarioDialog : Window
     {
@@ -16,12 +16,12 @@ namespace FERCO.View
             {
                 txtDescripcion.Text = inventario.Descripcion;
                 InventarioEditado = inventario;
-                this.Title = "Editar Inventario";
+                Title = "Editar Inventario";
             }
             else
             {
                 InventarioEditado = new Inventario();
-                this.Title = "Nuevo Inventario";
+                Title = "Nuevo Inventario";
             }
         }
 
@@ -58,5 +58,12 @@ namespace FERCO.View
                 MessageBox.Show("Error al guardar el inventario.");
             }
         }
+
+        private void BtnCancelar_Click(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = false;
+            this.Close();
+        }
+
     }
 }

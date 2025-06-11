@@ -4,18 +4,20 @@ using System.Windows;
 using System.Windows.Controls;
 using FERCO.Model;
 using FERCO.Data;
-using FERCO.Utilidades;
+using FERCO.Utilities;
+using FERCO.View.Dialogs;
 
 namespace FERCO.View
 {
     public partial class VentaControl : UserControl
     {
         private List<Producto> productos = [];
-        private List<DetalleVenta> carrito = new();
+        private readonly List<DetalleVenta> carrito = [];
 
         public VentaControl()
         {
             InitializeComponent();
+            InicializarClientes();
             InicializarProductos();
             ActualizarListas();
         }
@@ -36,6 +38,7 @@ namespace FERCO.View
                 lstStock.Items.Add($"{p.NombreProducto} | Precio: ${p.PrecioProducto} | Stock total: {p.StockTotal}");
             }
         }
+
 
         private void BtnAgregarCarrito_Click(object sender, RoutedEventArgs e)
         {
@@ -115,9 +118,20 @@ namespace FERCO.View
             foreach (var d in carrito)
                 totalVenta += d.SubtotalDetalle;
 
+            int idCliente;
+
+            if (cmbCliente.SelectedItem is Cliente clienteSeleccionado)
+            {
+                idCliente = clienteSeleccionado.IdCliente;
+            }
+            else
+            {
+                idCliente = ObtenerClienteVentaExpress(); // Ya implementado más arriba
+            }
+
             var venta = new Venta
             {
-                IdCliente = 1,
+                IdCliente = idCliente,
                 FechaVenta = DateTime.Now,
                 TotalVenta = totalVenta
             };
@@ -135,7 +149,6 @@ namespace FERCO.View
             lstVentas.Items.Add($"Venta registrada - Total: ${totalVenta}");
             MostrarMensaje("Venta completada exitosamente.", true);
 
-            // ✅ Copia segura del carrito antes de limpiarlo
             var copiaCarrito = new List<DetalleVenta>(carrito);
 
             carrito.Clear();
@@ -145,10 +158,8 @@ namespace FERCO.View
             InicializarProductos();
             ActualizarListas();
 
-            // ✅ Generar boleta con los datos correctos
             BoletaHTMLGenerator.GenerarBoleta(venta, copiaCarrito);
         }
-
 
         private void MostrarMensaje(string texto, bool esExito)
         {
@@ -156,7 +167,6 @@ namespace FERCO.View
             lblMensaje.Foreground = esExito ? System.Windows.Media.Brushes.LightGreen : System.Windows.Media.Brushes.Salmon;
         }
 
-        // ✅ MÉTODO NUEVO: Se ejecuta al editar cantidad en el carrito
         private void Cantidad_LostFocus(object sender, RoutedEventArgs e)
         {
             if (sender is TextBox txt && txt.DataContext is DetalleVenta detalle)
@@ -169,7 +179,7 @@ namespace FERCO.View
                     if (nuevaCantidad > stock)
                     {
                         MostrarMensaje($"Stock insuficiente. Disponible: {stock}", false);
-                        txt.Text = detalle.CantidadDetalle.ToString(); // Revertir visualmente
+                        txt.Text = detalle.CantidadDetalle.ToString();
                         return;
                     }
 
@@ -180,12 +190,12 @@ namespace FERCO.View
                 else
                 {
                     MostrarMensaje("Cantidad inválida. Debe ser mayor a 0.", false);
-                    txt.Text = detalle.CantidadDetalle.ToString(); // Revertir
+                    txt.Text = detalle.CantidadDetalle.ToString();
                 }
             }
         }
 
-        private void DescontarStock(int idProducto, int cantidad)
+        private static void DescontarStock(int idProducto, int cantidad)
         {
             var ubicaciones = InventarioProductoDAO.ObtenerUbicacionesPorProducto(idProducto);
             int cantidadARestar = cantidad;
@@ -201,6 +211,46 @@ namespace FERCO.View
                 InventarioProductoDAO.Actualizar(u);
             }
         }
+        private void InicializarClientes()
+        {
+            var clientes = ClienteDAO.ObtenerTodos()
+                                     .OrderBy(c => c.NombreCliente)
+                                     .ToList();
 
+            cmbCliente.ItemsSource = clientes;
+            cmbCliente.DisplayMemberPath = "NombreCliente";
+        }
+
+        private void BtnAgregarCliente_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new ClienteDialog();
+            if (dialog.ShowDialog() == true)
+            {
+                InicializarClientes(); // Recarga los clientes incluyendo el nuevo
+                cmbCliente.SelectedItem = dialog.ClienteAgregado; // Selecciona automáticamente el nuevo
+            }
+        }
+
+        private static int ObtenerClienteVentaExpress()
+        {
+            const string nombreVentaExpress = "Venta Express";
+
+            var cliente = ClienteDAO.BuscarPorNombre(nombreVentaExpress);
+            if (cliente != null)
+                return cliente.IdCliente;
+
+            var nuevo = new Cliente
+            {
+                RutCliente = 99999999,
+                NombreCliente = nombreVentaExpress,
+                EstadoCliente = false,
+                EmailCliente = "ventaexpress@ferco.local",
+                DireccionCliente = "N/A",
+                TelefonoCliente = 0
+            };
+
+            int nuevoId = ClienteDAO.AgregarYObtenerId(nuevo);
+            return nuevoId;
+        }
     }
 }

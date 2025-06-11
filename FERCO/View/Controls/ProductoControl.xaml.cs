@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using FERCO.Data;
 using FERCO.Model;
+using FERCO.View.Dialogs;
 
 namespace FERCO.View
 {
