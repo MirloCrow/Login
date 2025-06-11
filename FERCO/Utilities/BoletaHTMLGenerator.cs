@@ -10,6 +10,8 @@ namespace FERCO.Utilities
     {
         public static void GenerarBoleta(Venta venta, List<DetalleVenta> detalles)
         {
+            string clienteNombre = string.IsNullOrEmpty(venta.ClienteNombre) ? "Venta Express" : venta.ClienteNombre;
+
             string html = $@"
 <!DOCTYPE html>
 <html>
@@ -17,19 +19,33 @@ namespace FERCO.Utilities
     <meta charset='utf-8'>
     <title>Boleta #{venta.IdVenta}</title>
     <style>
-        body {{ font-family: Arial, sans-serif; margin: 40px; }}
-        h1 {{ text-align: center; }}
+        body {{ font-family: Arial, sans-serif; margin: 40px; color: #000; }}
+        h1, h2 {{ text-align: center; margin: 0; }}
+        .empresa-info {{ text-align: center; margin-top: 5px; margin-bottom: 20px; font-size: 14px; }}
+        .datos-venta, .datos-cliente {{ margin-top: 10px; font-size: 14px; }}
         table {{ width: 100%; border-collapse: collapse; margin-top: 20px; }}
         th, td {{ border: 1px solid #ccc; padding: 8px; text-align: center; }}
         th {{ background-color: #f4f4f4; }}
         .total {{ font-weight: bold; }}
-        .footer {{ margin-top: 30px; text-align: center; font-style: italic; }}
+        .footer {{ margin-top: 30px; text-align: center; font-style: italic; font-size: 14px; }}
     </style>
 </head>
 <body>
-    <h1>FERCO - Boleta de Venta</h1>
-    <p><strong>Fecha:</strong> {venta.FechaVenta}</p>
-    <p><strong>ID Venta:</strong> {venta.IdVenta}</p>
+    <h1>FERCO</h1>
+    <div class='empresa-info'>
+        Giro: Reparación y venta de bicicletas y accesorios.<br/>
+        Dirección: Cruce El Molino Carretera H-30 El Molino S/N, Coltauco, Rancagua<br/>
+        Teléfono: +56 9 8944 4321
+    </div>
+
+    <div class='datos-venta'>
+        <strong>Fecha:</strong> {venta.FechaVenta:dd-MM-yyyy HH:mm}<br/>
+        <strong>ID Venta:</strong> {venta.IdVenta}
+    </div>
+
+    <div class='datos-cliente'>
+        <strong>Cliente:</strong> {clienteNombre}
+    </div>
 
     <table>
         <tr>
@@ -45,15 +61,15 @@ namespace FERCO.Utilities
         <tr>
             <td>{d.ProductoNombre}</td>
             <td>{d.CantidadDetalle}</td>
-            <td>${d.PrecioUnitario}</td>
-            <td>${d.SubtotalDetalle}</td>
+            <td>${d.PrecioUnitario:N0}</td>
+            <td>${d.SubtotalDetalle:N0}</td>
         </tr>";
             }
 
             html += $@"
         <tr class='total'>
             <td colspan='3'>TOTAL</td>
-            <td>${venta.TotalVenta}</td>
+            <td>${venta.TotalVenta:N0}</td>
         </tr>
     </table>
 
@@ -73,5 +89,6 @@ namespace FERCO.Utilities
             // Abrir en navegador
             Process.Start(new ProcessStartInfo(rutaArchivo) { UseShellExecute = true });
         }
+
     }
 }
