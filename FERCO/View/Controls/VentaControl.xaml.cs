@@ -39,7 +39,6 @@ namespace FERCO.View
             }
         }
 
-
         private void BtnAgregarCarrito_Click(object sender, RoutedEventArgs e)
         {
             if (cmbProducto.SelectedItem is Producto productoSeleccionado &&
@@ -51,10 +50,11 @@ namespace FERCO.View
                     MostrarMensaje("Error: no se pudo obtener el stock del producto.", false);
                     return;
                 }
-                int stockActual = productoSeleccionado.UbicacionesConStock?.Sum(u => u.Cantidad) ?? 0;
-                if (cantidad > stockActual)
+
+                // Validación centralizada
+                if (!ValidarStockDisponible(productoSeleccionado.IdProducto, cantidad, null, out string mensaje))
                 {
-                    MostrarMensaje($"Stock insuficiente. Disponible: {stockActual}", false);
+                    MostrarMensaje(mensaje, false);
                     return;
                 }
 
@@ -76,9 +76,10 @@ namespace FERCO.View
             }
             else
             {
-                MostrarMensaje("Seleccione un producto y cantidad válida.", false);
+                MostrarMensaje("Seleccione un producto y una cantidad válida.", false);
             }
         }
+
 
         private void RefrescarCarrito()
         {
@@ -114,29 +115,52 @@ namespace FERCO.View
                 return;
             }
 
-            int totalVenta = 0;
-            foreach (var d in carrito)
-                totalVenta += d.SubtotalDetalle;
-
-            int idCliente;
-
-            if (cmbCliente.SelectedItem is Cliente clienteSeleccionado)
+            // Validación de stock por cada producto
+            foreach (var detalle in carrito)
             {
-                idCliente = clienteSeleccionado.IdCliente;
+                if (!ValidarStockDisponible(detalle.IdProducto, detalle.CantidadDetalle, detalle, out string mensaje))
+                {
+                    MostrarMensaje($"No se puede registrar la venta: {mensaje}", false);
+                    return;
+                }
+            }
+
+            int totalVenta = carrito.Sum(d => d.SubtotalDetalle);
+
+            Cliente? clienteSeleccionado;
+
+            if (cmbCliente.SelectedItem is Cliente cliente)
+            {
+                clienteSeleccionado = cliente;
             }
             else
             {
-                idCliente = ObtenerClienteVentaExpress(); // Ya implementado más arriba
+                int idExpress = ObtenerClienteVentaExpress();
+                clienteSeleccionado = ClienteDAO.ObtenerPorId(idExpress);
+
+                if (clienteSeleccionado == null)
+                {
+                    MostrarMensaje("Error: no se pudo obtener el cliente Venta Express.", false);
+                    return;
+                }
             }
 
             var venta = new Venta
             {
-                IdCliente = idCliente,
+                IdCliente = clienteSeleccionado.IdCliente,
+                ClienteNombre = clienteSeleccionado.NombreCliente,
                 FechaVenta = DateTime.Now,
                 TotalVenta = totalVenta
             };
 
+
             int idVenta = VentaDAO.RegistrarVenta(venta);
+            if (idVenta <= 0)
+            {
+                MostrarMensaje("No se pudo registrar la venta. Por favor, intente nuevamente.", false);
+                return;
+            }
+            venta.IdVenta = idVenta;
 
             foreach (var detalle in carrito)
             {
@@ -173,13 +197,10 @@ namespace FERCO.View
             {
                 if (int.TryParse(txt.Text, out int nuevaCantidad) && nuevaCantidad > 0)
                 {
-                    int stock = InventarioProductoDAO.ObtenerUbicacionesPorProducto(detalle.IdProducto)
-                                                     .Sum(u => u.Cantidad);
-
-                    if (nuevaCantidad > stock)
+                    if (!ValidarStockDisponible(detalle.IdProducto, nuevaCantidad, detalle, out string mensaje))
                     {
-                        MostrarMensaje($"Stock insuficiente. Disponible: {stock}", false);
-                        txt.Text = detalle.CantidadDetalle.ToString();
+                        MostrarMensaje(mensaje, false);
+                        txt.Text = detalle.CantidadDetalle.ToString(); // Revertir
                         return;
                     }
 
@@ -190,10 +211,46 @@ namespace FERCO.View
                 else
                 {
                     MostrarMensaje("Cantidad inválida. Debe ser mayor a 0.", false);
-                    txt.Text = detalle.CantidadDetalle.ToString();
+                    txt.Text = detalle.CantidadDetalle.ToString(); // Revertir
                 }
             }
         }
+
+        private bool ValidarStockDisponible(int idProducto, int cantidadDeseada, DetalleVenta? lineaActual, out string mensaje)
+        {
+            var ubicaciones = InventarioProductoDAO.ObtenerUbicacionesPorProducto(idProducto);
+            int stockTotal = ubicaciones.Sum(u => u.Cantidad);
+
+            int cantidadEnOtrasLineas = carrito
+                .Where(d => d.IdProducto == idProducto && d != lineaActual)
+                .Sum(d => d.CantidadDetalle);
+
+            int cantidadTotalDeseada = cantidadDeseada + cantidadEnOtrasLineas;
+
+            if (cantidadTotalDeseada > stockTotal)
+            {
+                int disponible = stockTotal - cantidadEnOtrasLineas;
+
+                if (stockTotal == 0)
+                {
+                    mensaje = "No hay stock disponible para este producto.";
+                }
+                else if (disponible <= 0)
+                {
+                    mensaje = $"Ya has asignado el máximo ({cantidadEnOtrasLineas}) en otras líneas.";
+                }
+                else
+                {
+                    mensaje = $"Stock insuficiente. Ya hay {cantidadEnOtrasLineas} en otras líneas. Máximo permitido aquí: {disponible}.";
+                }
+
+                return false;
+            }
+
+            mensaje = string.Empty;
+            return true;
+        }
+
 
         private static void DescontarStock(int idProducto, int cantidad)
         {
@@ -226,8 +283,22 @@ namespace FERCO.View
             var dialog = new ClienteDialog();
             if (dialog.ShowDialog() == true)
             {
-                InicializarClientes(); // Recarga los clientes incluyendo el nuevo
-                cmbCliente.SelectedItem = dialog.ClienteAgregado; // Selecciona automáticamente el nuevo
+                InicializarClientes(); // Recarga la lista
+
+                // Buscar por ID para volver a seleccionar al cliente recién agregado
+                var clienteAgregado = dialog.ClienteAgregado;
+
+                if (clienteAgregado != null)
+                {
+                    var clienteSeleccionado = cmbCliente.Items.Cast<Cliente>()
+                        .FirstOrDefault(c => c.IdCliente == clienteAgregado.IdCliente);
+
+                    if (clienteSeleccionado != null)
+                    {
+                        cmbCliente.SelectedItem = clienteSeleccionado;
+                    }
+                }
+
             }
         }
 

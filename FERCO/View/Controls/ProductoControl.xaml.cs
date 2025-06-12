@@ -118,7 +118,6 @@ namespace FERCO.View
 
             if (confirmar == MessageBoxResult.Yes)
             {
-                // Aquí debes implementar CategoriaDAO.Eliminar(id)
                 if (CategoriaDAO.Eliminar(categoria.IdCategoria))
                 {
                     MessageBox.Show("Categoría eliminada.");

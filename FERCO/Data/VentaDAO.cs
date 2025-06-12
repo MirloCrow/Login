@@ -22,7 +22,10 @@ namespace FERCO.Data
                 cmd.Parameters.AddWithValue("@fecha", venta.FechaVenta);
                 cmd.Parameters.AddWithValue("@total", venta.TotalVenta);
 
-                return (int)cmd.ExecuteScalar();
+                int idGenerado = (int)cmd.ExecuteScalar();
+                venta.IdVenta = idGenerado; // ← ASIGNACIÓN NECESARIA
+
+                return idGenerado;
             }
             catch (SqlException ex) when (ex.Message.Contains("FOREIGN KEY constraint") && ex.Message.Contains("Cliente"))
             {
@@ -30,7 +33,7 @@ namespace FERCO.Data
                                 "Cliente no encontrado",
                                 MessageBoxButton.OK,
                                 MessageBoxImage.Warning);
-                return -1; // Indicador de error
+                return -1;
             }
             catch (Exception ex)
             {
@@ -41,7 +44,6 @@ namespace FERCO.Data
                 return -1;
             }
         }
-
 
         public static void RegistrarDetalle(DetalleVenta detalle)
         {

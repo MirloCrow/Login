@@ -32,6 +32,32 @@ namespace FERCO.Data
             return null;
         }
 
+        public static Cliente? ObtenerPorId(int idCliente)
+        {
+            using var conn = ConexionBD.ObtenerConexion();
+            conn.Open();
+            var cmd = new SqlCommand("SELECT * FROM Cliente WHERE id_cliente = @id", conn);
+            cmd.Parameters.AddWithValue("@id", idCliente);
+
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                return new Cliente
+                {
+                    IdCliente = (int)reader["id_cliente"],
+                    RutCliente = (int)reader["rut_cliente"],
+                    EstadoCliente = (bool)reader["estado_cliente"],
+                    NombreCliente = reader["nombre_cliente"].ToString()!,
+                    EmailCliente = reader["email_cliente"].ToString()!,
+                    DireccionCliente = reader["direccion_cliente"].ToString()!,
+                    TelefonoCliente = (int)reader["telefono_cliente"]
+                };
+            }
+
+            return null;
+        }
+
+
         public static int AgregarYObtenerId(Cliente cliente)
         {
             using var conn = ConexionBD.ObtenerConexion();

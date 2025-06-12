@@ -41,6 +41,7 @@
                           Foreground="#2C3E50"
                           BorderBrush="#BDC3C7"
                           DisplayMemberPath="NombreCliente"
+                          SelectedValuePath="IdCliente"
                           SelectedIndex="-1"/>
                         <Button Content="+" Width="30" Margin="5,0" Click="BtnAgregarCliente_Click"/>
                     </StackPanel>
