@@ -38,9 +38,8 @@
                       DisplayMemberPath="Nombre"
                       Width="250" Margin="10,0"/>
             <Button Content="Agregar tipo de reparación"
-            Command="{Binding AgregarTipoReparacionCommand}"
-            Margin="10,0"/>
-
+                    Command="{Binding AgregarTipoReparacionCommand}"
+                    Margin="10,0"/>
         </StackPanel>
 
         <!-- Lista de productos -->
@@ -50,7 +49,21 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Producto" Binding="{Binding NombreProducto}" IsReadOnly="True"/>
                 <DataGridTextColumn Header="Cantidad sugerida" Binding="{Binding CantidadRequerida}" IsReadOnly="True"/>
-                <DataGridTextColumn Header="Cantidad a usar" Binding="{Binding CantidadAUsar, Mode=TwoWay}"/>
+
+                <!-- Columna editable con estilo visual mejorado -->
+                <DataGridTemplateColumn Header="Cantidad a usar ✎" Width="150">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding CantidadAUsar, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                     Background="LightYellow"
+                                     ToolTip="Puedes modificar la cantidad que deseas usar para esta reparación"
+                                     HorizontalAlignment="Center"
+                                     VerticalAlignment="Center"
+                                     Width="100"
+                                     Margin="5"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
 
@@ -62,3 +75,4 @@
                 Grid.Row="3" Margin="0,10,0,0"/>
     </Grid>
 </UserControl>
+

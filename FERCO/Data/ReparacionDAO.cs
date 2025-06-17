@@ -14,6 +14,17 @@ namespace FERCO.Data
 
             using var conn = DAOHelper.AbrirConexionSegura();
             using var trans = conn.BeginTransaction();
+            // Validación previa: stock suficiente para cada producto
+            foreach (var item in productos)
+            {
+                int stockTotal = InventarioProductoDAO.ObtenerStockTotal(conn, trans, item.IdProducto);
+                if (stockTotal < item.CantidadAUsar)
+                {
+                    mensajeError = $"Stock insuficiente para '{item.NombreProducto}': requiere {item.CantidadAUsar}, disponible {stockTotal}.";
+                    return false;
+                }
+            }
+
             try
             {
                 // 1. Insertar reparación base
