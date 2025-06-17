@@ -14,21 +14,38 @@ namespace FERCO.Data
             try
             {
                 using var conn = DAOHelper.AbrirConexionSegura();
-                string query = "SELECT id_producto, nombre_producto, descripcion_producto, precio_producto, id_proveedor, id_categoria FROM Producto";
+
+                string query = @"
+            SELECT p.id_producto, 
+                   p.nombre_producto, 
+                   p.descripcion_producto, 
+                   p.precio_producto, 
+                   p.id_proveedor, 
+                   p.id_categoria,
+                   pr.nombre_proveedor,
+                   c.nombre_categoria
+            FROM Producto p
+            JOIN Proveedor pr ON p.id_proveedor = pr.id_proveedor
+            JOIN Categoria c ON p.id_categoria = c.id_categoria";
+
                 using var cmd = new SqlCommand(query, conn);
                 using var reader = cmd.ExecuteReader();
 
                 while (reader.Read())
                 {
+                    int idProducto = reader.GetInt32(0);
+
                     var producto = new Producto
                     {
-                        IdProducto = reader.GetInt32(0),
+                        IdProducto = idProducto,
                         NombreProducto = reader.GetString(1),
                         DescripcionProducto = reader.GetString(2),
                         PrecioProducto = reader.GetInt32(3),
                         IdProveedor = reader.GetInt32(4),
                         IdCategoria = reader.GetInt32(5),
-                        UbicacionesConStock = InventarioProductoDAO.ObtenerUbicacionesPorProducto(reader.GetInt32(0))
+                        NombreProveedor = reader.GetString(6),
+                        NombreCategoria = reader.GetString(7),
+                        UbicacionesConStock = InventarioProductoDAO.ObtenerUbicacionesPorProducto(idProducto)
                     };
 
                     productos.Add(producto);
@@ -41,6 +58,7 @@ namespace FERCO.Data
 
             return productos;
         }
+
         public static Producto? BuscarPorNombre(string nombre)
         {
             using var conn = DAOHelper.AbrirConexionSegura();

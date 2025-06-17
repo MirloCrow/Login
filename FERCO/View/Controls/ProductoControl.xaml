@@ -54,7 +54,7 @@
                 <!-- Inventario -->
                 <Label Content="Inventario"/>
                 <StackPanel Orientation="Horizontal">
-                    <ComboBox x:Name="cmbInventario" Width="200"/>
+                    <ComboBox x:Name="cmbInventario" Width="200" DisplayMemberPath="Descripcion" SelectionChanged="CmbInventario_SelectionChanged"/>
                     <Button Content="+" Width="30" Margin="5,0" Click="BtnAgregarInventario_Click"/>
                     <Button Content="✎" Width="30" Margin="2,0" Click="BtnEditarInventario_Click"/>
                     <Button Content="🗑" Width="30" Margin="2,0" Click="BtnEliminarInventario_Click"/>
@@ -72,10 +72,19 @@
 
         <!-- DataGrid de productos -->
         <DataGrid x:Name="dgProductos"
-                  Grid.Row="1"
-                  AutoGenerateColumns="True"
-                  SelectionChanged="DgProductos_SelectionChanged"
-                  Margin="0,10,0,10"/>
+          Grid.Row="1"
+          AutoGenerateColumns="False"
+          SelectionChanged="DgProductos_SelectionChanged"
+          Margin="0,10,0,10">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Nombre" Binding="{Binding NombreProducto}" Width="2*" />
+                <DataGridTextColumn Header="Descripción" Binding="{Binding DescripcionProducto}" Width="3*" />
+                <DataGridTextColumn Header="Precio" Binding="{Binding PrecioProducto}" Width="1*" />
+                <DataGridTextColumn Header="Categoría" Binding="{Binding NombreCategoria}" Width="2*" />
+                <DataGridTextColumn Header="Proveedor" Binding="{Binding NombreProveedor}" Width="2*" />
+                <DataGridTextColumn Header="Stock Total" Binding="{Binding StockTotal}" Width="1*" />
+            </DataGrid.Columns>
+        </DataGrid>
 
         <!-- DataGrid editable de ubicaciones con stock -->
         <GroupBox Header="Ubicaciones con stock del producto seleccionado"
@@ -86,7 +95,7 @@
                       CanUserAddRows="False"
                       IsReadOnly="False"
                       CellEditEnding="DgUbicaciones_CellEditEnding"
-                      Height="150">
+                      Height="111">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Ubicación" Binding="{Binding DescripcionUbicacion}" Width="*" IsReadOnly="True"/>
                     <DataGridTextColumn Header="Stock" Binding="{Binding Cantidad}" Width="100"/>

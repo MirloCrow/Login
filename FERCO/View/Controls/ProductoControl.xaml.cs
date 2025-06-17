@@ -41,7 +41,7 @@ namespace FERCO.View
             cmbCategoria.SelectedValuePath = "IdCategoria";
 
             cmbInventario.ItemsSource = InventarioDAO.ObtenerInventarios();
-            cmbInventario.DisplayMemberPath = "Nombre";
+            cmbInventario.DisplayMemberPath = "Descripcion";
             cmbInventario.SelectedValuePath = "IdInventario";
         }
 
@@ -67,8 +67,21 @@ namespace FERCO.View
 
                 dgUbicaciones.ItemsSource = productoSeleccionado?.UbicacionesConStock;
 
+                var inventarioMayorStock = productoSeleccionado?.UbicacionesConStock?
+                    .OrderByDescending(u => u.Cantidad)
+                    .FirstOrDefault();
+
+                if (inventarioMayorStock != null)
+                {
+                    cmbInventario.SelectedValue = inventarioMayorStock.IdInventario;
+                }
+                else
+                {
+                    cmbInventario.SelectedIndex = -1;
+                }
             }
         }
+
 
         // CRUD CATEGORÍA
         private void BtnAgregarCategoria_Click(object sender, RoutedEventArgs e)
@@ -433,6 +446,26 @@ namespace FERCO.View
             LimpiarCampos();
             CargarProductos();
         }
+        private void CmbInventario_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (productoSeleccionado != null &&
+                cmbInventario.SelectedItem is Inventario inventario &&
+                productoSeleccionado.UbicacionesConStock != null)
+            {
+                var ubicacion = productoSeleccionado.UbicacionesConStock
+                    .FirstOrDefault(u => u.IdInventario == inventario.IdInventario);
+
+                if (ubicacion != null)
+                {
+                    txtStock.Text = ubicacion.Cantidad.ToString();
+                }
+                else
+                {
+                    txtStock.Text = "0";
+                }
+            }
+        }
+
 
 
 
