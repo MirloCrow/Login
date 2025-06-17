@@ -2,7 +2,7 @@
 using FERCO.Model;
 using FERCO.Data;
 
-namespace FERCO.View
+namespace FERCO.View.Dialogs
 {
     public partial class CategoriaDialog : Window
     {
@@ -14,7 +14,6 @@ namespace FERCO.View
 
             if (categoria != null)
             {
-                // Si se pasa una categoría, estamos editando
                 txtNombre.Text = categoria.Nombre;
                 txtDescripcion.Text = categoria.Descripcion;
                 CategoriaEditada = categoria;
@@ -22,7 +21,6 @@ namespace FERCO.View
             }
             else
             {
-                // Si no, es una nueva
                 CategoriaEditada = new Categoria();
                 this.Title = "Nueva Categoría";
             }
@@ -35,7 +33,7 @@ namespace FERCO.View
 
             if (string.IsNullOrWhiteSpace(CategoriaEditada.Nombre))
             {
-                MessageBox.Show("El nombre no puede estar vacío.");
+                MessageBox.Show("El nombre no puede estar vacío.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -52,13 +50,19 @@ namespace FERCO.View
 
             if (resultado)
             {
-                DialogResult = true;
-                Close();
+                this.DialogResult = true;
+                this.Close();
             }
             else
             {
-                MessageBox.Show("No se pudo guardar la categoría.");
+                MessageBox.Show("No se pudo guardar la categoría.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void BtnCancelar_Click(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = false;
+            this.Close();
         }
     }
 }

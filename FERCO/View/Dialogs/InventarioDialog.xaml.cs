@@ -2,7 +2,7 @@
 using FERCO.Data;
 using FERCO.Model;
 
-namespace FERCO.View
+namespace FERCO.View.Dialogs
 {
     public partial class InventarioDialog : Window
     {
@@ -14,34 +14,28 @@ namespace FERCO.View
 
             if (inventario != null)
             {
-                txtIdProducto.Text = inventario.IdProducto.ToString();
-                txtCantidad.Text = inventario.CantidadProducto.ToString();
+                txtDescripcion.Text = inventario.Descripcion;
                 InventarioEditado = inventario;
-                this.Title = "Editar Inventario";
+                Title = "Editar Inventario";
             }
             else
             {
                 InventarioEditado = new Inventario();
-                this.Title = "Nuevo Inventario";
+                Title = "Nuevo Inventario";
             }
         }
 
         private void BtnGuardar_Click(object sender, RoutedEventArgs e)
         {
-            if (!int.TryParse(txtIdProducto.Text, out int idProd) || idProd <= 0)
+            string descripcion = txtDescripcion.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(descripcion))
             {
-                MessageBox.Show("ID de producto inválido.");
+                MessageBox.Show("La descripción no puede estar vacía.");
                 return;
             }
 
-            if (!int.TryParse(txtCantidad.Text, out int cantidad) || cantidad < 0)
-            {
-                MessageBox.Show("Cantidad inválida.");
-                return;
-            }
-
-            InventarioEditado.IdProducto = idProd;
-            InventarioEditado.CantidadProducto = cantidad;
+            InventarioEditado.Descripcion = descripcion;
 
             bool exito;
             if (InventarioEditado.IdInventario == 0)
@@ -64,5 +58,12 @@ namespace FERCO.View
                 MessageBox.Show("Error al guardar el inventario.");
             }
         }
+
+        private void BtnCancelar_Click(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = false;
+            this.Close();
+        }
+
     }
 }

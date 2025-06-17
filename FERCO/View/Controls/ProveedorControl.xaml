@@ -40,9 +40,13 @@
         </StackPanel>
 
         <DataGrid x:Name="dgProveedores"
-          Grid.Row="1"
-          AutoGenerateColumns="True"
-          SelectionChanged="dgProveedores_SelectionChanged"/>
-
+                  Grid.Row="1"
+                  AutoGenerateColumns="True"
+                  SelectionChanged="DgProveedores_SelectionChanged"
+                  Foreground="Black"
+                  Background="White"
+                  FontWeight="SemiBold"
+                  RowBackground="White"
+                  AlternatingRowBackground="#F0F0F0"/>
     </Grid>
 </UserControl>

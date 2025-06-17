@@ -7,6 +7,8 @@ namespace FERCO.View
 {
     public partial class InventarioControl : UserControl
     {
+        private Inventario? inventarioSeleccionado = null;
+
         public InventarioControl()
         {
             InitializeComponent();
@@ -15,66 +17,67 @@ namespace FERCO.View
 
         private void CargarDatos()
         {
-            dgInventario.ItemsSource = InventarioDAO.ObtenerInventario();
+            dgInventario.ItemsSource = InventarioDAO.ObtenerInventarios();
+            inventarioSeleccionado = null;
+            txtDescripcion.Clear();
         }
 
         private void BtnAgregar_Click(object sender, RoutedEventArgs e)
         {
-            if (CamposValidos(out int id, out int prod, out int cantidad))
+            if (string.IsNullOrWhiteSpace(txtDescripcion.Text))
             {
-                var inv = new Inventario
-                {
-                    IdInventario = id,
-                    IdProducto = prod,
-                    CantidadProducto = cantidad
-                };
-                InventarioDAO.Agregar(inv);
-                CargarDatos();
+                MessageBox.Show("Ingrese una descripción para el inventario.");
+                return;
             }
+
+            var nuevo = new Inventario
+            {
+                Descripcion = txtDescripcion.Text.Trim()
+            };
+
+            InventarioDAO.Agregar(nuevo);
+            CargarDatos();
         }
 
         private void BtnEditar_Click(object sender, RoutedEventArgs e)
         {
-            if (CamposValidos(out int id, out int prod, out int cantidad))
+            if (inventarioSeleccionado == null)
             {
-                var inv = new Inventario
-                {
-                    IdInventario = id,
-                    IdProducto = prod,
-                    CantidadProducto = cantidad
-                };
-                InventarioDAO.Actualizar(inv);
-                CargarDatos();
+                MessageBox.Show("Seleccione un inventario desde la tabla.");
+                return;
             }
+
+            if (string.IsNullOrWhiteSpace(txtDescripcion.Text))
+            {
+                MessageBox.Show("La descripción no puede estar vacía.");
+                return;
+            }
+
+            inventarioSeleccionado.Descripcion = txtDescripcion.Text.Trim();
+            InventarioDAO.Actualizar(inventarioSeleccionado);
+            CargarDatos();
         }
 
         private void BtnEliminar_Click(object sender, RoutedEventArgs e)
         {
-            if (int.TryParse(txtId.Text, out int id))
+            if (inventarioSeleccionado == null)
             {
-                InventarioDAO.Eliminar(id);
-                CargarDatos();
+                MessageBox.Show("Seleccione un inventario para eliminar.");
+                return;
             }
-            else
-            {
-                MessageBox.Show("Ingrese un ID válido para eliminar.");
-            }
+
+            InventarioDAO.Eliminar(inventarioSeleccionado.IdInventario);
+            CargarDatos();
         }
 
-        private bool CamposValidos(out int id, out int prod, out int cantidad)
+        private void DgInventario_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            id = prod = cantidad = 0;
-            if (string.IsNullOrWhiteSpace(txtId.Text) ||
-                string.IsNullOrWhiteSpace(txtProducto.Text) ||
-                string.IsNullOrWhiteSpace(txtCantidad.Text))
-            {
-                MessageBox.Show("Todos los campos son obligatorios.");
-                return false;
-            }
+            inventarioSeleccionado = dgInventario.SelectedItem as Inventario;
 
-            return int.TryParse(txtId.Text, out id) &&
-                   int.TryParse(txtProducto.Text, out prod) &&
-                   int.TryParse(txtCantidad.Text, out cantidad);
+            if (inventarioSeleccionado != null)
+            {
+                txtDescripcion.Text = inventarioSeleccionado.Descripcion;
+            }
         }
     }
 }

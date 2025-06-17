@@ -1,6 +1,7 @@
-﻿using System;
+﻿using FERCO.Model;
 using Microsoft.Data.SqlClient;
-using FERCO.Model;
+using System;
+using System.Windows;
 
 namespace FERCO.Data
 {
@@ -8,15 +9,40 @@ namespace FERCO.Data
     {
         public static int RegistrarVenta(Venta venta)
         {
-            using SqlConnection conn = ConexionBD.ObtenerConexion();
-            conn.Open();
-            string query = "INSERT INTO Ventas (id_cliente, fecha_venta, total_venta) OUTPUT INSERTED.id_venta VALUES (@cliente, @fecha, @total)";
-            using SqlCommand cmd = new(query, conn);
-            cmd.Parameters.AddWithValue("@cliente", venta.IdCliente);
-            cmd.Parameters.AddWithValue("@fecha", venta.FechaVenta);
-            cmd.Parameters.AddWithValue("@total", venta.TotalVenta);
+            try
+            {
+                using SqlConnection conn = ConexionBD.ObtenerConexion();
+                conn.Open();
 
-            return (int)cmd.ExecuteScalar(); // devuelve el ID generado
+                string query = "INSERT INTO Ventas (id_cliente, fecha_venta, total_venta) " +
+                               "OUTPUT INSERTED.id_venta VALUES (@cliente, @fecha, @total)";
+
+                using SqlCommand cmd = new(query, conn);
+                cmd.Parameters.AddWithValue("@cliente", venta.IdCliente);
+                cmd.Parameters.AddWithValue("@fecha", venta.FechaVenta);
+                cmd.Parameters.AddWithValue("@total", venta.TotalVenta);
+
+                int idGenerado = (int)cmd.ExecuteScalar();
+                venta.IdVenta = idGenerado; // ← ASIGNACIÓN NECESARIA
+
+                return idGenerado;
+            }
+            catch (SqlException ex) when (ex.Message.Contains("FOREIGN KEY constraint") && ex.Message.Contains("Cliente"))
+            {
+                MessageBox.Show("Error: el cliente seleccionado no existe. Por favor, agregue un cliente antes de registrar una venta.",
+                                "Cliente no encontrado",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Warning);
+                return -1;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Se produjo un error al registrar la venta:\n" + ex.Message,
+                                "Error inesperado",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Error);
+                return -1;
+            }
         }
 
         public static void RegistrarDetalle(DetalleVenta detalle)

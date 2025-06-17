@@ -2,7 +2,7 @@
 using FERCO.Data;
 using FERCO.Model;
 
-namespace FERCO.View
+namespace FERCO.View.Dialogs
 {
     public partial class ProveedorDialog : Window
     {
@@ -21,13 +21,13 @@ namespace FERCO.View
                 txtTelefono.Text = proveedor.Telefono.ToString();
 
                 ProveedorEditado = proveedor;
-                this.Title = "Editar Proveedor";
+                Title = "Editar Proveedor";
             }
             else
             {
                 // Nuevo
                 ProveedorEditado = new Proveedor();
-                this.Title = "Nuevo Proveedor";
+                Title = "Nuevo Proveedor";
             }
         }
 
@@ -71,5 +71,11 @@ namespace FERCO.View
                 MessageBox.Show("No se pudo guardar el proveedor.");
             }
         }
+        private void BtnCancelar_Click(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = false;
+            this.Close();
+        }
+
     }
 }

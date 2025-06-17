@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using FERCO.Data;
 using FERCO.Model;
+using FERCO.View.Dialogs;
 
 namespace FERCO.View
 {
@@ -25,6 +26,7 @@ namespace FERCO.View
         {
             InitializeComponent();
             CargarCombos();
+            CargarProductos();
         }
 
         // LOADERS
@@ -38,8 +40,8 @@ namespace FERCO.View
             cmbCategoria.DisplayMemberPath = "Nombre";
             cmbCategoria.SelectedValuePath = "IdCategoria";
 
-            cmbInventario.ItemsSource = InventarioDAO.ObtenerInventario();
-            cmbInventario.DisplayMemberPath = "Nombre";
+            cmbInventario.ItemsSource = InventarioDAO.ObtenerInventarios();
+            cmbInventario.DisplayMemberPath = "Descripcion";
             cmbInventario.SelectedValuePath = "IdInventario";
         }
 
@@ -58,12 +60,28 @@ namespace FERCO.View
                 txtNombre.Text = productoSeleccionado.NombreProducto;
                 txtDescripcion.Text = productoSeleccionado.DescripcionProducto;
                 txtPrecio.Text = productoSeleccionado.PrecioProducto.ToString();
-                txtStock.Text = productoSeleccionado.StockProducto.ToString();
+                txtStock.Text = productoSeleccionado.StockTotal.ToString();
 
                 cmbCategoria.SelectedValue = productoSeleccionado.IdCategoria;
                 cmbProveedor.SelectedValue = productoSeleccionado.IdProveedor;
+
+                dgUbicaciones.ItemsSource = productoSeleccionado?.UbicacionesConStock;
+
+                var inventarioMayorStock = productoSeleccionado?.UbicacionesConStock?
+                    .OrderByDescending(u => u.Cantidad)
+                    .FirstOrDefault();
+
+                if (inventarioMayorStock != null)
+                {
+                    cmbInventario.SelectedValue = inventarioMayorStock.IdInventario;
+                }
+                else
+                {
+                    cmbInventario.SelectedIndex = -1;
+                }
             }
         }
+
 
         // CRUD CATEGORÍA
         private void BtnAgregarCategoria_Click(object sender, RoutedEventArgs e)
@@ -113,7 +131,6 @@ namespace FERCO.View
 
             if (confirmar == MessageBoxResult.Yes)
             {
-                // Aquí debes implementar CategoriaDAO.Eliminar(id)
                 if (CategoriaDAO.Eliminar(categoria.IdCategoria))
                 {
                     MessageBox.Show("Categoría eliminada.");
@@ -192,30 +209,40 @@ namespace FERCO.View
             if (int.TryParse(txtPrecio.Text, out int precio) &&
                 int.TryParse(txtStock.Text, out int stock) &&
                 cmbCategoria.SelectedItem is Categoria categoria &&
-                cmbProveedor.SelectedItem is Proveedor proveedor)
+                cmbProveedor.SelectedItem is Proveedor proveedor &&
+                cmbInventario.SelectedItem is Inventario inventario)
             {
-                Producto nuevo = new()
-                {
-                    NombreProducto = txtNombre.Text.Trim(),
-                    DescripcionProducto = txtDescripcion.Text.Trim(),
-                    PrecioProducto = precio,
-                    StockProducto = stock,
-                    IdCategoria = categoria.IdCategoria,
-                    IdProveedor = proveedor.IdProveedor
-                };
+                string nombre = txtNombre.Text.Trim();
 
-                if (ProductoDAO.Agregar(nuevo))
-                {
-                    int idProducto = ProductoDAO.ObtenerUltimoId(); // o podrías devolverlo desde el INSERT
-                    InventarioDAO.Agregar(new Inventario { IdProducto = idProducto, CantidadProducto = stock });
+                // Buscar si ya existe un producto con el mismo nombre
+                Producto? existente = ProductoDAO.BuscarPorNombre(nombre);
 
-                    MessageBox.Show("Producto agregado.");
-                    LimpiarCampos();
-                    CargarProductos();
+                if (existente != null)
+                {
+                    // Ya existe -> agregar stock en otra ubicación
+                    AgregarStockUbicacion(existente.IdProducto, stock, inventario.IdInventario);
                 }
                 else
                 {
-                    MessageBox.Show("Error al agregar producto.");
+                    // Crear nuevo producto
+                    Producto nuevo = new()
+                    {
+                        NombreProducto = nombre,
+                        DescripcionProducto = txtDescripcion.Text.Trim(),
+                        PrecioProducto = precio,
+                        IdCategoria = categoria.IdCategoria,
+                        IdProveedor = proveedor.IdProveedor
+                    };
+
+                    if (ProductoDAO.Agregar(nuevo))
+                    {
+                        int idProducto = ProductoDAO.ObtenerUltimoId();
+                        AgregarStockUbicacion(idProducto, stock, inventario.IdInventario);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Error al agregar producto.");
+                    }
                 }
             }
             else
@@ -223,6 +250,8 @@ namespace FERCO.View
                 MessageBox.Show("Revisa los datos ingresados.");
             }
         }
+
+
 
         private void BtnEditarProducto_Click(object sender, RoutedEventArgs e)
         {
@@ -235,18 +264,37 @@ namespace FERCO.View
             if (int.TryParse(txtPrecio.Text, out int precio) &&
                 int.TryParse(txtStock.Text, out int stock) &&
                 cmbCategoria.SelectedItem is Categoria categoria &&
-                cmbProveedor.SelectedItem is Proveedor proveedor)
+                cmbProveedor.SelectedItem is Proveedor proveedor &&
+                cmbInventario.SelectedItem is Inventario inventario)
             {
                 productoSeleccionado.NombreProducto = txtNombre.Text.Trim();
                 productoSeleccionado.DescripcionProducto = txtDescripcion.Text.Trim();
                 productoSeleccionado.PrecioProducto = precio;
-                productoSeleccionado.StockProducto = stock;
                 productoSeleccionado.IdCategoria = categoria.IdCategoria;
                 productoSeleccionado.IdProveedor = proveedor.IdProveedor;
 
                 if (ProductoDAO.Actualizar(productoSeleccionado))
                 {
-                    MessageBox.Show("Producto actualizado.");
+                    var inventarioProducto = new InventarioProducto
+                    {
+                        IdInventario = inventario.IdInventario,
+                        IdProducto = productoSeleccionado.IdProducto,
+                        Cantidad = stock
+                    };
+
+                    // Si ya existe, actualiza; si no, inserta
+                    var ubicaciones = InventarioProductoDAO.ObtenerUbicacionesPorProducto(productoSeleccionado.IdProducto);
+                    bool yaExiste = ubicaciones.Any(ip => ip.IdInventario == inventario.IdInventario);
+
+                    bool ok = yaExiste
+                        ? InventarioProductoDAO.Actualizar(inventarioProducto)
+                        : InventarioProductoDAO.Insertar(inventarioProducto);
+
+                    if (ok)
+                        MessageBox.Show("Producto actualizado.");
+                    else
+                        MessageBox.Show("Error al actualizar el stock en la ubicación seleccionada.");
+
                     CargarProductos();
                     LimpiarCampos();
                 }
@@ -260,6 +308,7 @@ namespace FERCO.View
                 MessageBox.Show("Revisa los datos ingresados.");
             }
         }
+
 
         private void BtnEliminarProducto_Click(object sender, RoutedEventArgs e)
         {
@@ -301,8 +350,8 @@ namespace FERCO.View
 
             if (dialog.ShowDialog() == true && dialog.InventarioEditado != null)
             {
-                cmbInventario.ItemsSource = InventarioDAO.ObtenerInventario();
-                cmbInventario.SelectedItem = dialog.InventarioEditado;
+                cmbInventario.ItemsSource = InventarioDAO.ObtenerInventarios();
+                cmbInventario.SelectedValue = dialog.InventarioEditado.IdInventario;
             }
         }
 
@@ -318,7 +367,7 @@ namespace FERCO.View
             var dialog = new InventarioDialog(inventario);
             if (dialog.ShowDialog() == true)
             {
-                cmbInventario.ItemsSource = InventarioDAO.ObtenerInventario();
+                cmbInventario.ItemsSource = InventarioDAO.ObtenerInventarios();
                 cmbInventario.SelectedItem = dialog.InventarioEditado;
             }
         }
@@ -343,7 +392,7 @@ namespace FERCO.View
                 if (InventarioDAO.Eliminar(inventario.IdInventario))
                 {
                     MessageBox.Show("Inventario eliminado.");
-                    cmbInventario.ItemsSource = InventarioDAO.ObtenerInventario();
+                    cmbInventario.ItemsSource = InventarioDAO.ObtenerInventarios();
                 }
                 else
                 {
@@ -351,6 +400,75 @@ namespace FERCO.View
                 }
             }
         }
+        private void DgUbicaciones_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            if (e.EditAction == DataGridEditAction.Commit &&
+                e.Row.Item is InventarioProducto item &&
+                e.Column.Header.ToString() == "Stock")
+            {
+                if (e.EditingElement is TextBox tb &&
+                    int.TryParse(tb.Text, out int nuevaCantidad) &&
+                    nuevaCantidad >= 0)
+                {
+                    item.Cantidad = nuevaCantidad;
+                    bool ok = InventarioProductoDAO.Actualizar(item);
+                    if (!ok)
+                        MessageBox.Show("Error al actualizar el stock en la base de datos.");
+                }
+                else
+                {
+                    MessageBox.Show("Cantidad inválida.");
+                    e.Cancel = true;
+                }
+            }
+        }
+        private void AgregarStockUbicacion(int idProducto, int cantidad, int idInventario)
+        {
+            var inventarioProducto = new InventarioProducto
+            {
+                IdProducto = idProducto,
+                IdInventario = idInventario,
+                Cantidad = cantidad
+            };
+
+            var ubicaciones = InventarioProductoDAO.ObtenerUbicacionesPorProducto(idProducto);
+            bool yaExiste = ubicaciones.Any(ip => ip.IdInventario == idInventario);
+
+            bool ok = yaExiste
+                ? InventarioProductoDAO.Actualizar(inventarioProducto)
+                : InventarioProductoDAO.Insertar(inventarioProducto);
+
+            if (ok)
+                MessageBox.Show("Stock actualizado.");
+            else
+                MessageBox.Show("Error al actualizar el stock.");
+
+            LimpiarCampos();
+            CargarProductos();
+        }
+        private void CmbInventario_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (productoSeleccionado != null &&
+                cmbInventario.SelectedItem is Inventario inventario &&
+                productoSeleccionado.UbicacionesConStock != null)
+            {
+                var ubicacion = productoSeleccionado.UbicacionesConStock
+                    .FirstOrDefault(u => u.IdInventario == inventario.IdInventario);
+
+                if (ubicacion != null)
+                {
+                    txtStock.Text = ubicacion.Cantidad.ToString();
+                }
+                else
+                {
+                    txtStock.Text = "0";
+                }
+            }
+        }
+
+
+
+
 
         private void LimpiarCampos()
         {

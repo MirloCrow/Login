@@ -17,14 +17,11 @@ using FERCO.Model;
 
 namespace FERCO.View
 {
-    /// <summary>
-    /// Interaction logic for ProveedorControl.xaml
-    /// </summary>
     public partial class ProveedorControl : UserControl
     {
         private Proveedor? proveedorSeleccionado;
 
-        private void dgProveedores_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void DgProveedores_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             proveedorSeleccionado = dgProveedores.SelectedItem as Proveedor;
             if (proveedorSeleccionado != null)
@@ -37,32 +34,53 @@ namespace FERCO.View
         }
         private void BtnAgregar_Click(object sender, RoutedEventArgs e)
         {
-            if (int.TryParse(txtTelefono.Text, out int telefono))
-            {
-                Proveedor proveedor = new Proveedor
-                {
-                    Nombre = txtNombre.Text.Trim(),
-                    Email = txtEmail.Text.Trim(),
-                    Direccion = txtDireccion.Text.Trim(),
-                    Telefono = telefono
-                };
+            string nombre = txtNombre.Text.Trim();
+            string email = txtEmail.Text.Trim();
+            string direccion = txtDireccion.Text.Trim();
+            string telefonoTexto = txtTelefono.Text.Trim();
 
-                if (ProveedorDAO.Agregar(proveedor))
-                {
-                    MessageBox.Show("Proveedor agregado correctamente.");
-                    CargarProveedores();
-                    LimpiarCampos();
-                }
-                else
-                {
-                    MessageBox.Show("Error al agregar proveedor.");
-                }
+            // Validar campos vacíos
+            if (string.IsNullOrWhiteSpace(nombre) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(direccion) || string.IsNullOrWhiteSpace(telefonoTexto))
+            {
+                MessageBox.Show("Todos los campos son obligatorios.");
+                return;
+            }
+
+            // Validar email básico
+            if (!email.Contains('@') || !email.Contains('.') || email.StartsWith('@') || email.EndsWith('@'))
+            {
+                MessageBox.Show("El correo electrónico no es válido. Debe tener formato texto@texto.com");
+                return;
+            }
+
+            // Validar teléfono
+            if (!long.TryParse(telefonoTexto, out long telefono) || telefonoTexto.Length < 9)
+            {
+                MessageBox.Show("El teléfono debe contener al menos 9 dígitos numéricos.");
+                return;
+            }
+
+            // Crear objeto y agregar
+            Proveedor proveedor = new()
+            {
+                Nombre = nombre,
+                Email = email,
+                Direccion = direccion,
+                Telefono = (int)telefono
+            };
+
+            if (ProveedorDAO.Agregar(proveedor))
+            {
+                MessageBox.Show("Proveedor agregado correctamente.");
+                CargarProveedores();
+                LimpiarCampos();
             }
             else
             {
-                MessageBox.Show("Teléfono inválido.");
+                MessageBox.Show("Error al agregar proveedor.");
             }
         }
+
 
         private void BtnEditar_Click(object sender, RoutedEventArgs e)
         {
@@ -138,6 +156,7 @@ namespace FERCO.View
         public ProveedorControl()
         {
             InitializeComponent();
+            CargarProveedores();
         }
 
     }
