@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using FERCO.View;
+using FERCO.View.Controls;
 using FERCO;
 
 namespace FERCO
@@ -93,5 +94,10 @@ namespace FERCO
         {
             Close();
         }
+        private void BtnReparaciones_Click(object sender, RoutedEventArgs e)
+        {
+            ContenidoPrincipal.Content = new FERCO.View.Controls.ReparacionControl();
+        }
+
     }
 }

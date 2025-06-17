@@ -1,0 +1,64 @@
+﻿<UserControl x:Class="FERCO.View.Controls.ReparacionControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:FERCO.ViewModel"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="900">
+    <UserControl.DataContext>
+        <vm:ReparacionViewModel />
+    </UserControl.DataContext>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Cliente -->
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+            <TextBlock Text="Cliente:" VerticalAlignment="Center"/>
+            <ComboBox ItemsSource="{Binding Clientes}"
+                      SelectedItem="{Binding ClienteSeleccionado}"
+                      DisplayMemberPath="NombreCliente"
+                      Width="250" Margin="10,0"/>
+            <Button Content="Agregar Cliente"
+                    Command="{Binding AgregarClienteCommand}"
+                    Margin="10,0"/>
+        </StackPanel>
+
+        <!-- Tipo de reparación -->
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,0,0,10">
+            <TextBlock Text="Tipo de reparación:" VerticalAlignment="Center"/>
+            <ComboBox ItemsSource="{Binding TiposReparacion}"
+                      SelectedItem="{Binding TipoSeleccionado}"
+                      DisplayMemberPath="Nombre"
+                      Width="250" Margin="10,0"/>
+            <Button Content="Agregar tipo de reparación"
+            Command="{Binding AgregarTipoReparacionCommand}"
+            Margin="10,0"/>
+
+        </StackPanel>
+
+        <!-- Lista de productos -->
+        <DataGrid Grid.Row="2" ItemsSource="{Binding ProductosReparacion}"
+                  AutoGenerateColumns="False" CanUserAddRows="False"
+                  Margin="0,10,0,10" IsReadOnly="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Producto" Binding="{Binding NombreProducto}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Cantidad sugerida" Binding="{Binding CantidadRequerida}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Cantidad a usar" Binding="{Binding CantidadAUsar, Mode=TwoWay}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Botón para agendar reparación -->
+        <Button Content="Agendar Reparación"
+                Command="{Binding AgendarReparacionCommand}"
+                HorizontalAlignment="Right"
+                Width="200" Height="35"
+                Grid.Row="3" Margin="0,10,0,0"/>
+    </Grid>
+</UserControl>

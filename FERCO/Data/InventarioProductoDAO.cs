@@ -136,5 +136,30 @@ namespace FERCO.Data
                 return false;
             }
         }
+        public static List<InventarioProducto> ObtenerInventariosConStock(SqlConnection conn, SqlTransaction trans, int idProducto)
+        {
+            List<InventarioProducto> lista = [];
+
+            SqlCommand cmd = new(
+                "SELECT ip.id_inventario, ip.id_producto, ip.cantidad " +
+                "FROM InventarioProducto ip " +
+                "WHERE ip.id_producto = @id AND ip.cantidad > 0 " +
+                "ORDER BY ip.cantidad DESC", conn, trans);
+            cmd.Parameters.AddWithValue("@id", idProducto);
+
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                lista.Add(new InventarioProducto
+                {
+                    IdInventario = (int)reader["id_inventario"],
+                    IdProducto = (int)reader["id_producto"],
+                    Cantidad = (int)reader["cantidad"]
+                });
+            }
+            reader.Close();
+            return lista;
+        }
+
     }
 }
