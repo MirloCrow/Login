@@ -55,6 +55,10 @@ namespace FERCO
         {
             ContenidoPrincipal.Content = new VentaControl();
         }
+        private void BtnSeguimiento_Click(object sender, RoutedEventArgs e)
+        {
+            ContenidoPrincipal.Content = new SeguimientoReparacionesControl();
+        }
 
         private void TBShow(object sender, RoutedEventArgs e)
         {

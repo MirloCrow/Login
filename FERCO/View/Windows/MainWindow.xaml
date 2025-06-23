@@ -173,6 +173,20 @@
                             </Button>
                         </ListViewItem>
 
+                        <!-- SEGUIMIENTO -->
+                        <ListViewItem Style="{StaticResource ListViewStyle}" Height="70">
+                            <Button x:Name="BtnSeguimiento" Style="{StaticResource BtnListaStyle}" Height="70" Click="BtnSeguimiento_Click">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="60"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="20" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1" Text="Seguimiento" Foreground="{StaticResource PrimaryTextBrush}" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="15" FontWeight="SemiBold" Margin="5,0,0,0" Visibility="{Binding ElementName=GridMenu, Path=Width, Converter={StaticResource WidthToVisibilityConverter}, ConverterParameter=100}"/>
+                                </Grid>
+                            </Button>
+                        </ListViewItem>
+
                     </ListView>
                 </StackPanel>
             </Grid>

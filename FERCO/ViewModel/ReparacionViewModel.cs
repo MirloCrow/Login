@@ -135,8 +135,27 @@ namespace FERCO.ViewModel
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
     }
 
-    public class TipoReparacionProductoEditable : TipoReparacionProducto
+    public class TipoReparacionProductoEditable : TipoReparacionProducto, INotifyPropertyChanged
     {
-        public int CantidadAUsar { get; set; }
+        private int _cantidadAUsar;
+        public int CantidadAUsar
+        {
+            get => _cantidadAUsar;
+            set
+            {
+                _cantidadAUsar = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(StockSuficiente));
+            }
+        }
+
+        public int StockDisponible => InventarioProductoDAO.ObtenerStockTotal(IdProducto);
+
+        public bool StockSuficiente => StockDisponible >= CantidadAUsar;
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+        private void OnPropertyChanged([CallerMemberName] string? prop = null) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
     }
+
 }

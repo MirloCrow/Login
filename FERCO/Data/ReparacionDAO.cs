@@ -106,5 +106,40 @@ namespace FERCO.Data
             cmd.Parameters.AddWithValue("@id", idProducto);
             return (int)cmd.ExecuteScalar();
         }
+        public static List<ReparacionEditable> ObtenerTodas()
+        {
+            List<ReparacionEditable> lista = [];
+
+            using var conn = DAOHelper.AbrirConexionSegura();
+            SqlCommand cmd = new(
+                "SELECT r.id_reparacion, r.fecha_reparacion, r.costo_reparacion, r.estado, c.nombre_cliente " +
+                "FROM Reparacion r JOIN Cliente c ON r.id_cliente = c.id_cliente", conn);
+
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                lista.Add(new ReparacionEditable
+                {
+                    IdReparacion = (int)reader["id_reparacion"],
+                    Fecha = (DateTime)reader["fecha_reparacion"],
+                    Costo = (int)reader["costo_reparacion"],
+                    Estado = reader["estado"].ToString() ?? "",
+                    NombreCliente = reader["nombre_cliente"].ToString() ?? ""
+                });
+            }
+
+            return lista;
+        }
+
+        public static bool ActualizarEstado(int idReparacion, string nuevoEstado)
+        {
+            using var conn = DAOHelper.AbrirConexionSegura();
+            SqlCommand cmd = new(
+                "UPDATE Reparacion SET estado = @estado WHERE id_reparacion = @id", conn);
+            cmd.Parameters.AddWithValue("@estado", nuevoEstado);
+            cmd.Parameters.AddWithValue("@id", idReparacion);
+            return cmd.ExecuteNonQuery() > 0;
+        }
+
     }
 }
