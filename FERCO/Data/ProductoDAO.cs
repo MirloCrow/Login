@@ -91,14 +91,15 @@ namespace FERCO.Data
             try
             {
                 using var conn = DAOHelper.AbrirConexionSegura();
-                string query = @"INSERT INTO Producto (id_proveedor, id_categoria, nombre_producto, descripcion_producto, precio_producto)
-                         VALUES (@proveedor, @categoria, @nombre, @descripcion, @precio)";
+                string query = @"INSERT INTO Producto (id_proveedor, id_categoria, nombre_producto, descripcion_producto, precio_producto, codigo_producto)
+                         VALUES (@proveedor, @categoria, @nombre, @descripcion, @precio, @codigoproducto)";
                 using var cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@proveedor", producto.IdProveedor);
                 cmd.Parameters.AddWithValue("@categoria", producto.IdCategoria);
                 cmd.Parameters.AddWithValue("@nombre", producto.NombreProducto);
                 cmd.Parameters.AddWithValue("@descripcion", producto.DescripcionProducto);
                 cmd.Parameters.AddWithValue("@precio", producto.PrecioProducto);
+                cmd.Parameters.AddWithValue("@codigoproducto", producto.CodigoProducto);
 
                 return DAOHelper.EjecutarNoQuery(cmd);
             }

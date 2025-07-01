@@ -3,8 +3,8 @@
     public static class ConexionLocal
     {
         // En Servidor se debe poner la dirección local según el dispositivo
-        public static string Servidor = "R5\\SQLEXPRESS";
-        public static string BaseDatos = "test3";
+        public static string Servidor = "LAPTOP-HK8AMDPP\\GESTION_FERCO";
+        public static string BaseDatos = "test19";
 
         public static string ObtenerCadenaConexion()
         {

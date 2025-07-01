@@ -233,7 +233,7 @@ namespace FERCO.View
                 cmbProveedor.SelectedItem is Proveedor proveedor)
             {
                 string nombre = txtNombre.Text.Trim();
-
+                
                 // Verificar si ya existe un producto con ese nombre
                 Producto? existente = ProductoDAO.BuscarPorNombre(nombre);
 
@@ -248,6 +248,7 @@ namespace FERCO.View
                 {
                     NombreProducto = nombre,
                     DescripcionProducto = txtDescripcion.Text.Trim(),
+                    CodigoProducto = txtCodigo.Text.Trim(),
                     PrecioProducto = precio,
                     IdCategoria = categoria.IdCategoria,
                     IdProveedor = proveedor.IdProveedor

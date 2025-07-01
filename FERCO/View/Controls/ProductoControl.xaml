@@ -25,6 +25,9 @@
             <Label Content="Precio" />
             <TextBox x:Name="txtPrecio" />
 
+            <Label Content="Codigo" />
+            <TextBox x:Name="txtCodigo" />
+
             <Label Content="Categoría" />
             <StackPanel Orientation="Horizontal">
                 <ComboBox x:Name="cmbCategoria" Width="180" />
