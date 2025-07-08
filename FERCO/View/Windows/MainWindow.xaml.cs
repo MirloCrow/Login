@@ -100,7 +100,11 @@ namespace FERCO
         }
         private void BtnReparaciones_Click(object sender, RoutedEventArgs e)
         {
-            ContenidoPrincipal.Content = new FERCO.View.Controls.ReparacionControl();
+            ContenidoPrincipal.Content = new ReparacionControl();
+        }
+        private void BtnConfiguracion_Click(object sender, RoutedEventArgs e)
+        {
+            ContenidoPrincipal.Content = new ConfiguracionControl();
         }
 
     }

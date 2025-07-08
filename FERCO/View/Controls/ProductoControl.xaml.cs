@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using FERCO.Data;
 using FERCO.Model;
+using FERCO.Utilities;
 using FERCO.View.Dialogs;
 
 namespace FERCO.View
@@ -15,7 +16,7 @@ namespace FERCO.View
     {
         private Producto? productoSeleccionado = null;
         private bool filtroStockBajoActivo = false;
-
+    
         public ProductoControl()
         {
             InitializeComponent();
@@ -33,7 +34,8 @@ namespace FERCO.View
         // Stock Warning
         private void ActualizarAlertaStockBajo(List<Producto> productos)
         {
-            int productosConStockBajo = productos.Count(p => p.StockTotal < 5);
+            int umbral = ConfiguracionManager.Config.UmbralStockBajo;
+            int productosConStockBajo = productos.Count(p => p.StockTotal < umbral);
 
             if (productosConStockBajo == 0)
             {

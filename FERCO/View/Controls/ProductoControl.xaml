@@ -17,16 +17,22 @@
         </Grid.RowDefinitions>
 
         <!-- Fila 0: Acciones y búsqueda -->
-        <DockPanel Grid.Row="0" Margin="0,0,0,10">
+        <Grid Grid.Row="0" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
             <!-- Botones CRUD -->
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+            <StackPanel Orientation="Horizontal" Grid.Column="0">
                 <Button Content="Agregar Producto" Width="140" Margin="0,0,10,0" Click="BtnAgregarProducto_Click"/>
                 <Button Content="Editar Producto" Width="140" Margin="0,0,10,0" Click="BtnEditarProducto_Click"/>
                 <Button Content="Eliminar Producto" Width="140" Click="BtnEliminarProducto_Click"/>
             </StackPanel>
 
             <!-- Búsqueda -->
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+            <StackPanel Orientation="Horizontal" Grid.Column="2">
                 <ComboBox x:Name="cmbTipoBusqueda" Width="150" SelectedIndex="0" Margin="0,0,10,0">
                     <ComboBoxItem Content="Nombre" />
                     <ComboBoxItem Content="Código" />
@@ -35,7 +41,7 @@
                 <TextBox x:Name="txtBuscar" Width="250" Margin="0,0,10,0" KeyDown="TxtBuscar_KeyDown"/>
                 <Button Content="Buscar" Width="100" Click="BtnBuscar_Click"/>
             </StackPanel>
-        </DockPanel>
+        </Grid>
 
         <!-- Fila 1: Lista de productos -->
         <DataGrid x:Name="dgProductos"

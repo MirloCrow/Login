@@ -11,7 +11,7 @@ namespace FERCO.Converters
         {
             if (value is double width)
             {
-                return new Thickness(width, 35, 0, 0);
+                return new Thickness(width, 0, 0, 0);
             }
             return new Thickness(75, 35, 0, 0);
         }
