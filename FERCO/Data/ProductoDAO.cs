@@ -7,6 +7,7 @@ namespace FERCO.Data
 {
     public static class ProductoDAO
     {
+        // Buscar y obtener productos
         public static List<Producto> ObtenerTodos()
         {
             var productos = new List<Producto>();
@@ -81,11 +82,51 @@ namespace FERCO.Data
             return null;
         }
 
+        public static Producto? BuscarPorCodigo(string codigo)
+        {
+            using var conn = DAOHelper.AbrirConexionSegura();
+            SqlCommand cmd = new("SELECT * FROM Producto WHERE codigo_producto = @codigo", conn);
+            cmd.Parameters.AddWithValue("@codigo", codigo);
 
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                return new Producto
+                {
+                    IdProducto = (int)reader["id_producto"],
+                    CodigoProducto = reader["codigo_producto"].ToString() ?? "",
+                    NombreProducto = reader["nombre_producto"].ToString() ?? "",
+                    DescripcionProducto = reader["descripcion_producto"].ToString() ?? "",
+                    PrecioProducto = (int)reader["precio_producto"],
+                    IdCategoria = (int)reader["id_categoria"],
+                    IdProveedor = (int)reader["id_proveedor"]
+                };
+            }
+            return null;
+        }
 
+        public static int ObtenerUltimoId()
+        {
+            try
+            {
+                using var conn = DAOHelper.AbrirConexionSegura();
+                string query = "SELECT MAX(id_producto) FROM Producto";
+                using var cmd = new SqlCommand(query, conn);
+                return DAOHelper.EjecutarEscalar(cmd);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"[ERROR][ProductoDAO.ObtenerUltimoId] {ex.Message}");
+                return 0;
+            }
+        }
+
+        // CRUD Producto
         public static bool Agregar(Producto producto)
         {
-            if (string.IsNullOrWhiteSpace(producto.NombreProducto) || producto.PrecioProducto < 0)
+            if (string.IsNullOrWhiteSpace(producto.NombreProducto) ||
+                string.IsNullOrWhiteSpace(producto.CodigoProducto) ||
+                producto.PrecioProducto < 0)
                 return false;
 
             try
@@ -109,7 +150,6 @@ namespace FERCO.Data
                 return false;
             }
         }
-
 
         public static bool Actualizar(Producto producto)
         {
@@ -160,22 +200,6 @@ namespace FERCO.Data
             {
                 Console.Error.WriteLine($"[ERROR][ProductoDAO.Eliminar] {ex.Message}");
                 return false;
-            }
-        }
-
-        public static int ObtenerUltimoId()
-        {
-            try
-            {
-                using var conn = DAOHelper.AbrirConexionSegura();
-                string query = "SELECT MAX(id_producto) FROM Producto";
-                using var cmd = new SqlCommand(query, conn);
-                return DAOHelper.EjecutarEscalar(cmd);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"[ERROR][ProductoDAO.ObtenerUltimoId] {ex.Message}");
-                return 0;
             }
         }
     }

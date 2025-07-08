@@ -232,12 +232,32 @@ namespace FERCO.View
                 cmbCategoria.SelectedItem is Categoria categoria &&
                 cmbProveedor.SelectedItem is Proveedor proveedor)
             {
+                string codigo = txtCodigo.Text.Trim();
                 string nombre = txtNombre.Text.Trim();
-                
-                // Verificar si ya existe un producto con ese nombre
-                Producto? existente = ProductoDAO.BuscarPorNombre(nombre);
 
-                if (existente != null)
+                if (string.IsNullOrWhiteSpace(codigo))
+                {
+                    MessageBox.Show("El código del producto es obligatorio.");
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(nombre))
+                {
+                    MessageBox.Show("El nombre del producto es obligatorio.");
+                    return;
+                }
+
+                // Validar si ya existe el código
+                Producto? existenteCodigo = ProductoDAO.BuscarPorCodigo(codigo);
+                if (existenteCodigo != null)
+                {
+                    MessageBox.Show("Ya existe un producto con ese código.");
+                    return;
+                }
+
+                // Validar si ya existe el nombre
+                Producto? existenteNombre = ProductoDAO.BuscarPorNombre(nombre);
+                if (existenteNombre != null)
                 {
                     MessageBox.Show("Ya existe un producto con ese nombre.");
                     return;
