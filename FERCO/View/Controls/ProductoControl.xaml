@@ -61,7 +61,7 @@
                     <ComboBoxItem Content="Código" />
                     <ComboBoxItem Content="Categoría" />
                 </ComboBox>
-                <TextBox x:Name="txtBuscar" Width="250" Margin="10,0"/>
+                <TextBox x:Name="txtBuscar" Width="250" Margin="10,0" KeyDown="TxtBuscar_KeyDown"/>
                 <Button Content="Buscar" Width="100" Click="BtnBuscar_Click"/>
             </StackPanel>
 

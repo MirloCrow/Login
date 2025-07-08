@@ -67,6 +67,8 @@ namespace FERCO.View
 
                 dgUbicaciones.ItemsSource = seleccionado.UbicacionesConStock;
 
+                txtCodigo.Text = seleccionado.CodigoProducto;
+
                 // Mostrar stock total con advertencia
                 int stockTotal = seleccionado.StockTotal;
                 txtStockTotal.Text = $"Stock total: {stockTotal}";
@@ -303,7 +305,32 @@ namespace FERCO.View
                 cmbCategoria.SelectedItem is Categoria categoria &&
                 cmbProveedor.SelectedItem is Proveedor proveedor)
             {
-                productoSeleccionado.NombreProducto = txtNombre.Text.Trim();
+                string nuevoCodigo = txtCodigo.Text.Trim();
+                string nuevoNombre = txtNombre.Text.Trim();
+
+                if (string.IsNullOrWhiteSpace(nuevoCodigo))
+                {
+                    MessageBox.Show("El código del producto es obligatorio.");
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(nuevoNombre))
+                {
+                    MessageBox.Show("El nombre del producto es obligatorio.");
+                    return;
+                }
+
+                // Validar si el código ya lo tiene otro producto
+                Producto? existente = ProductoDAO.BuscarPorCodigo(nuevoCodigo);
+                if (existente != null && existente.IdProducto != productoSeleccionado.IdProducto)
+                {
+                    MessageBox.Show("Ya existe otro producto con ese código.");
+                    return;
+                }
+
+                // Actualizar los campos del producto seleccionado
+                productoSeleccionado.CodigoProducto = nuevoCodigo;
+                productoSeleccionado.NombreProducto = nuevoNombre;
                 productoSeleccionado.DescripcionProducto = txtDescripcion.Text.Trim();
                 productoSeleccionado.PrecioProducto = precio;
                 productoSeleccionado.IdCategoria = categoria.IdCategoria;
@@ -325,7 +352,6 @@ namespace FERCO.View
                 MessageBox.Show("Revisa los datos ingresados.");
             }
         }
-
 
         private void BtnEliminarProducto_Click(object sender, RoutedEventArgs e)
         {
@@ -539,22 +565,32 @@ namespace FERCO.View
             switch (tipoBusqueda)
             {
                 case "Nombre":
-                    productos = [.. productos.Where(p => p.NombreProducto?.IndexOf(filtro, StringComparison.OrdinalIgnoreCase) >= 0)];
-
+                    productos = [.. productos
+                        .Where(p => !string.IsNullOrWhiteSpace(p.NombreProducto) &&
+                                    p.NombreProducto.Contains(filtro, StringComparison.OrdinalIgnoreCase))];
                     break;
 
                 case "Código":
-                    // No implementado aún → mostrar todos
+                    productos = [.. productos
+                        .Where(p => !string.IsNullOrWhiteSpace(p.CodigoProducto) &&
+                                    p.CodigoProducto.Contains(filtro, StringComparison.OrdinalIgnoreCase))];
                     break;
 
                 case "Categoría":
-                    productos = [.. productos.Where(p => p.NombreCategoria?.IndexOf(filtro, StringComparison.OrdinalIgnoreCase) >= 0)];
-
+                    productos = [.. productos
+                        .Where(p => !string.IsNullOrWhiteSpace(p.NombreCategoria) &&
+                                    p.NombreCategoria.Contains(filtro, StringComparison.OrdinalIgnoreCase))];
                     break;
+            }
+
+            if (productos.Count == 0)
+            {
+                MessageBox.Show("No se encontraron productos con ese criterio de búsqueda.", "Sin resultados", MessageBoxButton.OK, MessageBoxImage.Information);
             }
 
             dgProductos.ItemsSource = productos;
         }
+
 
         private void BtnLimpiar_Click(object sender, RoutedEventArgs e)
         {
@@ -579,6 +615,15 @@ namespace FERCO.View
             productoSeleccionado = null;
             panelAgregarStock.Visibility = Visibility.Collapsed;
             CargarProductos();
+        }
+
+        // Keyboard shortcuts
+        private void TxtBuscar_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                BtnBuscar_Click(sender, e);
+            }
         }
     }
 }

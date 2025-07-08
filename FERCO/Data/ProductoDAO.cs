@@ -17,7 +17,8 @@ namespace FERCO.Data
                 using var conn = DAOHelper.AbrirConexionSegura();
 
                 string query = @"
-            SELECT p.id_producto, 
+            SELECT p.id_producto,
+                   p.codigo_producto,
                    p.nombre_producto, 
                    p.descripcion_producto, 
                    p.precio_producto, 
@@ -39,13 +40,14 @@ namespace FERCO.Data
                     var producto = new Producto
                     {
                         IdProducto = idProducto,
-                        NombreProducto = reader.GetString(1),
-                        DescripcionProducto = reader.GetString(2),
-                        PrecioProducto = reader.GetInt32(3),
-                        IdProveedor = reader.GetInt32(4),
-                        IdCategoria = reader.GetInt32(5),
-                        NombreProveedor = reader.GetString(6),
-                        NombreCategoria = reader.GetString(7),
+                        CodigoProducto = reader.GetString(1),
+                        NombreProducto = reader.GetString(2),
+                        DescripcionProducto = reader.GetString(3),
+                        PrecioProducto = reader.GetInt32(4),
+                        IdProveedor = reader.GetInt32(5),
+                        IdCategoria = reader.GetInt32(6),
+                        NombreProveedor = reader.GetString(7),
+                        NombreCategoria = reader.GetString(8),
                         UbicacionesConStock = InventarioProductoDAO.ObtenerUbicacionesPorProducto(idProducto)
                     };
 
@@ -161,7 +163,8 @@ namespace FERCO.Data
             {
                 using var conn = DAOHelper.AbrirConexionSegura();
                 string query = @"UPDATE Producto
-                                 SET id_proveedor = @proveedor,
+                                 SET codigo_producto = @codigo,
+                                     id_proveedor = @proveedor,
                                      id_categoria = @categoria,
                                      nombre_producto = @nombre,
                                      descripcion_producto = @descripcion,
@@ -174,6 +177,7 @@ namespace FERCO.Data
                 cmd.Parameters.AddWithValue("@nombre", producto.NombreProducto);
                 cmd.Parameters.AddWithValue("@descripcion", producto.DescripcionProducto);
                 cmd.Parameters.AddWithValue("@precio", producto.PrecioProducto);
+                cmd.Parameters.AddWithValue("@codigo", producto.CodigoProducto);
 
                 return DAOHelper.EjecutarNoQuery(cmd);
             }
