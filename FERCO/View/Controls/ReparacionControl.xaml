@@ -1,0 +1,109 @@
+﻿<UserControl x:Class="FERCO.View.Controls.ReparacionControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:FERCO.ViewModel"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="1000">
+
+    <UserControl.DataContext>
+        <vm:ReparacionViewModel />
+    </UserControl.DataContext>
+
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="7*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Columna izquierda: Cliente y tipo de reparación -->
+        <StackPanel Grid.Column="0" Margin="10" Orientation="Vertical" VerticalAlignment="Top">
+
+            <!-- Cliente -->
+            <TextBlock Text="Cliente" FontWeight="Bold" Margin="0,0,0,5"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <ComboBox ItemsSource="{Binding Clientes}"
+                          SelectedItem="{Binding ClienteSeleccionado}"
+                          DisplayMemberPath="NombreCliente"
+                          Width="200"/>
+                <Button Content="+" Width="30" Margin="5,0" Command="{Binding AgregarClienteCommand}"/>
+            </StackPanel>
+
+            <!-- Tipo de reparación -->
+            <TextBlock Text="Tipo de Reparación" FontWeight="Bold" Margin="0,10,0,5"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <ComboBox ItemsSource="{Binding TiposReparacion}"
+                          SelectedItem="{Binding TipoSeleccionado}"
+                          DisplayMemberPath="Nombre"
+                          Width="200"/>
+                <Button Content="+" Width="30" Margin="5,0" Command="{Binding AgregarTipoReparacionCommand}"/>
+            </StackPanel>
+
+            <!-- Observaciones (opcional futura mejora) -->
+            <!--<TextBlock Text="Observaciones" Margin="0,5,0,5"/>
+            <TextBox Text="{Binding Observaciones}" Height="60" AcceptsReturn="True" TextWrapping="Wrap"/>-->
+        </StackPanel>
+
+        <!-- Columna derecha: Productos y botón -->
+        <StackPanel Grid.Column="1" Margin="10" Orientation="Vertical">
+
+            <TextBlock Text="Productos requeridos" FontWeight="Bold" FontSize="16" Margin="0,0,0,5"/>
+
+            <DataGrid ItemsSource="{Binding ProductosReparacion}"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      IsReadOnly="False"
+                      Height="300"
+                      Margin="0,0,0,10">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Producto" Binding="{Binding NombreProducto}" IsReadOnly="True" Width="*"/>
+                    <DataGridTextColumn Header="Cantidad sugerida" Binding="{Binding CantidadRequerida}" IsReadOnly="True" Width="100"/>
+
+                    <DataGridTemplateColumn Header="Cantidad a usar ✎" Width="120">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox Text="{Binding CantidadAUsar, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Background="LightYellow"
+                         HorizontalAlignment="Center"
+                         Width="80"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- Nueva columna: Stock disponible -->
+                    <DataGridTemplateColumn Header="Stock disponible" Width="150">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding StockDisponible}"
+                           FontWeight="Bold"
+                           HorizontalAlignment="Center">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding StockSuficiente}" Value="False">
+                                                    <Setter Property="Foreground" Value="Red"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding StockSuficiente}" Value="True">
+                                                    <Setter Property="Foreground" Value="Green"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+
+
+            </DataGrid>
+
+            <Button Content="Agendar Reparación"
+                    Command="{Binding AgendarReparacionCommand}"
+                    Width="200" Height="40"
+                    HorizontalAlignment="Right"
+                    Margin="0,10,0,0"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

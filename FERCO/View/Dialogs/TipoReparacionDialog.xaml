@@ -1,0 +1,51 @@
+﻿<Window x:Class="FERCO.View.Dialogs.TipoReparacionDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Nuevo Tipo de Reparación" Height="500" Width="600" WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Encabezado -->
+        <StackPanel>
+            <TextBlock Text="Nombre:"/>
+            <TextBox x:Name="txtNombre" Margin="0,5,0,10"/>
+
+            <TextBlock Text="Descripción:"/>
+            <TextBox x:Name="txtDescripcion" Margin="0,5,0,10"/>
+        </StackPanel>
+
+        <!-- Tabla productos -->
+        <GroupBox Header="Productos necesarios" Grid.Row="1" Margin="0,10,0,10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <ComboBox x:Name="cmbProducto" Width="300" DisplayMemberPath="NombreProducto" SelectedValuePath="IdProducto"/>
+                    <TextBox x:Name="txtCantidad" Width="60" Margin="10,0,0,0"/>
+                    <Button Content="Agregar" Click="AgregarProducto_Click" Margin="10,0,0,0"/>
+                </StackPanel>
+
+                <DataGrid x:Name="dgProductos" Grid.Row="1" AutoGenerateColumns="False" CanUserAddRows="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Producto" Binding="{Binding NombreProducto}" Width="*"/>
+                        <DataGridTextColumn Header="Cantidad" Binding="{Binding CantidadRequerida}" Width="80"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </GroupBox>
+
+        <!-- Botones -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Guardar" Width="100" Margin="0,0,10,0" Click="Guardar_Click"/>
+            <Button Content="Cancelar" Width="100" Click="Cancelar_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

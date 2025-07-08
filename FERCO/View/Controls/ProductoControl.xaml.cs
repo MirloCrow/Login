@@ -53,21 +53,40 @@ namespace FERCO.View
 
         private void DgProductos_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            productoSeleccionado = dgProductos.SelectedItem as Producto;
+            var seleccionado = dgProductos.SelectedItem as Producto;
+            productoSeleccionado = seleccionado;
 
-            if (productoSeleccionado != null)
+            if (seleccionado != null)
             {
-                txtNombre.Text = productoSeleccionado.NombreProducto;
-                txtDescripcion.Text = productoSeleccionado.DescripcionProducto;
-                txtPrecio.Text = productoSeleccionado.PrecioProducto.ToString();
-                txtStock.Text = productoSeleccionado.StockTotal.ToString();
+                txtNombre.Text = seleccionado.NombreProducto;
+                txtDescripcion.Text = seleccionado.DescripcionProducto;
+                txtPrecio.Text = seleccionado.PrecioProducto.ToString();
 
-                cmbCategoria.SelectedValue = productoSeleccionado.IdCategoria;
-                cmbProveedor.SelectedValue = productoSeleccionado.IdProveedor;
+                cmbCategoria.SelectedValue = seleccionado.IdCategoria;
+                cmbProveedor.SelectedValue = seleccionado.IdProveedor;
 
-                dgUbicaciones.ItemsSource = productoSeleccionado?.UbicacionesConStock;
+                dgUbicaciones.ItemsSource = seleccionado.UbicacionesConStock;
 
-                var inventarioMayorStock = productoSeleccionado?.UbicacionesConStock?
+                txtCodigo.Text = seleccionado.CodigoProducto;
+
+                // Mostrar stock total con advertencia
+                int stockTotal = seleccionado.StockTotal;
+                txtStockTotal.Text = $"Stock total: {stockTotal}";
+
+                if (stockTotal == 0)
+                {
+                    txtStockTotal.Foreground = Brushes.DarkRed;
+                    txtStockTotal.FontWeight = FontWeights.Bold;
+                    txtStockTotal.Text += " ⚠ Sin unidades disponibles";
+                }
+                else
+                {
+                    txtStockTotal.Foreground = Brushes.DarkGreen;
+                    txtStockTotal.FontWeight = FontWeights.Bold;
+                }
+
+                // Seleccionar automáticamente la ubicación con más stock
+                var inventarioMayorStock = seleccionado.UbicacionesConStock?
                     .OrderByDescending(u => u.Cantidad)
                     .FirstOrDefault();
 
@@ -79,8 +98,13 @@ namespace FERCO.View
                 {
                     cmbInventario.SelectedIndex = -1;
                 }
+
+                // Mostrar el panel de agregar stock
+                panelAgregarStock.Visibility = Visibility.Visible;
             }
         }
+
+
 
 
         // CRUD CATEGORÍA
@@ -207,42 +231,60 @@ namespace FERCO.View
         private void BtnAgregarProducto_Click(object sender, RoutedEventArgs e)
         {
             if (int.TryParse(txtPrecio.Text, out int precio) &&
-                int.TryParse(txtStock.Text, out int stock) &&
                 cmbCategoria.SelectedItem is Categoria categoria &&
-                cmbProveedor.SelectedItem is Proveedor proveedor &&
-                cmbInventario.SelectedItem is Inventario inventario)
+                cmbProveedor.SelectedItem is Proveedor proveedor)
             {
+                string codigo = txtCodigo.Text.Trim();
                 string nombre = txtNombre.Text.Trim();
 
-                // Buscar si ya existe un producto con el mismo nombre
-                Producto? existente = ProductoDAO.BuscarPorNombre(nombre);
-
-                if (existente != null)
+                if (string.IsNullOrWhiteSpace(codigo))
                 {
-                    // Ya existe -> agregar stock en otra ubicación
-                    AgregarStockUbicacion(existente.IdProducto, stock, inventario.IdInventario);
+                    MessageBox.Show("El código del producto es obligatorio.");
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(nombre))
+                {
+                    MessageBox.Show("El nombre del producto es obligatorio.");
+                    return;
+                }
+
+                // Validar si ya existe el código
+                Producto? existenteCodigo = ProductoDAO.BuscarPorCodigo(codigo);
+                if (existenteCodigo != null)
+                {
+                    MessageBox.Show("Ya existe un producto con ese código.");
+                    return;
+                }
+
+                // Validar si ya existe el nombre
+                Producto? existenteNombre = ProductoDAO.BuscarPorNombre(nombre);
+                if (existenteNombre != null)
+                {
+                    MessageBox.Show("Ya existe un producto con ese nombre.");
+                    return;
+                }
+
+                // Crear nuevo producto
+                Producto nuevo = new()
+                {
+                    NombreProducto = nombre,
+                    DescripcionProducto = txtDescripcion.Text.Trim(),
+                    CodigoProducto = txtCodigo.Text.Trim(),
+                    PrecioProducto = precio,
+                    IdCategoria = categoria.IdCategoria,
+                    IdProveedor = proveedor.IdProveedor
+                };
+
+                if (ProductoDAO.Agregar(nuevo))
+                {
+                    MessageBox.Show("Producto agregado. Ahora puedes registrar su stock.");
+                    CargarProductos();
+                    LimpiarCampos();
                 }
                 else
                 {
-                    // Crear nuevo producto
-                    Producto nuevo = new()
-                    {
-                        NombreProducto = nombre,
-                        DescripcionProducto = txtDescripcion.Text.Trim(),
-                        PrecioProducto = precio,
-                        IdCategoria = categoria.IdCategoria,
-                        IdProveedor = proveedor.IdProveedor
-                    };
-
-                    if (ProductoDAO.Agregar(nuevo))
-                    {
-                        int idProducto = ProductoDAO.ObtenerUltimoId();
-                        AgregarStockUbicacion(idProducto, stock, inventario.IdInventario);
-                    }
-                    else
-                    {
-                        MessageBox.Show("Error al agregar producto.");
-                    }
+                    MessageBox.Show("Error al agregar producto.");
                 }
             }
             else
@@ -250,8 +292,6 @@ namespace FERCO.View
                 MessageBox.Show("Revisa los datos ingresados.");
             }
         }
-
-
 
         private void BtnEditarProducto_Click(object sender, RoutedEventArgs e)
         {
@@ -262,12 +302,35 @@ namespace FERCO.View
             }
 
             if (int.TryParse(txtPrecio.Text, out int precio) &&
-                int.TryParse(txtStock.Text, out int stock) &&
                 cmbCategoria.SelectedItem is Categoria categoria &&
-                cmbProveedor.SelectedItem is Proveedor proveedor &&
-                cmbInventario.SelectedItem is Inventario inventario)
+                cmbProveedor.SelectedItem is Proveedor proveedor)
             {
-                productoSeleccionado.NombreProducto = txtNombre.Text.Trim();
+                string nuevoCodigo = txtCodigo.Text.Trim();
+                string nuevoNombre = txtNombre.Text.Trim();
+
+                if (string.IsNullOrWhiteSpace(nuevoCodigo))
+                {
+                    MessageBox.Show("El código del producto es obligatorio.");
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(nuevoNombre))
+                {
+                    MessageBox.Show("El nombre del producto es obligatorio.");
+                    return;
+                }
+
+                // Validar si el código ya lo tiene otro producto
+                Producto? existente = ProductoDAO.BuscarPorCodigo(nuevoCodigo);
+                if (existente != null && existente.IdProducto != productoSeleccionado.IdProducto)
+                {
+                    MessageBox.Show("Ya existe otro producto con ese código.");
+                    return;
+                }
+
+                // Actualizar los campos del producto seleccionado
+                productoSeleccionado.CodigoProducto = nuevoCodigo;
+                productoSeleccionado.NombreProducto = nuevoNombre;
                 productoSeleccionado.DescripcionProducto = txtDescripcion.Text.Trim();
                 productoSeleccionado.PrecioProducto = precio;
                 productoSeleccionado.IdCategoria = categoria.IdCategoria;
@@ -275,26 +338,7 @@ namespace FERCO.View
 
                 if (ProductoDAO.Actualizar(productoSeleccionado))
                 {
-                    var inventarioProducto = new InventarioProducto
-                    {
-                        IdInventario = inventario.IdInventario,
-                        IdProducto = productoSeleccionado.IdProducto,
-                        Cantidad = stock
-                    };
-
-                    // Si ya existe, actualiza; si no, inserta
-                    var ubicaciones = InventarioProductoDAO.ObtenerUbicacionesPorProducto(productoSeleccionado.IdProducto);
-                    bool yaExiste = ubicaciones.Any(ip => ip.IdInventario == inventario.IdInventario);
-
-                    bool ok = yaExiste
-                        ? InventarioProductoDAO.Actualizar(inventarioProducto)
-                        : InventarioProductoDAO.Insertar(inventarioProducto);
-
-                    if (ok)
-                        MessageBox.Show("Producto actualizado.");
-                    else
-                        MessageBox.Show("Error al actualizar el stock en la ubicación seleccionada.");
-
+                    MessageBox.Show("Producto actualizado.");
                     CargarProductos();
                     LimpiarCampos();
                 }
@@ -308,7 +352,6 @@ namespace FERCO.View
                 MessageBox.Show("Revisa los datos ingresados.");
             }
         }
-
 
         private void BtnEliminarProducto_Click(object sender, RoutedEventArgs e)
         {
@@ -446,39 +489,141 @@ namespace FERCO.View
             LimpiarCampos();
             CargarProductos();
         }
-        private void CmbInventario_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void BtnAgregarStock_Click(object sender, RoutedEventArgs e)
         {
-            if (productoSeleccionado != null &&
-                cmbInventario.SelectedItem is Inventario inventario &&
-                productoSeleccionado.UbicacionesConStock != null)
+            if (productoSeleccionado == null)
             {
-                var ubicacion = productoSeleccionado.UbicacionesConStock
-                    .FirstOrDefault(u => u.IdInventario == inventario.IdInventario);
-
-                if (ubicacion != null)
-                {
-                    txtStock.Text = ubicacion.Cantidad.ToString();
-                }
-                else
-                {
-                    txtStock.Text = "0";
-                }
+                MessageBox.Show("Seleccione un producto.");
+                return;
             }
+
+            if (!int.TryParse(txtStockNuevo.Text, out int cantidad) || cantidad <= 0)
+            {
+                MessageBox.Show("Ingrese una cantidad válida.");
+                return;
+            }
+
+            if (cmbInventario.SelectedItem is not Inventario inventario)
+            {
+                MessageBox.Show("Seleccione una ubicación de inventario.");
+                return;
+            }
+
+            var ubicaciones = InventarioProductoDAO.ObtenerUbicacionesPorProducto(productoSeleccionado.IdProducto);
+            var existente = ubicaciones.FirstOrDefault(u => u.IdInventario == inventario.IdInventario);
+
+            int nuevaCantidad = existente != null
+                ? existente.Cantidad + cantidad
+                : cantidad;
+
+            var nuevoRegistro = new InventarioProducto
+            {
+                IdProducto = productoSeleccionado.IdProducto,
+                IdInventario = inventario.IdInventario,
+                Cantidad = nuevaCantidad
+            };
+
+            bool ok = existente != null
+                ? InventarioProductoDAO.Actualizar(nuevoRegistro)
+                : InventarioProductoDAO.Insertar(nuevoRegistro);
+
+            if (ok)
+            {
+                MessageBox.Show("Stock actualizado.");
+
+                int id = productoSeleccionado.IdProducto;
+                CargarProductos();
+                SeleccionarProductoPorId(id);
+
+                txtStockNuevo.Text = "";
+            }
+            else
+            {
+                MessageBox.Show("Error al actualizar stock.");
+            }
+        }
+
+        private void SeleccionarProductoPorId(int idProducto)
+        {
+            var productos = ProductoDAO.ObtenerTodos();
+            dgProductos.ItemsSource = productos;
+
+            var seleccionado = productos.FirstOrDefault(p => p.IdProducto == idProducto);
+            if (seleccionado != null)
+                dgProductos.SelectedItem = seleccionado;
         }
 
 
 
+        private void BtnBuscar_Click(object sender, RoutedEventArgs e)
+        {
+            string filtro = txtBuscar.Text.Trim().ToLower();
+            string tipoBusqueda = ((ComboBoxItem)cmbTipoBusqueda.SelectedItem).Content.ToString() ?? "";
 
+            var productos = ProductoDAO.ObtenerTodos();
+
+            switch (tipoBusqueda)
+            {
+                case "Nombre":
+                    productos = [.. productos
+                        .Where(p => !string.IsNullOrWhiteSpace(p.NombreProducto) &&
+                                    p.NombreProducto.Contains(filtro, StringComparison.OrdinalIgnoreCase))];
+                    break;
+
+                case "Código":
+                    productos = [.. productos
+                        .Where(p => !string.IsNullOrWhiteSpace(p.CodigoProducto) &&
+                                    p.CodigoProducto.Contains(filtro, StringComparison.OrdinalIgnoreCase))];
+                    break;
+
+                case "Categoría":
+                    productos = [.. productos
+                        .Where(p => !string.IsNullOrWhiteSpace(p.NombreCategoria) &&
+                                    p.NombreCategoria.Contains(filtro, StringComparison.OrdinalIgnoreCase))];
+                    break;
+            }
+
+            if (productos.Count == 0)
+            {
+                MessageBox.Show("No se encontraron productos con ese criterio de búsqueda.", "Sin resultados", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+
+            dgProductos.ItemsSource = productos;
+        }
+
+
+        private void BtnLimpiar_Click(object sender, RoutedEventArgs e)
+        {
+            LimpiarCampos();
+        }
 
         private void LimpiarCampos()
         {
             txtNombre.Text = "";
             txtDescripcion.Text = "";
             txtPrecio.Text = "";
-            txtStock.Text = "";
+            txtStockTotal.Text = "Stock total: -";
+            txtStockTotal.Foreground = Brushes.Black;
+            txtStockTotal.FontWeight = FontWeights.Normal;
+            txtStockNuevo.Text = "";
+            txtBuscar.Text = "";
             cmbCategoria.SelectedIndex = -1;
             cmbProveedor.SelectedIndex = -1;
+            cmbInventario.SelectedIndex = -1;
+            dgUbicaciones.ItemsSource = null;
+            dgProductos.SelectedItem = null;
             productoSeleccionado = null;
+            panelAgregarStock.Visibility = Visibility.Collapsed;
+            CargarProductos();
+        }
+
+        // Keyboard shortcuts
+        private void TxtBuscar_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                BtnBuscar_Click(sender, e);
+            }
         }
     }
 }

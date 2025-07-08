@@ -7,6 +7,7 @@ namespace FERCO.Data
 {
     public static class ProductoDAO
     {
+        // Buscar y obtener productos
         public static List<Producto> ObtenerTodos()
         {
             var productos = new List<Producto>();
@@ -16,7 +17,8 @@ namespace FERCO.Data
                 using var conn = DAOHelper.AbrirConexionSegura();
 
                 string query = @"
-            SELECT p.id_producto, 
+            SELECT p.id_producto,
+                   p.codigo_producto,
                    p.nombre_producto, 
                    p.descripcion_producto, 
                    p.precio_producto, 
@@ -38,13 +40,14 @@ namespace FERCO.Data
                     var producto = new Producto
                     {
                         IdProducto = idProducto,
-                        NombreProducto = reader.GetString(1),
-                        DescripcionProducto = reader.GetString(2),
-                        PrecioProducto = reader.GetInt32(3),
-                        IdProveedor = reader.GetInt32(4),
-                        IdCategoria = reader.GetInt32(5),
-                        NombreProveedor = reader.GetString(6),
-                        NombreCategoria = reader.GetString(7),
+                        CodigoProducto = reader.GetString(1),
+                        NombreProducto = reader.GetString(2),
+                        DescripcionProducto = reader.GetString(3),
+                        PrecioProducto = reader.GetInt32(4),
+                        IdProveedor = reader.GetInt32(5),
+                        IdCategoria = reader.GetInt32(6),
+                        NombreProveedor = reader.GetString(7),
+                        NombreCategoria = reader.GetString(8),
                         UbicacionesConStock = InventarioProductoDAO.ObtenerUbicacionesPorProducto(idProducto)
                     };
 
@@ -81,24 +84,65 @@ namespace FERCO.Data
             return null;
         }
 
+        public static Producto? BuscarPorCodigo(string codigo)
+        {
+            using var conn = DAOHelper.AbrirConexionSegura();
+            SqlCommand cmd = new("SELECT * FROM Producto WHERE codigo_producto = @codigo", conn);
+            cmd.Parameters.AddWithValue("@codigo", codigo);
 
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                return new Producto
+                {
+                    IdProducto = (int)reader["id_producto"],
+                    CodigoProducto = reader["codigo_producto"].ToString() ?? "",
+                    NombreProducto = reader["nombre_producto"].ToString() ?? "",
+                    DescripcionProducto = reader["descripcion_producto"].ToString() ?? "",
+                    PrecioProducto = (int)reader["precio_producto"],
+                    IdCategoria = (int)reader["id_categoria"],
+                    IdProveedor = (int)reader["id_proveedor"]
+                };
+            }
+            return null;
+        }
 
+        public static int ObtenerUltimoId()
+        {
+            try
+            {
+                using var conn = DAOHelper.AbrirConexionSegura();
+                string query = "SELECT MAX(id_producto) FROM Producto";
+                using var cmd = new SqlCommand(query, conn);
+                return DAOHelper.EjecutarEscalar(cmd);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"[ERROR][ProductoDAO.ObtenerUltimoId] {ex.Message}");
+                return 0;
+            }
+        }
+
+        // CRUD Producto
         public static bool Agregar(Producto producto)
         {
-            if (string.IsNullOrWhiteSpace(producto.NombreProducto) || producto.PrecioProducto < 0)
+            if (string.IsNullOrWhiteSpace(producto.NombreProducto) ||
+                string.IsNullOrWhiteSpace(producto.CodigoProducto) ||
+                producto.PrecioProducto < 0)
                 return false;
 
             try
             {
                 using var conn = DAOHelper.AbrirConexionSegura();
-                string query = @"INSERT INTO Producto (id_proveedor, id_categoria, nombre_producto, descripcion_producto, precio_producto)
-                         VALUES (@proveedor, @categoria, @nombre, @descripcion, @precio)";
+                string query = @"INSERT INTO Producto (id_proveedor, id_categoria, nombre_producto, descripcion_producto, precio_producto, codigo_producto)
+                         VALUES (@proveedor, @categoria, @nombre, @descripcion, @precio, @codigoproducto)";
                 using var cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@proveedor", producto.IdProveedor);
                 cmd.Parameters.AddWithValue("@categoria", producto.IdCategoria);
                 cmd.Parameters.AddWithValue("@nombre", producto.NombreProducto);
                 cmd.Parameters.AddWithValue("@descripcion", producto.DescripcionProducto);
                 cmd.Parameters.AddWithValue("@precio", producto.PrecioProducto);
+                cmd.Parameters.AddWithValue("@codigoproducto", producto.CodigoProducto);
 
                 return DAOHelper.EjecutarNoQuery(cmd);
             }
@@ -108,7 +152,6 @@ namespace FERCO.Data
                 return false;
             }
         }
-
 
         public static bool Actualizar(Producto producto)
         {
@@ -120,7 +163,8 @@ namespace FERCO.Data
             {
                 using var conn = DAOHelper.AbrirConexionSegura();
                 string query = @"UPDATE Producto
-                                 SET id_proveedor = @proveedor,
+                                 SET codigo_producto = @codigo,
+                                     id_proveedor = @proveedor,
                                      id_categoria = @categoria,
                                      nombre_producto = @nombre,
                                      descripcion_producto = @descripcion,
@@ -133,6 +177,7 @@ namespace FERCO.Data
                 cmd.Parameters.AddWithValue("@nombre", producto.NombreProducto);
                 cmd.Parameters.AddWithValue("@descripcion", producto.DescripcionProducto);
                 cmd.Parameters.AddWithValue("@precio", producto.PrecioProducto);
+                cmd.Parameters.AddWithValue("@codigo", producto.CodigoProducto);
 
                 return DAOHelper.EjecutarNoQuery(cmd);
             }
@@ -159,22 +204,6 @@ namespace FERCO.Data
             {
                 Console.Error.WriteLine($"[ERROR][ProductoDAO.Eliminar] {ex.Message}");
                 return false;
-            }
-        }
-
-        public static int ObtenerUltimoId()
-        {
-            try
-            {
-                using var conn = DAOHelper.AbrirConexionSegura();
-                string query = "SELECT MAX(id_producto) FROM Producto";
-                using var cmd = new SqlCommand(query, conn);
-                return DAOHelper.EjecutarEscalar(cmd);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"[ERROR][ProductoDAO.ObtenerUltimoId] {ex.Message}");
-                return 0;
             }
         }
     }
