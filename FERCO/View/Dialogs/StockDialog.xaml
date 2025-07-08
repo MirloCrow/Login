@@ -1,0 +1,37 @@
+﻿<Window x:Class="FERCO.View.Dialogs.StockDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Agregar Existencias" Height="300" Width="400"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        Background="{StaticResource PrimaryBackgroundBrush}">
+    <Grid Background="{StaticResource PrimaryBackgroundBrush}" Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Agregar Stock" FontSize="20" FontWeight="Bold"
+                   Foreground="{StaticResource PrimaryTextBrush}" Margin="0,0,0,20"
+                   HorizontalAlignment="Center"/>
+
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" VerticalAlignment="Top">
+                <TextBlock Text="Cantidad a agregar:" Foreground="{StaticResource PrimaryTextBrush}"/>
+                <TextBox x:Name="txtCantidad"/>
+
+                <TextBlock Text="Ubicación de inventario:" Margin="0,10,0,0" Foreground="{StaticResource PrimaryTextBrush}"/>
+                <ComboBox x:Name="cmbInventario" DisplayMemberPath="Descripcion" SelectedValuePath="IdInventario"/>
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+                <Button Content="Cancelar" Width="80" Margin="0,0,10,0" Click="BtnCancelar_Click" Style="{StaticResource BTNHEADERSTYLE}"/>
+                <Button Content="Guardar" Width="80" Click="BtnGuardar_Click" Style="{StaticResource BTNHEADERSTYLE}"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>
