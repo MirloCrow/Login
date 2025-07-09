@@ -230,7 +230,6 @@ namespace FERCO.View
                 return;
             }
 
-            // Copia segura antes del diálogo
             var producto = productoSeleccionado;
 
             var dialog = new StockDialog(producto.IdProducto)
@@ -241,10 +240,9 @@ namespace FERCO.View
             if (dialog.ShowDialog() == true)
             {
                 CargarProductos();
-                SeleccionarProductoPorId(producto.IdProducto); // reutilizamos la lógica segura
+                SeleccionarProductoPorId(producto.IdProducto);
             }
         }
-
 
         private void DgUbicaciones_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {

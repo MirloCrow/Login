@@ -1,0 +1,34 @@
+﻿<Window x:Class="FERCO.View.Dialogs.IngresoInventarioDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:FERCO.ViewModel"
+        Title="Asignar Unidades a Inventario"
+        Height="400" Width="500"
+        WindowStartupLocation="CenterOwner">
+
+    <Window.DataContext>
+        <vm:IngresoInventarioDialogViewModel />
+    </Window.DataContext>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="{Binding NombreProducto}" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+
+        <DataGrid Grid.Row="1" ItemsSource="{Binding Ubicaciones}" AutoGenerateColumns="False" CanUserAddRows="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Ubicación" Binding="{Binding DescripcionUbicacion}" IsReadOnly="True" />
+                <DataGridTextColumn Header="Cantidad a Ingresar" Binding="{Binding Cantidad}" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Content="Confirmar" Width="100" Margin="0,0,10,0" Click="Confirmar_Click"/>
+            <Button Content="Cancelar" Width="100" Click="Cancelar_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

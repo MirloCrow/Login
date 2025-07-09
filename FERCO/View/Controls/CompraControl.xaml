@@ -1,0 +1,74 @@
+﻿<UserControl x:Class="FERCO.View.Controls.CompraControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:FERCO.ViewModel">
+    <UserControl.DataContext>
+        <vm:CompraViewModel />
+    </UserControl.DataContext>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Nueva Compra -->
+            <RowDefinition Height="Auto"/>
+            <!-- Historial -->
+            <RowDefinition Height="*"/>
+            <!-- Detalles del Pedido Seleccionado -->
+        </Grid.RowDefinitions>
+
+        <!-- Nueva Compra -->
+        <GroupBox Header="Nueva Compra" Grid.Row="0" Margin="0,0,0,10">
+            <StackPanel Margin="10">
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <TextBlock Text="Proveedor:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                    <ComboBox Width="200" ItemsSource="{Binding Proveedores}" 
+                              SelectedItem="{Binding ProveedorSeleccionado}" 
+                              DisplayMemberPath="Nombre"/>
+                    <TextBlock Text="Fecha:" Margin="20,0,5,0" VerticalAlignment="Center"/>
+                    <DatePicker SelectedDate="{Binding PedidoActual.FechaPedido}" Width="150"/>
+                </StackPanel>
+
+                <DataGrid ItemsSource="{Binding Detalles}" AutoGenerateColumns="False" CanUserAddRows="False" Height="150">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Producto" Binding="{Binding NombreProducto}" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Cantidad" Binding="{Binding Cantidad}" />
+                        <DataGridTextColumn Header="Precio Unitario" Binding="{Binding PrecioUnitario}" />
+                        <DataGridTextColumn Header="Subtotal" Binding="{Binding Subtotal}" IsReadOnly="True"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+                    <Button Content="Agregar Producto" Command="{Binding AgregarDetalleCommand}" Margin="0,0,10,0"/>
+                    <Button Content="Registrar Compra" Command="{Binding RegistrarCompraCommand}" />
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Historial -->
+        <GroupBox Header="Historial de Compras" Grid.Row="1" Margin="0,0,0,10">
+            <StackPanel Margin="10">
+                <DataGrid ItemsSource="{Binding HistorialPedidos}" 
+                          SelectedItem="{Binding PedidoSeleccionado}" 
+                          AutoGenerateColumns="False" Height="150">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Fecha" Binding="{Binding FechaPedido, StringFormat=d}" />
+                        <DataGridTextColumn Header="Proveedor" Binding="{Binding NombreProveedor}" />
+                        <DataGridTextColumn Header="Total" Binding="{Binding TotalPedido}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Detalles del Pedido Seleccionado -->
+        <GroupBox Header="Detalle de Compra Seleccionada" Grid.Row="2">
+            <DataGrid ItemsSource="{Binding PedidoSeleccionado.Detalles}" AutoGenerateColumns="False" Margin="10,0,10,10">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Producto" Binding="{Binding NombreProducto}" />
+                    <DataGridTextColumn Header="Cantidad" Binding="{Binding Cantidad}" />
+                    <DataGridTextColumn Header="Precio Unitario" Binding="{Binding PrecioUnitario}" />
+                    <DataGridTextColumn Header="Subtotal" Binding="{Binding Subtotal}" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+    </Grid>
+</UserControl>

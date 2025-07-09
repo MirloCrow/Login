@@ -49,23 +49,23 @@ namespace FERCO.View.Dialogs
 
             int nuevaCantidad = existente != null ? existente.Cantidad + cantidad : cantidad;
 
-            RegistroGenerado = new InventarioProducto
+            var nuevoRegistro = new InventarioProducto
             {
                 IdProducto = idProducto,
                 IdInventario = inventario.IdInventario,
-                Cantidad = nuevaCantidad
+                Cantidad = cantidad // solo el nuevo ingreso
             };
 
-            bool ok = existente != null
-                ? InventarioProductoDAO.Actualizar(RegistroGenerado)
-                : InventarioProductoDAO.Insertar(RegistroGenerado);
+            bool ok = InventarioProductoDAO.InsertarOIncrementar(nuevoRegistro);
 
             if (ok)
             {
+                RegistroGenerado = nuevoRegistro;
                 MessageBox.Show("Stock actualizado.", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
                 DialogResult = true;
                 Close();
             }
+
             else
             {
                 MessageBox.Show("Error al actualizar el stock.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
