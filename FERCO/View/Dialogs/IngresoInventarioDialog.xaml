@@ -4,7 +4,9 @@
         xmlns:vm="clr-namespace:FERCO.ViewModel"
         Title="Asignar Unidades a Inventario"
         Height="400" Width="500"
-        WindowStartupLocation="CenterOwner">
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="{StaticResource PrimaryBackgroundBrush}">
 
     <Window.DataContext>
         <vm:IngresoInventarioDialogViewModel />
@@ -13,22 +15,55 @@
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <!-- Título -->
             <RowDefinition Height="Auto"/>
+            <!-- Nombre del producto -->
+            <RowDefinition Height="*"/>
+            <!-- DataGrid -->
+            <RowDefinition Height="Auto"/>
+            <!-- Botones -->
         </Grid.RowDefinitions>
 
-        <TextBlock Text="{Binding NombreProducto}" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+        <!-- Título -->
+        <TextBlock Text="Asignar Unidades a Inventario"
+                   FontSize="20" FontWeight="Bold"
+                   Foreground="{StaticResource PrimaryTextBrush}"
+                   HorizontalAlignment="Center"
+                   Margin="0,0,0,20"/>
 
-        <DataGrid Grid.Row="1" ItemsSource="{Binding Ubicaciones}" AutoGenerateColumns="False" CanUserAddRows="False">
+        <!-- Nombre del producto -->
+        <TextBlock Grid.Row="1" Text="{Binding NombreProducto}"
+                   FontSize="16" FontWeight="SemiBold"
+                   Foreground="{StaticResource PrimaryTextBrush}"
+                   Margin="0,0,0,10"
+                   HorizontalAlignment="Center"/>
+
+        <!-- Tabla de ubicaciones -->
+        <DataGrid Grid.Row="2"
+                  ItemsSource="{Binding Ubicaciones}"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  HeadersVisibility="Column"
+                  GridLinesVisibility="Horizontal"
+                  Margin="0,0,0,10">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Ubicación" Binding="{Binding DescripcionUbicacion}" IsReadOnly="True" />
-                <DataGridTextColumn Header="Cantidad a Ingresar" Binding="{Binding Cantidad}" />
+                <DataGridTextColumn Header="Ubicación"
+                                    Binding="{Binding DescripcionUbicacion}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Cantidad a Ingresar"
+                                    Binding="{Binding Cantidad}"/>
             </DataGrid.Columns>
         </DataGrid>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
-            <Button Content="Confirmar" Width="100" Margin="0,0,10,0" Click="Confirmar_Click"/>
-            <Button Content="Cancelar" Width="100" Click="Cancelar_Click"/>
+        <!-- Botones -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Content="Cancelar" Width="100" Margin="0,0,10,0"
+                    Click="Cancelar_Click"
+                    Style="{StaticResource BTNHEADERSTYLE}"/>
+            <Button Content="Confirmar" Width="100"
+                    Click="Confirmar_Click"
+                    Style="{StaticResource BTNHEADERSTYLE}"/>
         </StackPanel>
     </Grid>
 </Window>

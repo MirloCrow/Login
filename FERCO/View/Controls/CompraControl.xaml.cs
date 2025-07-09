@@ -1,4 +1,6 @@
-﻿using System;
+﻿using FERCO.View.Dialogs;
+using FERCO.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,5 +26,23 @@ namespace FERCO.View.Controls
         {
             InitializeComponent();
         }
+        private void BtnAgregarProveedor_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new ProveedorDialog
+            {
+                Owner = Window.GetWindow(this)
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                if (DataContext is CompraViewModel vm)
+                {
+                    var nuevoProveedor = dialog.ProveedorEditado;
+                    vm.Proveedores.Add(nuevoProveedor);
+                    vm.ProveedorSeleccionado = nuevoProveedor;
+                }
+            }
+        }
+
     }
 }
