@@ -25,20 +25,44 @@
             </Grid.ColumnDefinitions>
 
             <!-- Botones CRUD -->
-            <StackPanel Orientation="Horizontal" Grid.Column="0">
+            <StackPanel Orientation="Horizontal" Grid.Column="0" Margin="0,0,20,0">
                 <Button Content="Agregar Producto" Width="140" Margin="0,0,10,0" Click="BtnAgregarProducto_Click"/>
                 <Button Content="Editar Producto" Width="140" Margin="0,0,10,0" Click="BtnEditarProducto_Click"/>
                 <Button Content="Eliminar Producto" Width="140" Click="BtnEliminarProducto_Click"/>
             </StackPanel>
 
+
             <!-- Búsqueda -->
             <StackPanel Orientation="Horizontal" Grid.Column="2">
-                <ComboBox x:Name="cmbTipoBusqueda" Width="150" SelectedIndex="0" Margin="0,0,10,0">
+                <ComboBox x:Name="cmbTipoBusqueda" Width="150" SelectedIndex="0" Margin="0,0,10,0" SelectionChanged="CmbTipoBusqueda_SelectionChanged">
                     <ComboBoxItem Content="Nombre" />
                     <ComboBoxItem Content="Código" />
                     <ComboBoxItem Content="Categoría" />
                 </ComboBox>
-                <TextBox x:Name="txtBuscar" Width="250" Margin="0,0,10,0" KeyDown="TxtBuscar_KeyDown"/>
+
+                <Grid>
+                    <!-- TextBox para búsqueda libre -->
+                    <TextBox x:Name="txtBuscar"
+                     Width="250" Margin="0,0,10,0"
+                     KeyDown="TxtBuscar_KeyDown"
+                     Visibility="Visible"/>
+
+                    <!-- ComboBox para categorías -->
+                    <ComboBox x:Name="cmbBuscarCategoria"
+                      Width="250" Margin="0,0,10,0"
+                      DisplayMemberPath="NombreCategoria"
+                      SelectedValuePath="NombreCategoria"
+                      Visibility="Collapsed"/>
+                </Grid>
+
+                <ToggleButton x:Name="ordenToggle"
+                  Content="⬆⬇ A-Z / Z-A"
+                  Margin="0,0,10,0"
+                  VerticalAlignment="Center"
+                  Click="OrdenToggle_Click"
+                  Visibility="Visible"/>
+
+
                 <Button Content="Buscar" Width="100" Click="BtnBuscar_Click"/>
             </StackPanel>
         </Grid>

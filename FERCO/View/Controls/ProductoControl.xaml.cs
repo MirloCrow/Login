@@ -16,22 +16,34 @@ namespace FERCO.View
     {
         private Producto? productoSeleccionado = null;
         private bool filtroStockBajoActivo = false;
-    
+        private bool ordenDescendente = false;
+        private List<Categoria> categorias = [];
+
         public ProductoControl()
         {
             InitializeComponent();
             CargarProductos();
+            CargarCategorias();
+            ordenToggle.Visibility = Visibility.Visible;
         }
 
         private void CargarProductos()
         {
             var productos = ProductoDAO.ObtenerTodos();
-            dgProductos.ItemsSource = productos;
+            productos = ordenDescendente
+                ? [.. productos.OrderByDescending(p => p.NombreProducto)]
+                : [.. productos.OrderBy(p => p.NombreProducto)];
 
+            dgProductos.ItemsSource = productos;
             ActualizarAlertaStockBajo(productos);
         }
 
-        // Stock Warning
+        private void CargarCategorias()
+        {
+            categorias = CategoriaDAO.ObtenerTodas();
+            cmbBuscarCategoria.ItemsSource = categorias;
+        }
+
         private void ActualizarAlertaStockBajo(List<Producto> productos)
         {
             int umbral = ConfiguracionManager.Config.UmbralStockBajo;
@@ -43,7 +55,6 @@ namespace FERCO.View
                 txtStockBajo.Text = "Productos con stock bajo: 0";
                 txtStockBajo.Foreground = Brushes.DarkGreen;
                 txtStockBajo.FontSize = 16;
-
                 borderStockBajo.Background = Brushes.Honeydew;
                 borderStockBajo.BorderBrush = Brushes.ForestGreen;
             }
@@ -53,7 +64,6 @@ namespace FERCO.View
                 txtStockBajo.Text = productosConStockBajo.ToString();
                 txtStockBajo.Foreground = Brushes.DarkRed;
                 txtStockBajo.FontSize = 20;
-
                 borderStockBajo.Background = Brushes.Moccasin;
                 borderStockBajo.BorderBrush = Brushes.DarkOrange;
             }
@@ -80,6 +90,19 @@ namespace FERCO.View
                 btnStockBajoToggle.Content = "Mostrar productos con bajo stock";
             }
         }
+
+        private void CmbTipoBusqueda_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!IsLoaded) return;
+
+            if (cmbTipoBusqueda.SelectedItem is ComboBoxItem item && item.Content is string tipo)
+            {
+                txtBuscar.Visibility = tipo == "Categoría" ? Visibility.Collapsed : Visibility.Visible;
+                cmbBuscarCategoria.Visibility = tipo == "Categoría" ? Visibility.Visible : Visibility.Collapsed;
+                ordenToggle.Visibility = tipo == "Nombre" ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+
         private void BtnExportarStockBajo_Click(object sender, RoutedEventArgs e)
         {
             var productosBajoStock = ProductoDAO.ObtenerTodos()
@@ -248,21 +271,28 @@ namespace FERCO.View
 
         private void BtnBuscar_Click(object sender, RoutedEventArgs e)
         {
-            string filtro = txtBuscar.Text.Trim().ToLower();
             string tipoBusqueda = ((ComboBoxItem)cmbTipoBusqueda.SelectedItem).Content.ToString() ?? "";
-
             var productos = ProductoDAO.ObtenerTodos();
 
             switch (tipoBusqueda)
             {
                 case "Nombre":
-                    productos = [.. productos.Where(p => p.NombreProducto?.ToLower().Contains(filtro, StringComparison.CurrentCultureIgnoreCase) == true)];
+                    string filtroNombre = txtBuscar.Text.Trim().ToLower();
+                    productos = [.. productos.Where(p => p.NombreProducto?.ToLower().Contains(filtroNombre, StringComparison.CurrentCultureIgnoreCase) == true)];
+                    productos = ordenDescendente
+                        ? [.. productos.OrderByDescending(p => p.NombreProducto)]
+                        : [.. productos.OrderBy(p => p.NombreProducto)];
                     break;
+
                 case "Código":
-                    productos = [.. productos.Where(p => p.CodigoProducto?.ToLower().Contains(filtro, StringComparison.CurrentCultureIgnoreCase) == true)];
+                    string filtroCodigo = txtBuscar.Text.Trim().ToLower().Replace("-", "");
+                    productos = [.. productos.Where(p =>
+                        p.CodigoProducto?.ToLower().Replace("-", "").Contains(filtroCodigo) == true)];
                     break;
+
                 case "Categoría":
-                    productos = [.. productos.Where(p => p.NombreCategoria?.ToLower().Contains(filtro, StringComparison.CurrentCultureIgnoreCase) == true)];
+                    string categoriaSeleccionada = cmbBuscarCategoria.SelectedValue?.ToString() ?? "";
+                    productos = [.. productos.Where(p => p.NombreCategoria == categoriaSeleccionada)];
                     break;
             }
 
@@ -280,6 +310,11 @@ namespace FERCO.View
             {
                 BtnBuscar_Click(sender, e);
             }
+        }
+        private void OrdenToggle_Click(object sender, RoutedEventArgs e)
+        {
+            ordenDescendente = !ordenDescendente;
+            BtnBuscar_Click(sender, e); // Actualiza resultados si ya hay un filtro
         }
     }
 }
