@@ -81,12 +81,33 @@ namespace FERCO.ViewModel
 
         private void RegistrarCompra()
         {
-            // 1. Cargar detalles en el modelo
+            if (Detalles.Count == 0)
+            {
+                MessageBox.Show("Debe agregar al menos un producto.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // 1. Mostrar los diálogos de ingreso a inventario primero
+            var movimientos = new List<InventarioProducto>();
+
+            foreach (var detalle in Detalles)
+            {
+                var dialog = new IngresoInventarioDialog(detalle.NombreProducto ?? "Producto", detalle.Cantidad, detalle.IdProducto);
+                bool? result = dialog.ShowDialog();
+
+                if (result != true || dialog.Resultado == null || dialog.Resultado.Count == 0)
+                {
+                    MessageBox.Show("Ingreso de productos cancelado. La compra no será registrada.", "Operación cancelada", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return; // Salir sin registrar
+                }
+
+                movimientos.AddRange(dialog.Resultado);
+            }
+
+            // 2. Registrar el pedido en la BD
             PedidoActual.Detalles = [.. Detalles];
             PedidoActual.TotalPedido = Detalles.Sum(d => d.Subtotal);
 
-            // 2. Registrar el pedido en la BD
-            var dao = new CompraDAO();
             int idPedido = CompraDAO.RegistrarPedido(PedidoActual);
 
             if (idPedido == 0)
@@ -95,32 +116,21 @@ namespace FERCO.ViewModel
                 return;
             }
 
-            // 3. Para cada producto, pedir ingreso a ubicaciones
-            foreach (var detalle in Detalles)
+            // 3. Registrar movimientos en inventario
+            foreach (var mov in movimientos)
             {
-                var dialog = new IngresoInventarioDialog(detalle.NombreProducto ?? "Producto", detalle.Cantidad, detalle.IdProducto);
-                bool? result = dialog.ShowDialog();
-
-                if (result == true)
-                {
-                    foreach (var ubicacion in dialog.Resultado)
-                    {
-                        InventarioProductoDAO.InsertarOIncrementar(ubicacion);
-                    }
-                }
+                InventarioProductoDAO.InsertarOIncrementar(mov);
             }
 
-            // Mensaje final
+            // 4. Confirmación y limpieza
             MessageBox.Show("Compra registrada y stock actualizado con éxito.", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
 
-            // Limpiar estado
             Detalles.Clear();
             PedidoActual = new Pedido();
             ProveedorSeleccionado = null;
             OnPropertyChanged(nameof(PedidoActual));
             CargarHistorial();
         }
-
 
         public event PropertyChangedEventHandler? PropertyChanged;
 

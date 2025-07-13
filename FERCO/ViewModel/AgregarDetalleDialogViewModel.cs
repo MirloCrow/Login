@@ -11,9 +11,9 @@ namespace FERCO.ViewModel
 {
     public class AgregarDetalleDialogViewModel : INotifyPropertyChanged
     {
-        public ObservableCollection<Producto> Productos { get; set; } = new();
-        public ObservableCollection<Producto> ProductosFiltrados { get; set; } = new();
-        public ObservableCollection<Categoria> Categorias { get; set; } = new();
+        public ObservableCollection<Producto> Productos { get; set; } = [];
+        public ObservableCollection<Producto> ProductosFiltrados { get; set; } = [];
+        public ObservableCollection<Categoria> Categorias { get; set; } = [];
 
         private Producto? _productoSeleccionado;
         public Producto? ProductoSeleccionado
@@ -103,7 +103,7 @@ namespace FERCO.ViewModel
             if (CriterioBusqueda == "Nombre")
             {
                 string texto = TextoBusqueda.Trim().ToLower();
-                filtrados = filtrados.Where(p => p.NombreProducto?.ToLower().Contains(texto) == true);
+                filtrados = filtrados.Where(p => p.NombreProducto?.ToLower().Contains(texto, StringComparison.CurrentCultureIgnoreCase) == true);
 
                 filtrados = OrdenAscendente
                     ? filtrados.OrderBy(p => p.NombreProducto)
@@ -113,7 +113,7 @@ namespace FERCO.ViewModel
             {
                 string texto = TextoBusqueda.Replace("-", "").Trim().ToLower();
                 filtrados = filtrados.Where(p =>
-                    p.CodigoProducto?.Replace("-", "").ToLower().Contains(texto) == true);
+                    p.CodigoProducto?.Replace("-", "").Contains(texto, StringComparison.CurrentCultureIgnoreCase) == true);
             }
             else if (CriterioBusqueda == "Categoría" && CategoriaSeleccionada != null)
             {
