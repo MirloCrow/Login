@@ -3,13 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:vm="clr-namespace:FERCO.ViewModel"
         mc:Ignorable="d"
         Title="Agregar Producto"
         Height="550" Width="850"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
-        Background="{StaticResource PrimaryBackgroundBrush}">
+        Background="{StaticResource PrimaryBackgroundBrush}"
+        Loaded="Dialog_Loaded">
 
     <Window.DataContext>
         <vm:AgregarDetalleDialogViewModel />
@@ -26,34 +28,26 @@
         <!-- Filtro -->
         <StackPanel Orientation="Horizontal">
             <ComboBox Width="150"
-                      SelectedIndex="{Binding IndiceFiltroSeleccionado}"
-                      Margin="0,0,10,0">
-                <ComboBoxItem Content="Nombre"/>
-                <ComboBoxItem Content="Código"/>
-                <ComboBoxItem Content="Categoría"/>
+                SelectedItem="{Binding CriterioBusqueda, UpdateSourceTrigger=PropertyChanged}"
+                Margin="0,0,10,0">
+                <sys:String>Nombre</sys:String>
+                <sys:String>Código</sys:String>
+                <sys:String>Categoría</sys:String>
             </ComboBox>
 
             <Grid>
-                <TextBox Width="250" Margin="0,0,10,0"
+                <TextBox x:Name="txtBuscar"
+                         Width="250" Margin="0,0,10,0"
                          Text="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}"
                          Visibility="{Binding EsFiltroPorCategoria, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
 
                 <ComboBox Width="250" Margin="0,0,10,0"
-                          ItemsSource="{Binding Categorias}"
-                          DisplayMemberPath="NombreCategoria"
-                          SelectedValuePath="NombreCategoria"
-                          SelectedValue="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}"
-                          Visibility="{Binding EsFiltroPorCategoria, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                      ItemsSource="{Binding Categorias}"
+                      DisplayMemberPath="Nombre"
+                      SelectedItem="{Binding CategoriaSeleccionada}"
+                      Visibility="{Binding EsFiltroPorCategoria, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
             </Grid>
-
-            <ToggleButton Content="⬆⬇ A-Z / Z-A"
-                          Margin="0,0,10,0"
-                          IsChecked="{Binding OrdenDescendente}"
-                          VerticalAlignment="Center"/>
-
-            <Button Content="Buscar"
-                    Width="100"
-                    Command="{Binding BuscarCommand}"/>
         </StackPanel>
 
         <!-- Resultados -->
@@ -78,7 +72,7 @@
             <TextBlock Text="Cantidad:" VerticalAlignment="Center" Margin="0,0,10,0"/>
             <TextBox Width="80" Text="{Binding Cantidad}" Margin="0,0,20,0"/>
 
-            <TextBlock Text="Precio Unitario:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+            <TextBlock Text="Costo Unitario:" VerticalAlignment="Center" Margin="0,0,10,0"/>
             <TextBox Width="100" Text="{Binding PrecioUnitario}" Margin="0,0,20,0"/>
         </StackPanel>
 

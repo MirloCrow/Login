@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Input;
 using FERCO.Model;
 using FERCO.ViewModel;
 
@@ -32,6 +33,12 @@ namespace FERCO.View.Dialogs
 
             DialogResult = true;
             Close();
+        }
+
+        private void Dialog_Loaded(object sender, RoutedEventArgs e)
+        {
+            txtBuscar.Focus();
+            Keyboard.Focus(txtBuscar);
         }
 
         private void Cancelar_Click(object sender, RoutedEventArgs e)
