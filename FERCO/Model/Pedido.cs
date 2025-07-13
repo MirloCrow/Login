@@ -10,7 +10,7 @@ namespace FERCO.Model
     {
         public int IdPedido { get; set; }
         public int IdProveedor { get; set; }
-        public DateTime FechaPedido { get; set; }
+        public DateTime FechaPedido { get; set; } = DateTime.Now;
         public int TotalPedido { get; set; }
 
         public string NombreProveedor { get; set; } = ""; // Para mostrar

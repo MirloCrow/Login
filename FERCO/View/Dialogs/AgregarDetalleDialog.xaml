@@ -6,7 +6,7 @@
         xmlns:vm="clr-namespace:FERCO.ViewModel"
         mc:Ignorable="d"
         Title="Agregar Producto"
-        Height="300" Width="450"
+        Height="550" Width="850"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         Background="{StaticResource PrimaryBackgroundBrush}">
@@ -18,59 +18,76 @@
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <!-- Título -->
-            <RowDefinition Height="*"/>
-            <!-- Contenido principal -->
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Título -->
-        <TextBlock Text="Agregar Producto"
-                   FontSize="20"
-                   FontWeight="Bold"
-                   Foreground="{StaticResource PrimaryTextBrush}"
-                   HorizontalAlignment="Center"
-                   Margin="0,0,0,20"/>
+        <!-- Filtro -->
+        <StackPanel Orientation="Horizontal">
+            <ComboBox Width="150"
+                      SelectedIndex="{Binding IndiceFiltroSeleccionado}"
+                      Margin="0,0,10,0">
+                <ComboBoxItem Content="Nombre"/>
+                <ComboBoxItem Content="Código"/>
+                <ComboBoxItem Content="Categoría"/>
+            </ComboBox>
 
-        <!-- Contenido -->
-        <Grid Grid.Row="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+            <Grid>
+                <TextBox Width="250" Margin="0,0,10,0"
+                         Text="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}"
+                         Visibility="{Binding EsFiltroPorCategoria, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
 
-            <!-- Selección de producto -->
-            <StackPanel Margin="0,0,0,10">
-                <TextBlock Text="Producto:" Foreground="{StaticResource PrimaryTextBrush}"/>
-                <ComboBox ItemsSource="{Binding Productos}"
-                          SelectedItem="{Binding ProductoSeleccionado}"
-                          DisplayMemberPath="NombreProducto"
-                          Width="400"/>
-            </StackPanel>
+                <ComboBox Width="250" Margin="0,0,10,0"
+                          ItemsSource="{Binding Categorias}"
+                          DisplayMemberPath="NombreCategoria"
+                          SelectedValuePath="NombreCategoria"
+                          SelectedValue="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}"
+                          Visibility="{Binding EsFiltroPorCategoria, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            </Grid>
 
-            <!-- Cantidad y precio -->
-            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
-                <TextBlock Text="Cantidad:" VerticalAlignment="Center"
-                           Margin="0,0,10,0"
-                           Foreground="{StaticResource PrimaryTextBrush}"/>
-                <TextBox Width="100" Text="{Binding Cantidad}"/>
+            <ToggleButton Content="⬆⬇ A-Z / Z-A"
+                          Margin="0,0,10,0"
+                          IsChecked="{Binding OrdenDescendente}"
+                          VerticalAlignment="Center"/>
 
-                <TextBlock Text="Precio unitario:" VerticalAlignment="Center"
-                           Margin="20,0,10,0"
-                           Foreground="{StaticResource PrimaryTextBrush}"/>
-                <TextBox Width="100" Text="{Binding PrecioUnitario}"/>
-            </StackPanel>
+            <Button Content="Buscar"
+                    Width="100"
+                    Command="{Binding BuscarCommand}"/>
+        </StackPanel>
 
-            <!-- Botones -->
-            <StackPanel Grid.Row="2" Orientation="Horizontal"
-                        HorizontalAlignment="Right" Margin="0,10,0,0">
-                <Button Content="Cancelar" Width="80" Margin="0,0,10,0"
-                        Click="Cancelar_Click"
-                        Style="{StaticResource BTNHEADERSTYLE}"/>
-                <Button Content="Aceptar" Width="80"
-                        Click="Aceptar_Click"
-                        Style="{StaticResource BTNHEADERSTYLE}"/>
-            </StackPanel>
-        </Grid>
+        <!-- Resultados -->
+        <DataGrid Grid.Row="1"
+                  ItemsSource="{Binding ProductosFiltrados}"
+                  SelectedItem="{Binding ProductoSeleccionado}"
+                  AutoGenerateColumns="False"
+                  Margin="0,10,0,10"
+                  Height="300"
+                  IsReadOnly="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Nombre" Binding="{Binding NombreProducto}" Width="2*" />
+                <DataGridTextColumn Header="Descripción" Binding="{Binding DescripcionProducto}" Width="2.5*" />
+                <DataGridTextColumn Header="Precio" Binding="{Binding PrecioProducto}" Width="*" />
+                <DataGridTextColumn Header="Categoría" Binding="{Binding NombreCategoria}" Width="1.5*" />
+                <DataGridTextColumn Header="Proveedor" Binding="{Binding NombreProveedor}" Width="1.5*" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Detalles -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center">
+            <TextBlock Text="Cantidad:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+            <TextBox Width="80" Text="{Binding Cantidad}" Margin="0,0,20,0"/>
+
+            <TextBlock Text="Precio Unitario:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+            <TextBox Width="100" Text="{Binding PrecioUnitario}" Margin="0,0,20,0"/>
+        </StackPanel>
+
+        <!-- Botones -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Content="Cancelar" Width="80" Margin="0,0,10,0"
+                    Click="Cancelar_Click" Style="{StaticResource BTNHEADERSTYLE}"/>
+            <Button Content="Aceptar" Width="80"
+                    Click="Aceptar_Click" Style="{StaticResource BTNHEADERSTYLE}"/>
+        </StackPanel>
     </Grid>
 </Window>
