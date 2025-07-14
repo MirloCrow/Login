@@ -180,5 +180,34 @@ namespace FERCO.Data
             return result != DBNull.Value ? Convert.ToInt32(result) : 0;
         }
 
+        public static bool InsertarOIncrementar(InventarioProducto item)
+        {
+            try
+            {
+                using var conn = DAOHelper.AbrirConexionSegura();
+
+                string query = @"
+            IF EXISTS (SELECT 1 FROM InventarioProducto WHERE id_inventario = @inv AND id_producto = @prod)
+                UPDATE InventarioProducto SET cantidad = cantidad + @cant
+                WHERE id_inventario = @inv AND id_producto = @prod
+            ELSE
+                INSERT INTO InventarioProducto (id_inventario, id_producto, cantidad)
+                VALUES (@inv, @prod, @cant)";
+
+                using var cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@inv", item.IdInventario);
+                cmd.Parameters.AddWithValue("@prod", item.IdProducto);
+                cmd.Parameters.AddWithValue("@cant", item.Cantidad);
+
+                return DAOHelper.EjecutarNoQuery(cmd);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"[ERROR][InventarioProductoDAO.InsertarOIncrementar] {ex.Message}");
+                return false;
+            }
+        }
+
+
     }
 }

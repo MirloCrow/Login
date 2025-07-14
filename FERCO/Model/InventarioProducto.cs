@@ -1,17 +1,40 @@
-﻿namespace FERCO.Model
+﻿using System;
+using System.ComponentModel;
+
+namespace FERCO.Model
 {
-    public class InventarioProducto
+    public class InventarioProducto : INotifyPropertyChanged
     {
         public int IdInventario { get; set; }
         public int IdProducto { get; set; }
-        public int Cantidad { get; set; }
 
-        // Esta propiedad es útil para mostrar el nombre del inventario en la UI
+        private int _cantidad;
+        public int Cantidad
+        {
+            get => _cantidad;
+            set
+            {
+                if (_cantidad != value)
+                {
+                    _cantidad = value;
+                    OnPropertyChanged(nameof(Cantidad));
+                    CantidadActualizada?.Invoke(); // Notifica al ViewModel
+                }
+            }
+        }
+
         public string DescripcionUbicacion { get; set; } = "";
+
+        // Callback que será asignado por el ViewModel
+        public Action? CantidadActualizada { get; set; }
 
         public override string ToString()
         {
-            return $"{DescripcionUbicacion} (Stock: {Cantidad})";
+            return $"{DescripcionUbicacion} (Agregar: {Cantidad})";
         }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void OnPropertyChanged(string nombre) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nombre));
     }
 }

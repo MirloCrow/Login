@@ -1,51 +1,86 @@
 ﻿<Window x:Class="FERCO.View.Dialogs.TipoReparacionDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Nuevo Tipo de Reparación" Height="500" Width="600" WindowStartupLocation="CenterScreen"
-        ResizeMode="NoResize">
-    <Grid Margin="10">
+        Title="Nuevo Tipo de Reparación"
+        Height="500" Width="600"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="{StaticResource PrimaryBackgroundBrush}">
+
+    <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <!-- Título -->
             <RowDefinition Height="Auto"/>
+            <!-- Formulario -->
+            <RowDefinition Height="*"/>
+            <!-- Tabla productos -->
+            <RowDefinition Height="Auto"/>
+            <!-- Botones -->
         </Grid.RowDefinitions>
 
-        <!-- Encabezado -->
-        <StackPanel>
-            <TextBlock Text="Nombre:"/>
+        <!-- Título -->
+        <TextBlock Text="Nuevo Tipo de Reparación"
+                   FontSize="20" FontWeight="Bold"
+                   Foreground="{StaticResource PrimaryTextBrush}"
+                   HorizontalAlignment="Center"
+                   Margin="0,0,0,20"/>
+
+        <!-- Formulario -->
+        <StackPanel Grid.Row="1" Margin="0,0,0,10">
+            <TextBlock Text="Nombre:" Foreground="{StaticResource PrimaryTextBrush}"/>
             <TextBox x:Name="txtNombre" Margin="0,5,0,10"/>
 
-            <TextBlock Text="Descripción:"/>
+            <TextBlock Text="Descripción:" Foreground="{StaticResource PrimaryTextBrush}"/>
             <TextBox x:Name="txtDescripcion" Margin="0,5,0,10"/>
         </StackPanel>
 
         <!-- Tabla productos -->
-        <GroupBox Header="Productos necesarios" Grid.Row="1" Margin="0,10,0,10">
-            <Grid>
+        <GroupBox Grid.Row="2" Header="Productos necesarios" Margin="0,10,0,10"
+                  Foreground="{StaticResource PrimaryTextBrush}">
+            <Grid Margin="10">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                    <ComboBox x:Name="cmbProducto" Width="300" DisplayMemberPath="NombreProducto" SelectedValuePath="IdProducto"/>
+                    <ComboBox x:Name="cmbProducto"
+                              Width="300"
+                              DisplayMemberPath="NombreProducto"
+                              SelectedValuePath="IdProducto"/>
                     <TextBox x:Name="txtCantidad" Width="60" Margin="10,0,0,0"/>
-                    <Button Content="Agregar" Click="AgregarProducto_Click" Margin="10,0,0,0"/>
+                    <Button Content="Agregar" Click="AgregarProducto_Click"
+                            Margin="10,0,0,0"
+                            Style="{StaticResource BTNHEADERSTYLE}"/>
                 </StackPanel>
 
-                <DataGrid x:Name="dgProductos" Grid.Row="1" AutoGenerateColumns="False" CanUserAddRows="False">
+                <DataGrid x:Name="dgProductos"
+                          Grid.Row="1"
+                          AutoGenerateColumns="False"
+                          CanUserAddRows="False"
+                          HeadersVisibility="Column"
+                          GridLinesVisibility="Horizontal">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Producto" Binding="{Binding NombreProducto}" Width="*"/>
-                        <DataGridTextColumn Header="Cantidad" Binding="{Binding CantidadRequerida}" Width="80"/>
+                        <DataGridTextColumn Header="Producto"
+                                            Binding="{Binding NombreProducto}"
+                                            Width="*"/>
+                        <DataGridTextColumn Header="Cantidad"
+                                            Binding="{Binding CantidadRequerida}"
+                                            Width="80"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </Grid>
         </GroupBox>
 
         <!-- Botones -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Guardar" Width="100" Margin="0,0,10,0" Click="Guardar_Click"/>
-            <Button Content="Cancelar" Width="100" Click="Cancelar_Click"/>
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Content="Cancelar" Width="100" Margin="0,0,10,0"
+                    Click="Cancelar_Click"
+                    Style="{StaticResource BTNHEADERSTYLE}"/>
+            <Button Content="Guardar" Width="100"
+                    Click="Guardar_Click"
+                    Style="{StaticResource BTNHEADERSTYLE}"/>
         </StackPanel>
     </Grid>
 </Window>
