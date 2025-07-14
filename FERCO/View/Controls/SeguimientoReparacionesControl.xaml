@@ -5,43 +5,69 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             d:DesignHeight="500" d:DesignWidth="900">
+             d:DesignHeight="500" d:DesignWidth="900"
+             Background="#F5F5F5">
 
     <UserControl.DataContext>
         <vm:SeguimientoReparacionesViewModel />
     </UserControl.DataContext>
 
+    <!-- Recursos de estilo comunes -->
+    <UserControl.Resources>
+        <!-- Texto base -->
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#222"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <!-- Encabezados DataGrid -->
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Background" Value="#DDD"/>
+        </Style>
+
+        <!-- ComboBox -->
+        <Style TargetType="ComboBox">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="#222"/>
+        </Style>
+
+        <!-- TextBox (por si se agrega luego) -->
+        <Style TargetType="TextBox">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="#222"/>
+            <Setter Property="Background" Value="White"/>
+        </Style>
+    </UserControl.Resources>
+
     <StackPanel Margin="20">
         <TextBlock Text="Seguimiento de Reparaciones" FontSize="20" FontWeight="Bold" Margin="0,0,0,10"/>
 
+        <!-- Filtro de Estado -->
         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
             <TextBlock Text="Filtrar por estado:" VerticalAlignment="Center" Margin="0,0,10,0"/>
-            <ComboBox ItemsSource="{Binding EstadosFiltro}"
-                      SelectedItem="{Binding EstadoSeleccionado}"
-                      Width="150"/>
+            <ComboBox ItemsSource="{Binding EstadosFiltro}" SelectedItem="{Binding EstadoSeleccionado}" Width="150"/>
         </StackPanel>
 
-        <DataGrid ItemsSource="{Binding Reparaciones}" AutoGenerateColumns="False" Height="350">
+        <!-- Tabla de reparaciones -->
+        <DataGrid ItemsSource="{Binding Reparaciones}" AutoGenerateColumns="False" Height="350" FontSize="14">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Cliente" Binding="{Binding NombreCliente}" Width="*"/>
                 <DataGridTextColumn Header="Fecha" Binding="{Binding Fecha, StringFormat='dd-MM-yyyy HH:mm'}" Width="160"/>
                 <DataGridTextColumn Header="Costo" Binding="{Binding Costo}" Width="80"/>
 
+                <!-- Columna editable de Estado -->
                 <DataGridTemplateColumn Header="Estado" Width="150">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <ComboBox
-                            ItemsSource="{Binding DataContext.EstadosEdicion, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                            SelectedItem="{Binding Estado, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                            SelectionChanged="ComboBox_SelectionChanged"
-                            Width="140"
-                            Margin="2"/>
-
+                            <ComboBox ItemsSource="{Binding DataContext.EstadosEdicion, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                      SelectedItem="{Binding Estado, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      Width="140" Margin="2"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-
-
             </DataGrid.Columns>
         </DataGrid>
     </StackPanel>
