@@ -162,13 +162,6 @@
                         <DataGridTextColumn Header="Stock" Binding="{Binding Cantidad}" Width="100" />
                     </DataGrid.Columns>
                 </DataGrid>
-
-                <!-- Botón para agregar stock -->
-                <Button Content="Agregar Existencias"
-                Grid.Row="2" Grid.Column="0"
-                Width="180"
-                HorizontalAlignment="Left"
-                Click="BtnAgregarStock_Click"/>
             </Grid>
         </GroupBox>
     </Grid>

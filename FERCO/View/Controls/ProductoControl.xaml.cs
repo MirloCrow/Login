@@ -222,6 +222,7 @@ namespace FERCO.View
             }
         }
 
+        //BtnAgregarStock_Click deprecated
         private void BtnAgregarStock_Click(object sender, RoutedEventArgs e)
         {
             if (productoSeleccionado == null)
