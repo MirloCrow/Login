@@ -3,6 +3,7 @@ using FERCO.ViewModel;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 
 namespace FERCO.View.Dialogs
 {
@@ -18,7 +19,7 @@ namespace FERCO.View.Dialogs
             cantidadEsperada = cantidad;
 
             if (DataContext is IngresoInventarioDialogViewModel vm)
-                vm.CargarUbicaciones(nombreProducto, idProducto);
+                vm.CargarUbicaciones(nombreProducto, idProducto, cantidad);
         }
 
         private void Confirmar_Click(object sender, RoutedEventArgs e)
@@ -44,5 +45,24 @@ namespace FERCO.View.Dialogs
             DialogResult = false;
             Close();
         }
+        private void SoloNumerosHandler(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = !int.TryParse(e.Text, out _);
+        }
+        private void SoloNumerosPegarHandler(object sender, DataObjectPastingEventArgs e)
+        {
+            if (e.DataObject.GetDataPresent(typeof(string)))
+            {
+                string textoPegado = (string)e.DataObject.GetData(typeof(string));
+                if (!int.TryParse(textoPegado, out _))
+                    e.CancelCommand();
+            }
+            else
+            {
+                e.CancelCommand();
+            }
+        }
+
+
     }
 }
