@@ -7,7 +7,6 @@ namespace FERCO.Data
 {
     public static class ProductoDAO
     {
-        // Buscar y obtener productos
         public static List<Producto> ObtenerTodos()
         {
             var productos = new List<Producto>();
@@ -16,7 +15,7 @@ namespace FERCO.Data
             {
                 using var conn = DAOHelper.AbrirConexionSegura();
 
-                string query = @"
+                const string query = @"
             SELECT p.id_producto,
                    p.codigo_producto,
                    p.nombre_producto, 
@@ -33,21 +32,31 @@ namespace FERCO.Data
                 using var cmd = new SqlCommand(query, conn);
                 using var reader = cmd.ExecuteReader();
 
+                int idIndex = reader.GetOrdinal("id_producto");
+                int codigoIndex = reader.GetOrdinal("codigo_producto");
+                int nombreIndex = reader.GetOrdinal("nombre_producto");
+                int descripcionIndex = reader.GetOrdinal("descripcion_producto");
+                int precioIndex = reader.GetOrdinal("precio_producto");
+                int idProvIndex = reader.GetOrdinal("id_proveedor");
+                int idCatIndex = reader.GetOrdinal("id_categoria");
+                int nomProvIndex = reader.GetOrdinal("nombre_proveedor");
+                int nomCatIndex = reader.GetOrdinal("nombre_categoria");
+
                 while (reader.Read())
                 {
-                    int idProducto = reader.GetInt32(0);
+                    int idProducto = reader.GetInt32(idIndex);
 
                     var producto = new Producto
                     {
                         IdProducto = idProducto,
-                        CodigoProducto = reader.GetString(1),
-                        NombreProducto = reader.GetString(2),
-                        DescripcionProducto = reader.GetString(3),
-                        PrecioProducto = reader.GetInt32(4),
-                        IdProveedor = reader.GetInt32(5),
-                        IdCategoria = reader.GetInt32(6),
-                        NombreProveedor = reader.GetString(7),
-                        NombreCategoria = reader.GetString(8),
+                        CodigoProducto = reader.GetString(codigoIndex),
+                        NombreProducto = reader.GetString(nombreIndex),
+                        DescripcionProducto = reader.GetString(descripcionIndex),
+                        PrecioProducto = reader.GetInt32(precioIndex),
+                        IdProveedor = reader.GetInt32(idProvIndex),
+                        IdCategoria = reader.GetInt32(idCatIndex),
+                        NombreProveedor = reader.GetString(nomProvIndex),
+                        NombreCategoria = reader.GetString(nomCatIndex),
                         UbicacionesConStock = InventarioProductoDAO.ObtenerUbicacionesPorProducto(idProducto)
                     };
 
@@ -134,8 +143,23 @@ namespace FERCO.Data
             try
             {
                 using var conn = DAOHelper.AbrirConexionSegura();
-                string query = @"INSERT INTO Producto (id_proveedor, id_categoria, nombre_producto, descripcion_producto, precio_producto, codigo_producto)
-                         VALUES (@proveedor, @categoria, @nombre, @descripcion, @precio, @codigoproducto)";
+
+                const string query = @"
+            INSERT INTO Producto (
+                id_proveedor, 
+                id_categoria, 
+                nombre_producto, 
+                descripcion_producto, 
+                precio_producto, 
+                codigo_producto)
+            VALUES (
+                @proveedor, 
+                @categoria, 
+                @nombre, 
+                @descripcion, 
+                @precio, 
+                @codigoproducto)";
+
                 using var cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@proveedor", producto.IdProveedor);
                 cmd.Parameters.AddWithValue("@categoria", producto.IdCategoria);
@@ -155,21 +179,27 @@ namespace FERCO.Data
 
         public static bool Actualizar(Producto producto)
         {
-            if (producto.IdProducto <= 0 || string.IsNullOrWhiteSpace(producto.NombreProducto) ||
+            if (producto.IdProducto <= 0 ||
+                string.IsNullOrWhiteSpace(producto.NombreProducto) ||
+                string.IsNullOrWhiteSpace(producto.CodigoProducto) ||
                 producto.PrecioProducto < 0)
                 return false;
 
             try
             {
                 using var conn = DAOHelper.AbrirConexionSegura();
-                string query = @"UPDATE Producto
-                                 SET codigo_producto = @codigo,
-                                     id_proveedor = @proveedor,
-                                     id_categoria = @categoria,
-                                     nombre_producto = @nombre,
-                                     descripcion_producto = @descripcion,
-                                     precio_producto = @precio
-                                 WHERE id_producto = @id";
+
+                const string query = @"
+            UPDATE Producto
+            SET 
+                codigo_producto = @codigo,
+                id_proveedor = @proveedor,
+                id_categoria = @categoria,
+                nombre_producto = @nombre,
+                descripcion_producto = @descripcion,
+                precio_producto = @precio
+            WHERE id_producto = @id";
+
                 using var cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@id", producto.IdProducto);
                 cmd.Parameters.AddWithValue("@proveedor", producto.IdProveedor);
@@ -195,10 +225,28 @@ namespace FERCO.Data
             try
             {
                 using var conn = DAOHelper.AbrirConexionSegura();
-                string query = "DELETE FROM Producto WHERE id_producto = @id";
+
+                // IMPORTANTE: Considerar si se deben eliminar también las referencias
+                // en InventarioProducto, Detalle_Pedido, Detalle_Venta, etc.
+                // Aquí solo se elimina el producto, por lo que debe haber control de FK en la BD
+
+                const string query = "DELETE FROM Producto WHERE id_producto = @id";
                 using var cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@id", idProducto);
+
                 return DAOHelper.EjecutarNoQuery(cmd);
+            }
+            catch (SqlException sqlEx)
+            {
+                Console.Error.WriteLine($"[ERROR][ProductoDAO.Eliminar][SQL] {sqlEx.Message}");
+
+                // Ejemplo: FK conflict
+                if (sqlEx.Number == 547) // Constraint violation (clave foránea)
+                {
+                    Console.Error.WriteLine("No se puede eliminar el producto porque está en uso en otras tablas.");
+                }
+
+                return false;
             }
             catch (Exception ex)
             {
