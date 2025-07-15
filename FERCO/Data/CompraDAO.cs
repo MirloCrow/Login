@@ -15,27 +15,29 @@ namespace FERCO.Data
             try
             {
                 // Insertar Pedido
-                var cmdPedido = new SqlCommand(
-                    "INSERT INTO Pedido_Proveedor (id_proveedor, fecha_pedido, total_pedido) " +
-                    "OUTPUT INSERTED.id_pedido VALUES (@prov, @fecha, @total)", conn, tran);
+                using var cmdPedido = new SqlCommand(@"
+            INSERT INTO Pedido_Proveedor (id_proveedor, fecha_pedido, total_pedido) 
+            OUTPUT INSERTED.id_pedido 
+            VALUES (@prov, @fecha, @total)", conn, tran);
+
                 cmdPedido.Parameters.AddWithValue("@prov", pedido.IdProveedor);
                 cmdPedido.Parameters.AddWithValue("@fecha", pedido.FechaPedido);
                 cmdPedido.Parameters.AddWithValue("@total", pedido.TotalPedido);
 
                 int idPedido = DAOHelper.EjecutarEscalar(cmdPedido);
 
-                // Insertar Detalles
+                // Insertar Detalles del Pedido
                 foreach (var det in pedido.Detalles)
                 {
-                    var cmdDetalle = new SqlCommand(
-                        "INSERT INTO Detalle_Pedido (id_pedido, id_producto, precio_unitario, cantidad_detalle, subtotal_detalle) " +
-                        "VALUES (@idPedido, @idProd, @precio, @cant, @subtotal)", conn, tran);
+                    using var cmdDetalle = new SqlCommand(@"
+                INSERT INTO Detalle_Pedido (id_pedido, id_producto, precio_unitario, cantidad_detalle, subtotal_detalle) 
+                VALUES (@idPedido, @idProd, @precio, @cant, @subtotal)", conn, tran);
+
                     cmdDetalle.Parameters.AddWithValue("@idPedido", idPedido);
                     cmdDetalle.Parameters.AddWithValue("@idProd", det.IdProducto);
                     cmdDetalle.Parameters.AddWithValue("@precio", det.PrecioUnitario);
                     cmdDetalle.Parameters.AddWithValue("@cant", det.Cantidad);
                     cmdDetalle.Parameters.AddWithValue("@subtotal", det.Subtotal);
-                    cmdDetalle.Transaction = tran;
 
                     DAOHelper.EjecutarNoQuery(cmdDetalle);
                 }
@@ -45,9 +47,9 @@ namespace FERCO.Data
             }
             catch (Exception ex)
             {
-                tran.Rollback();
+                try { tran.Rollback(); } catch { /* opcional: log adicional */ }
                 Console.Error.WriteLine($"[ERROR][CompraDAO.RegistrarPedido] {ex.Message}");
-                throw;
+                return 0; 
             }
         }
 
@@ -55,65 +57,95 @@ namespace FERCO.Data
         {
             List<Pedido> pedidos = [];
 
-            using var conn = DAOHelper.AbrirConexionSegura();
-            string query = @"
+            try
+            {
+                using var conn = DAOHelper.AbrirConexionSegura();
+
+                string query = @"
             SELECT p.id_pedido, p.id_proveedor, p.fecha_pedido, p.total_pedido,
                    pr.nombre_proveedor
             FROM Pedido_Proveedor p
             JOIN Proveedor pr ON p.id_proveedor = pr.id_proveedor
             ORDER BY p.fecha_pedido DESC";
 
-            using var cmd = new SqlCommand(query, conn);
-            using var reader = cmd.ExecuteReader();
+                using var cmd = new SqlCommand(query, conn);
+                using var reader = cmd.ExecuteReader();
 
-            while (reader.Read())
-            {
-                pedidos.Add(new Pedido
+                int idPedidoIndex = reader.GetOrdinal("id_pedido");
+                int idProveedorIndex = reader.GetOrdinal("id_proveedor");
+                int fechaIndex = reader.GetOrdinal("fecha_pedido");
+                int totalIndex = reader.GetOrdinal("total_pedido");
+                int nombreProveedorIndex = reader.GetOrdinal("nombre_proveedor");
+
+                while (reader.Read())
                 {
-                    IdPedido = reader.GetInt32(0),
-                    IdProveedor = reader.GetInt32(1),
-                    FechaPedido = reader.GetDateTime(2),
-                    TotalPedido = reader.GetInt32(3),
-                    NombreProveedor = reader.GetString(4)
-                });
-            }
+                    pedidos.Add(new Pedido
+                    {
+                        IdPedido = reader.GetInt32(idPedidoIndex),
+                        IdProveedor = reader.GetInt32(idProveedorIndex),
+                        FechaPedido = reader.GetDateTime(fechaIndex),
+                        TotalPedido = reader.GetInt32(totalIndex),
+                        NombreProveedor = reader.GetString(nombreProveedorIndex)
+                    });
+                }
 
-            foreach (var pedido in pedidos)
+                // Obtener detalles asociados a cada pedido
+                foreach (var pedido in pedidos)
+                {
+                    pedido.Detalles = ObtenerDetallesPorPedido(pedido.IdPedido);
+                }
+            }
+            catch (Exception ex)
             {
-                pedido.Detalles = ObtenerDetallesPorPedido(pedido.IdPedido);
+                Console.Error.WriteLine($"[ERROR][PedidoDAO.ObtenerPedidosConDetalles] {ex.Message}");
             }
 
             return pedidos;
         }
 
+
         private static List<DetallePedido> ObtenerDetallesPorPedido(int idPedido)
         {
             List<DetallePedido> detalles = [];
 
-            using var conn = DAOHelper.AbrirConexionSegura();
-            string query = @"
+            try
+            {
+                using var conn = DAOHelper.AbrirConexionSegura();
+                string query = @"
             SELECT d.id_producto, p.nombre_producto, d.cantidad_detalle, d.precio_unitario
             FROM Detalle_Pedido d
             JOIN Producto p ON d.id_producto = p.id_producto
             WHERE d.id_pedido = @id";
 
-            using var cmd = new SqlCommand(query, conn);
-            cmd.Parameters.AddWithValue("@id", idPedido);
-            using var reader = cmd.ExecuteReader();
+                using var cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@id", idPedido);
 
-            while (reader.Read())
-            {
-                detalles.Add(new DetallePedido
+                using var reader = cmd.ExecuteReader();
+
+                int idProdIndex = reader.GetOrdinal("id_producto");
+                int nombreProdIndex = reader.GetOrdinal("nombre_producto");
+                int cantidadIndex = reader.GetOrdinal("cantidad_detalle");
+                int precioIndex = reader.GetOrdinal("precio_unitario");
+
+                while (reader.Read())
                 {
-                    IdProducto = reader.GetInt32(0),
-                    NombreProducto = reader.GetString(1),
-                    Cantidad = reader.GetInt32(2),
-                    PrecioUnitario = reader.GetInt32(3)
-                });
+                    detalles.Add(new DetallePedido
+                    {
+                        IdProducto = reader.GetInt32(idProdIndex),
+                        NombreProducto = reader.GetString(nombreProdIndex),
+                        Cantidad = reader.GetInt32(cantidadIndex),
+                        PrecioUnitario = reader.GetInt32(precioIndex)
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"[ERROR][PedidoDAO.ObtenerDetallesPorPedido] {ex.Message}");
             }
 
             return detalles;
         }
+
 
     }
 }
