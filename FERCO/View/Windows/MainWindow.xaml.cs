@@ -18,6 +18,7 @@ namespace FERCO
         public MainWindow()
         {
             InitializeComponent();
+            ContenidoPrincipal.Content = new ReporteVentasControl();
         }
 
         private void TB(object sender, RoutedEventArgs e)
@@ -27,14 +28,7 @@ namespace FERCO
 
         private void BtnInicio_Click(object sender, RoutedEventArgs e)
         {
-            ContenidoPrincipal.Content = new TextBlock
-            {
-                Text = "TallerFERCO",
-                FontSize = 50,
-                Foreground = (Brush)FindResource("PrimaryTextBrush"),
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            };
+            ContenidoPrincipal.Content = new ReporteVentasControl();
         }
 
         private void BtnProducto_Click(object sender, RoutedEventArgs e)
