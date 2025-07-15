@@ -62,12 +62,18 @@ namespace FERCO.Data
         }
         public static List<Venta> ObtenerPorCliente(int idCliente)
         {
-            List<Venta> lista = new();
+            List<Venta> lista = [];
 
             using var conn = ConexionBD.ObtenerConexion();
             conn.Open();
 
-            var cmd = new SqlCommand("SELECT * FROM Ventas WHERE id_cliente = @id ORDER BY fecha_venta DESC", conn);
+            var cmd = new SqlCommand(@"
+                SELECT v.*, c.nombre_cliente 
+                FROM Ventas v
+                JOIN Cliente c ON v.id_cliente = c.id_cliente
+                WHERE v.id_cliente = @id
+                ORDER BY v.fecha_venta DESC", conn);
+
             cmd.Parameters.AddWithValue("@id", idCliente);
 
             using var reader = cmd.ExecuteReader();
@@ -78,11 +84,42 @@ namespace FERCO.Data
                     IdVenta = (int)reader["id_venta"],
                     IdCliente = (int)reader["id_cliente"],
                     FechaVenta = (DateTime)reader["fecha_venta"],
-                    TotalVenta = (int)reader["total_venta"]
+                    TotalVenta = (int)reader["total_venta"],
+                    ClienteNombre = reader["nombre_cliente"].ToString() ?? ""
                 });
             }
 
             return lista;
         }
+        public static List<DetalleVenta> ObtenerDetalles(int idVenta)
+        {
+            List<DetalleVenta> lista = [];
+
+            using var conn = DAOHelper.AbrirConexionSegura();
+            var cmd = new SqlCommand(@"
+            SELECT dv.*, p.nombre_producto
+            FROM Detalle_Venta dv
+            JOIN Producto p ON dv.id_producto = p.id_producto
+            WHERE dv.id_venta = @id", conn);
+
+            cmd.Parameters.AddWithValue("@id", idVenta);
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                lista.Add(new DetalleVenta
+                {
+                    IdDetalleVenta = (int)reader["id_detalle_venta"],
+                    IdVenta = (int)reader["id_venta"],
+                    IdProducto = (int)reader["id_producto"],
+                    CantidadDetalle = (int)reader["cantidad_detalle"],
+                    PrecioUnitario = (int)Convert.ToDecimal(reader["precio_unitario"]),
+                    NombreProducto = reader["nombre_producto"].ToString() ?? ""
+                });
+            }
+
+            return lista;
+        }
+
     }
 }

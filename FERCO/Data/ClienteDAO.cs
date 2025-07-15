@@ -1,7 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using FERCO.Model;
 using Microsoft.Data.SqlClient;
-using FERCO.Model;
+using System;
+using System.Collections.Generic;
+using System.Data.SQLite;
 
 namespace FERCO.Data
 {
@@ -116,6 +117,42 @@ namespace FERCO.Data
                     TelefonoCliente = (int)reader["telefono_cliente"]
                 });
             }
+            return lista;
+        }
+        public static List<Cliente> BuscarPorCriterio(string criterio)
+        {
+            List<Cliente> lista = [];
+            using var conn = DAOHelper.AbrirConexionSegura();
+
+            bool esRut = int.TryParse(criterio, out int rut);
+            SqlCommand cmd;
+
+            if (esRut)
+            {
+                cmd = new SqlCommand("SELECT * FROM Cliente WHERE rut_cliente = @rut", conn);
+                cmd.Parameters.AddWithValue("@rut", rut);
+            }
+            else
+            {
+                cmd = new SqlCommand("SELECT * FROM Cliente WHERE nombre_cliente LIKE @nombre", conn);
+                cmd.Parameters.AddWithValue("@nombre", $"%{criterio}%");
+            }
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                lista.Add(new Cliente
+                {
+                    IdCliente = (int)reader["id_cliente"],
+                    RutCliente = (int)reader["rut_cliente"],
+                    EstadoCliente = (bool)reader["estado_cliente"],
+                    NombreCliente = reader["nombre_cliente"].ToString() ?? "",
+                    EmailCliente = reader["email_cliente"].ToString() ?? "",
+                    DireccionCliente = reader["direccion_cliente"].ToString() ?? "",
+                    TelefonoCliente = (int)reader["telefono_cliente"]
+                });
+            }
+
             return lista;
         }
     }

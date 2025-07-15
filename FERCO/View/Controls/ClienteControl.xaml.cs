@@ -25,6 +25,11 @@ namespace FERCO.View.Controls
         {
             InitializeComponent();
             this.DataContext = new ClienteControlViewModel();
+
+            this.Loaded += (s, e) =>
+            {
+                BusquedaTextBox.Focus();
+            };
         }
     }
 }
