@@ -31,6 +31,25 @@ namespace FERCO.Data
 
             return null;
         }
+        public static void Actualizar(Cliente cliente)
+        {
+            using var conn = ConexionBD.ObtenerConexion();
+            conn.Open();
+
+            var cmd = new SqlCommand(
+                "UPDATE Cliente SET nombre_cliente = @nombre, email_cliente = @email, direccion_cliente = @direccion, " +
+                "telefono_cliente = @telefono, estado_cliente = @estado WHERE id_cliente = @id", conn);
+
+            cmd.Parameters.AddWithValue("@nombre", cliente.NombreCliente);
+            cmd.Parameters.AddWithValue("@email", cliente.EmailCliente);
+            cmd.Parameters.AddWithValue("@direccion", cliente.DireccionCliente);
+            cmd.Parameters.AddWithValue("@telefono", cliente.TelefonoCliente);
+            cmd.Parameters.AddWithValue("@estado", cliente.EstadoCliente);
+            cmd.Parameters.AddWithValue("@id", cliente.IdCliente);
+
+            cmd.ExecuteNonQuery();
+        }
+
 
         public static Cliente? ObtenerPorId(int idCliente)
         {

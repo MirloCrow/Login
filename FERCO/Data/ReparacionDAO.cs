@@ -131,6 +131,32 @@ namespace FERCO.Data
             return lista;
         }
 
+        public static List<Reparacion> ObtenerPorCliente(int idCliente)
+        {
+            List<Reparacion> lista = [];
+
+            using var conn = ConexionBD.ObtenerConexion();
+            conn.Open();
+
+            var cmd = new SqlCommand("SELECT * FROM Reparacion WHERE id_cliente = @id ORDER BY fecha_reparacion DESC", conn);
+            cmd.Parameters.AddWithValue("@id", idCliente);
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                lista.Add(new Reparacion
+                {
+                    IdReparacion = (int)reader["id_reparacion"],
+                    IdCliente = (int)reader["id_cliente"],
+                    FechaReparacion = (DateTime)reader["fecha_reparacion"],
+                    CostoReparacion = (int)reader["costo_reparacion"],
+                    Estado = reader["estado"].ToString()!
+                });
+            }
+
+            return lista;
+        }
+
         public static bool ActualizarEstado(int idReparacion, string nuevoEstado)
         {
             using var conn = DAOHelper.AbrirConexionSegura();

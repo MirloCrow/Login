@@ -14,6 +14,27 @@ namespace FERCO.View.Dialogs
             InitializeComponent();
         }
 
+        private bool esEdicion = false;
+        private Cliente clienteOriginal = new();
+
+        public ClienteDialog(Cliente clienteExistente) : this()
+        {
+            esEdicion = true;
+            clienteOriginal = clienteExistente;
+
+            txtRut.Text = clienteExistente.RutCliente.ToString();
+            txtNombre.Text = clienteExistente.NombreCliente;
+            txtEmail.Text = clienteExistente.EmailCliente;
+            txtDireccion.Text = clienteExistente.DireccionCliente;
+            txtTelefono.Text = clienteExistente.TelefonoCliente.ToString();
+
+            // Deshabilitar el campo RUT si no quieres que se edite
+            txtRut.IsEnabled = false;
+
+            this.Title = "Editar Cliente";
+        }
+
+
         private void BtnGuardar_Click(object sender, RoutedEventArgs e)
         {
             string errores = "";
@@ -30,7 +51,7 @@ namespace FERCO.View.Dialogs
             if (string.IsNullOrWhiteSpace(nombre))
                 errores += "- El nombre no puede estar vacío.\n";
 
-            if (!long.TryParse(telefonoStr, out long telefono))
+            if (!int.TryParse(telefonoStr, out int telefono))
                 errores += "- El teléfono debe ser numérico.\n";
 
             if (!string.IsNullOrEmpty(errores))
@@ -39,23 +60,38 @@ namespace FERCO.View.Dialogs
                 return;
             }
 
-            Cliente nuevo = new()
+            if (esEdicion)
             {
-                RutCliente = rut,
-                NombreCliente = nombre,
-                EmailCliente = email,
-                DireccionCliente = direccion,
-                TelefonoCliente = (int)telefono,
-                EstadoCliente = false
-            };
+                clienteOriginal.NombreCliente = nombre;
+                clienteOriginal.EmailCliente = email;
+                clienteOriginal.DireccionCliente = direccion;
+                clienteOriginal.TelefonoCliente = (int)telefono;
+                clienteOriginal.EstadoCliente = true;
 
-            int id = ClienteDAO.AgregarYObtenerId(nuevo);
-            nuevo.IdCliente = id;
+                ClienteDAO.Actualizar(clienteOriginal);
+                ClienteAgregado = clienteOriginal;
+            }
+            else
+            {
+                Cliente nuevo = new()
+                {
+                    RutCliente = rut,
+                    NombreCliente = nombre,
+                    EmailCliente = email,
+                    DireccionCliente = direccion,
+                    TelefonoCliente = (int)telefono,
+                    EstadoCliente = false
+                };
 
-            ClienteAgregado = nuevo;
+                int id = ClienteDAO.AgregarYObtenerId(nuevo);
+                nuevo.IdCliente = id;
+                ClienteAgregado = nuevo;
+            }
+
             DialogResult = true;
             Close();
         }
+
 
         private void BtnCancelar_Click(object sender, RoutedEventArgs e)
         {

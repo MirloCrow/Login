@@ -115,7 +115,7 @@ namespace FERCO.View
                 return;
             }
 
-            // Aquí podrías abrir un diálogo de guardado y exportar a CSV o PDF
+            // TODO: Implementar lógica de exportación
             MessageBox.Show("Función de exportación pendiente.");
         }
 

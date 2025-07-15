@@ -9,5 +9,10 @@
         public string EmailCliente { get; set; } = string.Empty;
         public string DireccionCliente { get; set; } = string.Empty;
         public int TelefonoCliente { get; set; }
+
+        // Historial
+        public List<Reparacion> Reparaciones { get; set; } = [];
+        public List<Venta> Ventas { get; set; } = [];
+
     }
 }

@@ -10,9 +10,11 @@
                 <ResourceDictionary Source="Themes/DarkTheme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- Convertidores de visibilidad -->
+            <!-- Convertidores globales -->
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <utils:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
+            <utils:NullToBoolConverter x:Key="NullToBoolConverter"/>
+            <utils:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -1,0 +1,47 @@
+﻿<UserControl x:Class="FERCO.View.Controls.ClienteControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:FERCO.ViewModel"
+             xmlns:utils="clr-namespace:FERCO.Utilities"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Panel izquierdo: búsqueda y datos -->
+        <StackPanel Grid.Column="0" Margin="10">
+            <TextBox Text="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}" />
+            <Button Content="Buscar" Command="{Binding BuscarCommand}" Margin="0,5"/>
+            <ListBox ItemsSource="{Binding ListaClientes}" SelectedItem="{Binding ClienteSeleccionado}" DisplayMemberPath="NombreCliente" Height="200"/>
+
+            <Button Content="Nuevo Cliente" Command="{Binding NuevoClienteCommand}" Margin="0,5"/>
+            <Button Content="Editar Cliente" Command="{Binding EditarClienteCommand}" IsEnabled="{Binding ClienteSeleccionado, Converter={StaticResource NullToBoolConverter}}"/>
+        </StackPanel>
+
+        <!-- Panel derecho: historial -->
+        <TabControl Grid.Column="1" Margin="10" Visibility="{Binding ClienteSeleccionado, Converter={StaticResource NullToVisibilityConverter}}">
+            <TabItem Header="Reparaciones">
+                <DataGrid ItemsSource="{Binding ClienteSeleccionado.Reparaciones}" AutoGenerateColumns="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Fecha" Binding="{Binding FechaReparacion}" />
+                        <DataGridTextColumn Header="Estado" Binding="{Binding Estado}" />
+                        <DataGridTextColumn Header="Costo" Binding="{Binding CostoReparacion}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+            <TabItem Header="Compras">
+                <DataGrid ItemsSource="{Binding ClienteSeleccionado.Ventas}" AutoGenerateColumns="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Fecha" Binding="{Binding FechaVenta}" />
+                        <DataGridTextColumn Header="Total" Binding="{Binding TotalVenta}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>

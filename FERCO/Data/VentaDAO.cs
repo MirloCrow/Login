@@ -60,5 +60,29 @@ namespace FERCO.Data
 
             cmd.ExecuteNonQuery();
         }
+        public static List<Venta> ObtenerPorCliente(int idCliente)
+        {
+            List<Venta> lista = new();
+
+            using var conn = ConexionBD.ObtenerConexion();
+            conn.Open();
+
+            var cmd = new SqlCommand("SELECT * FROM Ventas WHERE id_cliente = @id ORDER BY fecha_venta DESC", conn);
+            cmd.Parameters.AddWithValue("@id", idCliente);
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                lista.Add(new Venta
+                {
+                    IdVenta = (int)reader["id_venta"],
+                    IdCliente = (int)reader["id_cliente"],
+                    FechaVenta = (DateTime)reader["fecha_venta"],
+                    TotalVenta = (int)reader["total_venta"]
+                });
+            }
+
+            return lista;
+        }
     }
 }

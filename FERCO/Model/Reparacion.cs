@@ -6,8 +6,12 @@ using System.Threading.Tasks;
 
 namespace FERCO.Model
 {
-    class Reparacion
+    public class Reparacion
     {
-        public string Estado { get; set; } = "Pendiente";
+        public int IdReparacion { get; set; }
+        public int IdCliente { get; set; }
+        public DateTime FechaReparacion { get; set; }
+        public int CostoReparacion { get; set; }
+        public string Estado { get; set; } = string.Empty;
     }
 }

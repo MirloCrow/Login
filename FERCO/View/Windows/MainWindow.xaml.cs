@@ -110,5 +110,9 @@ namespace FERCO
         {
             ContenidoPrincipal.Content = new CompraControl();
         }
+        private void BtnCliente_Click(object sender, RoutedEventArgs e)
+        {
+            ContenidoPrincipal.Content = new ClienteControl();
+        }
     }
 }

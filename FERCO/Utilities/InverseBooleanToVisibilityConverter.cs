@@ -9,16 +9,20 @@ namespace FERCO.Utilities
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is bool b)
-                return b ? Visibility.Collapsed : Visibility.Visible;
-            return Visibility.Visible;
+            if (value is bool booleanValue)
+            {
+                return booleanValue ? Visibility.Collapsed : Visibility.Visible;
+            }
+            return DependencyProperty.UnsetValue;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is Visibility v)
-                return v != Visibility.Visible;
-            return true;
+            if (value is Visibility visibility)
+            {
+                return visibility == Visibility.Collapsed;
+            }
+            return DependencyProperty.UnsetValue;
         }
     }
 }

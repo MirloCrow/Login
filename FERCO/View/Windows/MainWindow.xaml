@@ -155,6 +155,32 @@
                                     </Grid>
                                 </Button>
                             </ListViewItem>
+                            <!-- CLIENTES -->
+                            <ListViewItem Style="{StaticResource ListViewStyle}" Height="70">
+                                <Button x:Name="BtnCliente" Style="{StaticResource BtnListaStyle}" Height="70" Click="BtnCliente_Click">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="60"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <!-- Ícono de contacto (puedes cambiarlo si prefieres otro) -->
+                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="" FontSize="20" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="1"
+                                           Text="Clientes"
+                                           Foreground="{StaticResource PrimaryTextBrush}"
+                                           HorizontalAlignment="Left"
+                                           VerticalAlignment="Center"
+                                           FontSize="15"
+                                           FontWeight="SemiBold"
+                                           Margin="5,0,0,0"
+                                           Visibility="{Binding ElementName=GridMenu,
+                                            Path=Width,
+                                            Converter={StaticResource WidthToVisibilityConverter},
+                                            ConverterParameter=100}"/>
+                                    </Grid>
+                                </Button>
+                            </ListViewItem>
+
 
                             <!-- PUNTO DE VENTA -->
                             <ListViewItem Style="{StaticResource ListViewStyle}" Height="70">
