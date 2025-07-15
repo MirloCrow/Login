@@ -81,10 +81,12 @@ namespace FERCO.ViewModel
         public ObservableCollection<DetalleReparacion> DetallesReparacion { get; set; } = [];
 
 
+
         public ICommand BuscarCommand { get; }
         public ICommand NuevoClienteCommand { get; }
         public ICommand EditarClienteCommand { get; }
         public ICommand VerBoletaCommand { get; }
+        public ICommand VerOrdenServicioCommand { get; }
 
 
         public ClienteControlViewModel()
@@ -93,6 +95,7 @@ namespace FERCO.ViewModel
             NuevoClienteCommand = new RelayCommand(() => AbrirDialogoNuevoCliente());
             EditarClienteCommand = new RelayCommand(() => AbrirDialogoEditarCliente(), () => ClienteSeleccionado != null);
             VerBoletaCommand = new RelayCommand(VerBoleta, () => VentaSeleccionada != null || ReparacionSeleccionada != null);
+            VerOrdenServicioCommand = new RelayCommand(VerOrdenServicio, () => ReparacionSeleccionada != null);
             CargarClientes();
         }
 
@@ -184,6 +187,25 @@ namespace FERCO.ViewModel
                     DetallesReparacion.Add(d);
             }
         }
+        private void VerOrdenServicio()
+        {
+            if (ReparacionSeleccionada == null) return;
+
+            try
+            {
+                var detalles = ReparacionDAO.ObtenerDetalles(ReparacionSeleccionada.IdReparacion);
+
+                // Asegurarse de tener el nombre del cliente antes de generar la boleta
+                ReparacionSeleccionada.NombreCliente = ClienteSeleccionado?.NombreCliente ?? "Cliente sin nombre";
+
+                BoletaHTMLGenerator.GenerarBoleta(ReparacionSeleccionada, detalles);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al generar orden de servicio: " + ex.Message);
+            }
+        }
+
         private void VerBoleta()
         {
             try

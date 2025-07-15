@@ -17,23 +17,25 @@ namespace FERCO.Utilities
 <html>
 <head>
     <meta charset='utf-8'>
-    <title>Boleta #{venta.IdVenta}</title>
+    <title>Boleta de Compra #{venta.IdVenta}</title>
     <style>
         body {{ font-family: Arial, sans-serif; margin: 40px; color: #000; }}
-        h1, h2 {{ text-align: center; margin: 0; }}
-        .empresa-info {{ text-align: center; margin-top: 5px; margin-bottom: 20px; font-size: 14px; }}
+        h1 {{ text-align: center; margin: 0; font-size: 26px; }}
+        h2 {{ text-align: center; margin: 0; font-size: 20px; color: #444; }}
+        .empresa-info {{ text-align: center; margin: 5px 0 20px; font-size: 14px; }}
         .datos-venta, .datos-cliente {{ margin-top: 10px; font-size: 14px; }}
         table {{ width: 100%; border-collapse: collapse; margin-top: 20px; }}
         th, td {{ border: 1px solid #ccc; padding: 8px; text-align: center; }}
-        th {{ background-color: #f4f4f4; }}
-        .total {{ font-weight: bold; }}
-        .footer {{ margin-top: 30px; text-align: center; font-style: italic; font-size: 14px; }}
+        th {{ background-color: #f9f9f9; }}
+        .total {{ font-weight: bold; background-color: #f0f0f0; }}
+        .footer {{ margin-top: 30px; text-align: center; font-style: italic; font-size: 13px; color: #666; }}
     </style>
 </head>
 <body>
     <h1>FERCO</h1>
+    <h2>Boleta de Compra #{venta.IdVenta}</h2>
     <div class='empresa-info'>
-        Giro: Reparación y venta de bicicletas y accesorios.<br/>
+        Giro: Reparación y venta de bicicletas y accesorios<br/>
         Dirección: Cruce El Molino Carretera H-30 El Molino S/N, Coltauco, Rancagua<br/>
         Teléfono: +56 9 8944 4321
     </div>
@@ -62,14 +64,13 @@ namespace FERCO.Utilities
                     : d.CantidadDetalle * d.PrecioUnitario;
 
                 html += $@"
-                <tr>
-                    <td>{d.NombreProducto}</td>
-                    <td>{d.CantidadDetalle}</td>
-                    <td>${d.PrecioUnitario:N0}</td>
-                    <td>${subtotal:N0}</td>
-                </tr>";
+        <tr>
+            <td>{d.NombreProducto}</td>
+            <td>{d.CantidadDetalle}</td>
+            <td>${d.PrecioUnitario:N0}</td>
+            <td>${subtotal:N0}</td>
+        </tr>";
             }
-
 
             html += $@"
         <tr class='total'>
@@ -79,21 +80,20 @@ namespace FERCO.Utilities
     </table>
 
     <div class='footer'>
-        ¡Gracias por su compra!
+        ¡Gracias por su compra!<br/>
+        FERCO
     </div>
 </body>
 </html>";
 
-            // Guardar archivo
             string carpeta = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "BoletasFERCO");
             Directory.CreateDirectory(carpeta);
             string rutaArchivo = Path.Combine(carpeta, $"Boleta_{venta.IdVenta}.html");
 
             File.WriteAllText(rutaArchivo, html);
-
-            // Abrir en navegador
             Process.Start(new ProcessStartInfo(rutaArchivo) { UseShellExecute = true });
         }
+
         public static void GenerarBoleta(Reparacion reparacion, List<DetalleReparacion> detalles)
         {
             string clienteNombre = string.IsNullOrEmpty(reparacion.NombreCliente) ? "Cliente sin nombre" : reparacion.NombreCliente;
@@ -106,20 +106,22 @@ namespace FERCO.Utilities
     <title>Orden de Servicio #{reparacion.IdReparacion}</title>
     <style>
         body {{ font-family: Arial, sans-serif; margin: 40px; color: #000; }}
-        h1, h2 {{ text-align: center; margin: 0; }}
-        .empresa-info {{ text-align: center; margin-top: 5px; margin-bottom: 20px; font-size: 14px; }}
+        h1 {{ text-align: center; margin: 0; font-size: 26px; }}
+        h2 {{ text-align: center; margin: 0; font-size: 20px; color: #444; }}
+        .empresa-info {{ text-align: center; margin: 5px 0 20px; font-size: 14px; }}
         .datos-venta, .datos-cliente {{ margin-top: 10px; font-size: 14px; }}
         table {{ width: 100%; border-collapse: collapse; margin-top: 20px; }}
         th, td {{ border: 1px solid #ccc; padding: 8px; text-align: center; }}
-        th {{ background-color: #f4f4f4; }}
-        .total {{ font-weight: bold; }}
-        .footer {{ margin-top: 30px; text-align: center; font-style: italic; font-size: 14px; }}
+        th {{ background-color: #f9f9f9; }}
+        .total {{ font-weight: bold; background-color: #f0f0f0; }}
+        .footer {{ margin-top: 30px; text-align: center; font-style: italic; font-size: 13px; color: #666; }}
     </style>
 </head>
 <body>
     <h1>FERCO</h1>
+    <h2>Orden de Servicio #{reparacion.IdReparacion}</h2>
     <div class='empresa-info'>
-        Giro: Reparación y venta de bicicletas y accesorios.<br/>
+        Giro: Reparación y venta de bicicletas y accesorios<br/>
         Dirección: Cruce El Molino Carretera H-30 El Molino S/N, Coltauco, Rancagua<br/>
         Teléfono: +56 9 8944 4321
     </div>
@@ -142,9 +144,13 @@ namespace FERCO.Utilities
             <th>Subtotal</th>
         </tr>";
 
+            int total = 0;
+
             foreach (var d in detalles)
             {
                 int subtotal = d.Cantidad * d.PrecioUnitario;
+                total += subtotal;
+
                 html += $@"
         <tr>
             <td>{d.NombreProducto}</td>
@@ -157,27 +163,23 @@ namespace FERCO.Utilities
             html += $@"
         <tr class='total'>
             <td colspan='3'>TOTAL</td>
-            <td>${reparacion.CostoReparacion:N0}</td>
+            <td>${total:N0}</td>
         </tr>
     </table>
 
     <div class='footer'>
-        ¡Gracias por preferirnos!
+        ¡Gracias por preferirnos!<br/>
+        FERCO
     </div>
 </body>
 </html>";
 
-            // Guardar archivo
             string carpeta = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "BoletasFERCO");
             Directory.CreateDirectory(carpeta);
             string rutaArchivo = Path.Combine(carpeta, $"Reparacion_{reparacion.IdReparacion}.html");
 
             File.WriteAllText(rutaArchivo, html);
-
-            // Abrir en navegador
             Process.Start(new ProcessStartInfo(rutaArchivo) { UseShellExecute = true });
         }
-
-
     }
 }

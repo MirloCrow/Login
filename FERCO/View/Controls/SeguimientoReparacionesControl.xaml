@@ -64,6 +64,7 @@
                         <DataTemplate>
                             <ComboBox ItemsSource="{Binding DataContext.EstadosEdicion, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                       SelectedItem="{Binding Estado, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      SelectionChanged="ComboBox_SelectionChanged"
                                       Width="140" Margin="2"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>

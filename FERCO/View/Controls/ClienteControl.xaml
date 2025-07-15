@@ -49,6 +49,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="2*"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <!-- Lista de reparaciones -->
@@ -73,6 +74,14 @@
                             <DataGridTextColumn Header="Costo Unitario" Binding="{Binding PrecioUnitario}" />
                         </DataGrid.Columns>
                     </DataGrid>
+                    <!-- Botón para ver orden de servicio -->
+                    <Button Grid.Row="2"
+                    Content="Ver Orden de Servicio"
+                    Command="{Binding VerOrdenServicioCommand}"
+                    IsEnabled="{Binding ReparacionSeleccionada, Converter={StaticResource NullToBoolConverter}}"
+                    Margin="0,5"
+                    HorizontalAlignment="Right"
+                    Width="120"/>
                 </Grid>
             </TabItem>
 
