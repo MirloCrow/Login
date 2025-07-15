@@ -1,14 +1,16 @@
-﻿using System;
+﻿using FERCO.Data;
+using FERCO.Model;
+using FERCO.Utilities;
+using FERCO.View.Dialogs;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using FERCO.Data;
-using FERCO.Model;
-using FERCO.Utilities;
-using FERCO.View.Dialogs;
 
 namespace FERCO.View
 {
@@ -71,11 +73,12 @@ namespace FERCO.View
 
         private void BtnStockBajoToggle_Click(object sender, RoutedEventArgs e)
         {
+            int umbral = ConfiguracionManager.Config.UmbralStockBajo;
             if (!filtroStockBajoActivo)
             {
                 // Activar filtro
                 var productosBajoStock = ProductoDAO.ObtenerTodos()
-                    .Where(p => p.StockTotal < 3)
+                    .Where(p => p.StockTotal < umbral)
                     .ToList();
 
                 dgProductos.ItemsSource = productosBajoStock;
@@ -105,18 +108,48 @@ namespace FERCO.View
 
         private void BtnExportarStockBajo_Click(object sender, RoutedEventArgs e)
         {
-            var productosBajoStock = ProductoDAO.ObtenerTodos()
-                .Where(p => p.StockTotal < 3)
-                .ToList();
-
-            if (productosBajoStock.Count == 0)
+            try
             {
-                MessageBox.Show("No hay productos con stock bajo para exportar.");
-                return;
-            }
+                int umbral = ConfiguracionManager.Config.UmbralStockBajo;
+                var productosCriticos = ProductoDAO.ObtenerTodos()
+                    .Where(p => p.StockTotal < umbral)
+                    .ToList();
 
-            // TODO: Implementar lógica de exportación
-            MessageBox.Show("Función de exportación pendiente.");
+                if (productosCriticos.Count == 0)
+                {
+                    MessageBox.Show("No hay productos con stock bajo el umbral.", "Exportación", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+
+                // Diálogo para seleccionar ubicación de guardado
+                var dialog = new Microsoft.Win32.SaveFileDialog
+                {
+                    FileName = "productos_criticos",
+                    DefaultExt = ".csv",
+                    Filter = "Archivos CSV (*.csv)|*.csv"
+                };
+
+                if (dialog.ShowDialog() == true)
+                {
+                    string ruta = dialog.FileName;
+                    using (var writer = new StreamWriter(ruta, false, Encoding.UTF8))
+                    {
+                        writer.WriteLine("Código,Nombre,Categoría,Proveedor,Stock Total");
+
+                        foreach (var p in productosCriticos)
+                        {
+                            string linea = $"{p.CodigoProducto},{p.NombreProducto},{p.NombreCategoria},{p.NombreProveedor},{p.StockTotal}";
+                            writer.WriteLine(linea);
+                        }
+                    }
+
+                    MessageBox.Show("Archivo exportado exitosamente.", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al exportar: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void SeleccionarProductoPorId(int idProducto)
