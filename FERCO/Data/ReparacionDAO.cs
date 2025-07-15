@@ -167,5 +167,35 @@ namespace FERCO.Data
             return cmd.ExecuteNonQuery() > 0;
         }
 
+        public static List<DetalleReparacion> ObtenerDetalles(int idReparacion)
+        {
+            List<DetalleReparacion> lista = [];
+
+            using var conn = DAOHelper.AbrirConexionSegura();
+            var cmd = new SqlCommand(@"
+        SELECT dr.*, p.nombre_producto
+        FROM Detalle_Reparacion dr
+        JOIN Producto p ON dr.id_producto = p.id_producto
+        WHERE dr.id_reparacion = @id", conn);
+
+            cmd.Parameters.AddWithValue("@id", idReparacion);
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                lista.Add(new DetalleReparacion
+                {
+                    IdDetalleReparacion = (int)reader["id_detalle"],
+                    IdReparacion = (int)reader["id_reparacion"],
+                    IdProducto = (int)reader["id_producto"],
+                    Cantidad = (int)reader["cantidad"],
+                    PrecioUnitario = (int)reader["costo_unitario"],
+                    NombreProducto = reader["nombre_producto"].ToString() ?? ""
+                });
+            }
+
+            return lista;
+        }
+
     }
 }

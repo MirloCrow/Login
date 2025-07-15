@@ -61,7 +61,7 @@ namespace FERCO.View
                 var detalle = new DetalleVenta
                 {
                     IdProducto = productoSeleccionado.IdProducto,
-                    ProductoNombre = productoSeleccionado.NombreProducto,
+                    NombreProducto = productoSeleccionado.NombreProducto,
                     PrecioUnitario = productoSeleccionado.PrecioProducto,
                     CantidadDetalle = cantidad,
                     SubtotalDetalle = cantidad * productoSeleccionado.PrecioProducto

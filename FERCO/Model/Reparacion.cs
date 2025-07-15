@@ -10,6 +10,8 @@ namespace FERCO.Model
     {
         public int IdReparacion { get; set; }
         public int IdCliente { get; set; }
+        public string NombreCliente { get; set; } = string.Empty;
+
         public DateTime FechaReparacion { get; set; }
         public int CostoReparacion { get; set; }
         public string Estado { get; set; } = string.Empty;

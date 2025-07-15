@@ -15,33 +15,118 @@
 
         <!-- Panel izquierdo: búsqueda y datos -->
         <StackPanel Grid.Column="0" Margin="10">
-            <TextBox Text="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}" />
-            <Button Content="Buscar" Command="{Binding BuscarCommand}" Margin="0,5"/>
-            <ListBox ItemsSource="{Binding ListaClientes}" SelectedItem="{Binding ClienteSeleccionado}" DisplayMemberPath="NombreCliente" Height="200"/>
+
+            <!-- Instrucción de búsqueda -->
+            <TextBlock Text="Ingrese nombre o RUT (sin puntos ni guion):"
+               FontWeight="SemiBold"
+               Margin="0,0,0,2"/>
+
+            <!-- Caja de búsqueda -->
+            <TextBox x:Name="BusquedaTextBox"
+             Text="{Binding TextoBusqueda, UpdateSourceTrigger=PropertyChanged}" 
+             Margin="0,0,0,5" 
+             ToolTip="Buscar por nombre o RUT (sin puntos ni guion)" />
+
+            <!-- Resultados -->
+            <ListBox ItemsSource="{Binding ListaClientes}"
+             SelectedItem="{Binding ClienteSeleccionado}"
+             DisplayMemberPath="NombreCliente"
+             Height="200"/>
 
             <Button Content="Nuevo Cliente" Command="{Binding NuevoClienteCommand}" Margin="0,5"/>
-            <Button Content="Editar Cliente" Command="{Binding EditarClienteCommand}" IsEnabled="{Binding ClienteSeleccionado, Converter={StaticResource NullToBoolConverter}}"/>
+            <Button Content="Editar Cliente"
+            Command="{Binding EditarClienteCommand}"
+            IsEnabled="{Binding ClienteSeleccionado, Converter={StaticResource NullToBoolConverter}}"/>
         </StackPanel>
+
 
         <!-- Panel derecho: historial -->
         <TabControl Grid.Column="1" Margin="10" Visibility="{Binding ClienteSeleccionado, Converter={StaticResource NullToVisibilityConverter}}">
+
+            <!-- Pestaña Reparaciones -->
             <TabItem Header="Reparaciones">
-                <DataGrid ItemsSource="{Binding ClienteSeleccionado.Reparaciones}" AutoGenerateColumns="False">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Fecha" Binding="{Binding FechaReparacion}" />
-                        <DataGridTextColumn Header="Estado" Binding="{Binding Estado}" />
-                        <DataGridTextColumn Header="Costo" Binding="{Binding CostoReparacion}" />
-                    </DataGrid.Columns>
-                </DataGrid>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="2*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Lista de reparaciones -->
+                    <DataGrid Grid.Row="0"
+                      ItemsSource="{Binding ClienteSeleccionado.Reparaciones}"
+                      SelectedItem="{Binding ReparacionSeleccionada}"
+                      AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Fecha" Binding="{Binding FechaReparacion}" />
+                            <DataGridTextColumn Header="Estado" Binding="{Binding Estado}" />
+                            <DataGridTextColumn Header="Costo" Binding="{Binding CostoReparacion}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <!-- Detalle de productos usados en la reparación -->
+                    <DataGrid Grid.Row="1"
+                      ItemsSource="{Binding DetallesReparacion}"
+                      AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Producto" Binding="{Binding NombreProducto}" />
+                            <DataGridTextColumn Header="Cantidad" Binding="{Binding Cantidad}" />
+                            <DataGridTextColumn Header="Costo Unitario" Binding="{Binding PrecioUnitario}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <!-- Botón para ver orden de servicio -->
+                    <Button Grid.Row="2"
+                    Content="Ver Orden de Servicio"
+                    Command="{Binding VerOrdenServicioCommand}"
+                    IsEnabled="{Binding ReparacionSeleccionada, Converter={StaticResource NullToBoolConverter}}"
+                    Margin="0,5"
+                    HorizontalAlignment="Right"
+                    Width="120"/>
+                </Grid>
             </TabItem>
+
+            <!-- Pestaña Compras -->
             <TabItem Header="Compras">
-                <DataGrid ItemsSource="{Binding ClienteSeleccionado.Ventas}" AutoGenerateColumns="False">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Fecha" Binding="{Binding FechaVenta}" />
-                        <DataGridTextColumn Header="Total" Binding="{Binding TotalVenta}" />
-                    </DataGrid.Columns>
-                </DataGrid>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="2*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Lista de compras -->
+                    <DataGrid Grid.Row="0"
+                      ItemsSource="{Binding ClienteSeleccionado.Ventas}"
+                      SelectedItem="{Binding VentaSeleccionada}"
+                      AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Fecha" Binding="{Binding FechaVenta}" />
+                            <DataGridTextColumn Header="Total" Binding="{Binding TotalVenta}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <!-- Detalle de productos comprados -->
+                    <DataGrid Grid.Row="1"
+                      ItemsSource="{Binding DetallesVenta}"
+                      AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Producto" Binding="{Binding NombreProducto}" />
+                            <DataGridTextColumn Header="Cantidad" Binding="{Binding CantidadDetalle}" />
+                            <DataGridTextColumn Header="Precio Unitario" Binding="{Binding PrecioUnitario}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <!-- Botón para ver boleta -->
+                    <Button Grid.Row="2"
+                    Content="Ver Boleta"
+                    Command="{Binding VerBoletaCommand}"
+                    IsEnabled="{Binding VentaSeleccionada, Converter={StaticResource NullToBoolConverter}}"
+                    Margin="0,5"
+                    HorizontalAlignment="Right"
+                    Width="120"/>
+                </Grid>
             </TabItem>
         </TabControl>
+
     </Grid>
 </UserControl>
