@@ -14,16 +14,19 @@ namespace FERCO.Data
             try
             {
                 using var conn = DAOHelper.AbrirConexionSegura();
-                string query = "SELECT id_inventario, descripcion FROM Inventario";
+                const string query = "SELECT id_inventario, descripcion FROM Inventario";
                 using var cmd = new SqlCommand(query, conn);
                 using var reader = cmd.ExecuteReader();
+
+                int idIndex = reader.GetOrdinal("id_inventario");
+                int descIndex = reader.GetOrdinal("descripcion");
 
                 while (reader.Read())
                 {
                     inventarios.Add(new Inventario
                     {
-                        IdInventario = reader.GetInt32(0),
-                        Descripcion = reader.GetString(1)
+                        IdInventario = reader.GetInt32(idIndex),
+                        Descripcion = reader.GetString(descIndex)
                     });
                 }
             }
@@ -35,21 +38,25 @@ namespace FERCO.Data
             return inventarios;
         }
 
+
         public static Inventario? ObtenerUltimo()
         {
             try
             {
                 using var conn = DAOHelper.AbrirConexionSegura();
-                string query = "SELECT TOP 1 id_inventario, descripcion FROM Inventario ORDER BY id_inventario DESC";
+                const string query = "SELECT TOP 1 id_inventario, descripcion FROM Inventario ORDER BY id_inventario DESC";
                 using var cmd = new SqlCommand(query, conn);
                 using var reader = cmd.ExecuteReader();
+
+                int idIndex = reader.GetOrdinal("id_inventario");
+                int descIndex = reader.GetOrdinal("descripcion");
 
                 if (reader.Read())
                 {
                     return new Inventario
                     {
-                        IdInventario = reader.GetInt32(0),
-                        Descripcion = reader.GetString(1)
+                        IdInventario = reader.GetInt32(idIndex),
+                        Descripcion = reader.GetString(descIndex)
                     };
                 }
             }
@@ -69,8 +76,7 @@ namespace FERCO.Data
             try
             {
                 using var conn = DAOHelper.AbrirConexionSegura();
-                string query = @"INSERT INTO Inventario (descripcion)
-                                 VALUES (@descripcion)";
+                const string query = @"INSERT INTO Inventario (descripcion) VALUES (@descripcion)";
                 using var cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@descripcion", inventario.Descripcion);
 
@@ -91,9 +97,11 @@ namespace FERCO.Data
             try
             {
                 using var conn = DAOHelper.AbrirConexionSegura();
-                string query = @"UPDATE Inventario 
-                                 SET descripcion = @descripcion 
-                                 WHERE id_inventario = @id";
+                const string query = @"
+            UPDATE Inventario 
+            SET descripcion = @descripcion 
+            WHERE id_inventario = @id";
+
                 using var cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@descripcion", inventario.Descripcion);
                 cmd.Parameters.AddWithValue("@id", inventario.IdInventario);
@@ -109,14 +117,16 @@ namespace FERCO.Data
 
         public static bool Eliminar(int idInventario)
         {
-            if (idInventario <= 0) return false;
+            if (idInventario <= 0)
+                return false;
 
             try
             {
                 using var conn = DAOHelper.AbrirConexionSegura();
-                string query = "DELETE FROM Inventario WHERE id_inventario = @id";
+                const string query = "DELETE FROM Inventario WHERE id_inventario = @id";
                 using var cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@id", idInventario);
+
                 return DAOHelper.EjecutarNoQuery(cmd);
             }
             catch (Exception ex)
