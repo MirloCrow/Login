@@ -38,6 +38,25 @@ namespace FERCO.Data
             return inventarios;
         }
 
+        public static string ObtenerDescripcionPorId(int idInventario)
+        {
+            try
+            {
+                using var conn = DAOHelper.AbrirConexionSegura();
+                const string query = "SELECT descripcion FROM Inventario WHERE id_inventario = @id";
+
+                using var cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@id", idInventario);
+                var result = cmd.ExecuteScalar();
+
+                return result?.ToString() ?? "(Desconocido)";
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"[ERROR][InventarioDAO.ObtenerDescripcionPorId] {ex.Message}");
+                return "(Error)";
+            }
+        }
 
         public static Inventario? ObtenerUltimo()
         {

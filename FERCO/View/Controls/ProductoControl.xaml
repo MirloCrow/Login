@@ -98,45 +98,81 @@
 
         <!-- Fila 2: Ubicaciones -->
         <GroupBox Header="Ubicaciones de Inventario" Grid.Row="2" FontWeight="Bold" FontSize="14">
-            <Grid Margin="10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="240" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="150" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" />     <!-- Columna 0: Ubicaciones -->
+            <ColumnDefinition Width="2*" />     <!-- Columna 1: Movimientos -->
+            <ColumnDefinition Width="240" />    <!-- Columna 2: Stock bajo y botones -->
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-                <TextBlock x:Name="txtStockTotal" Grid.Row="0" Grid.Column="0" FontWeight="Bold" Foreground="DarkGreen" FontSize="14" Margin="0,0,0,5" Text="Stock total: -" />
+        <!-- Stock total -->
+        <TextBlock x:Name="txtStockTotal"
+                   Grid.Column="0"
+                   Grid.Row="0"
+                   FontWeight="Bold"
+                   FontSize="14"
+                   Foreground="DarkGreen"
+                   Margin="0,0,0,10"
+                   Text="Stock total: -" />
 
-                <Grid Grid.Row="0" Grid.Column="1" Grid.RowSpan="3" Margin="10,0,0,0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
+        <!-- Columna 0: Ubicaciones -->
+        <StackPanel Grid.Column="0" Grid.Row="1">
+            <TextBlock Text="Stock por ubicación" FontWeight="Bold" FontSize="14" Margin="0,0,0,5"/>
+            <DataGrid x:Name="dgUbicaciones"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      IsReadOnly="True"
+                      Margin="0,0,10,0"
+                      FontSize="14"
+                      Height="150">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Ubicación" Binding="{Binding DescripcionUbicacion}" Width="2*" />
+                    <DataGridTextColumn Header="Stock" Binding="{Binding Cantidad}" Width="100" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </StackPanel>
 
-                    <Border x:Name="borderStockBajo" Grid.Row="0" Padding="10" Background="#FFEDF7" BorderBrush="DarkRed" BorderThickness="1" CornerRadius="5">
-                        <StackPanel>
-                            <TextBlock x:Name="txtStockBajoTitulo" Text="Productos con bajo stock:" FontWeight="Bold" FontSize="13" Margin="0,0,0,5" />
-                            <TextBlock x:Name="txtStockBajo" Text="0" FontSize="18" FontWeight="Bold" Foreground="DarkRed"/>
-                        </StackPanel>
-                    </Border>
+        <!-- Columna 1: Historial de movimientos -->
+        <StackPanel Grid.Column="1" Grid.Row="1">
+            <TextBlock Text="Historial de movimientos de inventario" FontWeight="Bold" FontSize="14" Margin="0,0,0,5"/>
+            <DataGrid x:Name="dgMovimientos"
+                      AutoGenerateColumns="False"
+                      FontSize="14"
+                      IsReadOnly="True"
+                      Height="150">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Fecha" Binding="{Binding FechaMovimiento, StringFormat=g}" Width="150"/>
+                    <DataGridTextColumn Header="Tipo" Binding="{Binding TipoMovimiento}" Width="100"/>
+                    <DataGridTextColumn Header="Inventario" Binding="{Binding DescripcionInventario}" Width="2*"/>
+                    <DataGridTextColumn Header="Cantidad" Binding="{Binding Cantidad}" Width="100"/>
+                    <DataGridTextColumn Header="Motivo" Binding="{Binding Motivo}" Width="2*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </StackPanel>
 
-                    <StackPanel Grid.Row="1" Margin="0,10,0,0">
-                        <Button x:Name="btnStockBajoToggle" Content="Mostrar productos con bajo stock" Click="BtnStockBajoToggle_Click" Padding="5" Margin="0,0,0,5" Style="{StaticResource BotonClaro}"/>
-                        <Button Content="Exportar productos críticos" Click="BtnExportarStockBajo_Click" Padding="5" Style="{StaticResource BotonClaro}"/>
-                    </StackPanel>
-                </Grid>
+        <!-- Columna 2: Stock bajo y botones -->
+        <StackPanel Grid.Column="2" Grid.Row="1" Margin="10,0,0,0">
+            <Border x:Name="borderStockBajo" Padding="10" Background="#FFEDF7" BorderBrush="DarkRed" BorderThickness="1" CornerRadius="5">
+                <StackPanel>
+                    <TextBlock x:Name="txtStockBajoTitulo" Text="Productos con bajo stock:" FontWeight="Bold" FontSize="13" Margin="0,0,0,5" />
+                    <TextBlock x:Name="txtStockBajo" Text="0" FontSize="18" FontWeight="Bold" Foreground="DarkRed"/>
+                </StackPanel>
+            </Border>
 
-                <DataGrid x:Name="dgUbicaciones" Grid.Row="1" Grid.Column="0" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" Margin="0,0,0,10" FontSize="14">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Ubicación" Binding="{Binding DescripcionUbicacion}" Width="2*" />
-                        <DataGridTextColumn Header="Stock" Binding="{Binding Cantidad}" Width="100" />
-                    </DataGrid.Columns>
-                </DataGrid>
-            </Grid>
-        </GroupBox>
+            <Button x:Name="btnStockBajoToggle" Content="Mostrar productos con bajo stock"
+                    Click="BtnStockBajoToggle_Click" Padding="5" Margin="0,10,0,5"
+                    Style="{StaticResource BotonClaro}"/>
+            <Button Content="Exportar productos críticos"
+                    Click="BtnExportarStockBajo_Click" Padding="5"
+                    Style="{StaticResource BotonClaro}"/>
+        </StackPanel>
+    </Grid>
+</GroupBox>
+
+
     </Grid>
 </UserControl>
