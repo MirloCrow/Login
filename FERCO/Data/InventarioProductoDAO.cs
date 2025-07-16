@@ -18,10 +18,11 @@ namespace FERCO.Data
             {
                 using var conn = DAOHelper.AbrirConexionSegura();
                 const string query = @"
-            SELECT ip.id_inventario, ip.id_producto, ip.cantidad, i.descripcion
-            FROM InventarioProducto ip
-            JOIN Inventario i ON ip.id_inventario = i.id_inventario
-            WHERE ip.id_producto = @idProducto";
+                SELECT ip.id_inventario, ip.id_producto, ip.cantidad, i.descripcion
+                FROM InventarioProducto ip
+                JOIN Inventario i ON ip.id_inventario = i.id_inventario
+                WHERE ip.id_producto = @idProducto
+                ORDER BY ip.id_inventario ASC";  // FIFO: primero los inventarios más antiguos
 
                 using var cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@idProducto", idProducto);

@@ -104,7 +104,7 @@ namespace FERCO.ViewModel
                 movimientos.AddRange(dialog.Resultado);
             }
 
-            // 2. Registrar el pedido en la BD
+            // 2. Registrar el pedido en la BD (incluye detalles + actualización de costos)
             PedidoActual.Detalles = [.. Detalles];
             PedidoActual.TotalPedido = Detalles.Sum(d => d.Subtotal);
 
@@ -116,10 +116,25 @@ namespace FERCO.ViewModel
                 return;
             }
 
-            // 3. Registrar movimientos en inventario
+            // 3. Registrar movimientos en inventario y en MovimientoInventario
             foreach (var mov in movimientos)
             {
                 InventarioProductoDAO.InsertarOIncrementar(mov);
+
+                // Buscar el detalle correspondiente al producto
+                var detalle = Detalles.FirstOrDefault(d => d.IdProducto == mov.IdProducto);
+
+                if (detalle != null)
+                {
+                    MovimientoInventarioDAO.RegistrarEntrada(
+                        mov.IdProducto,
+                        mov.IdInventario,
+                        mov.Cantidad,
+                        detalle.PrecioUnitario,
+                        motivo: "Compra",
+                        idReferencia: idPedido
+                    );
+                }
             }
 
             // 4. Confirmación y limpieza

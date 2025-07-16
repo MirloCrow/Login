@@ -31,5 +31,9 @@ namespace FERCO
                 vm.LoginCommand.Execute(null);
             }
         }
+        private void CerrarVentana_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
     }
 }

@@ -16,18 +16,20 @@ namespace FERCO.Data
                 using var conn = DAOHelper.AbrirConexionSegura();
 
                 const string query = @"
-            SELECT p.id_producto,
-                   p.codigo_producto,
-                   p.nombre_producto, 
-                   p.descripcion_producto, 
-                   p.precio_producto, 
-                   p.id_proveedor, 
-                   p.id_categoria,
-                   pr.nombre_proveedor,
-                   c.nombre_categoria
-            FROM Producto p
-            JOIN Proveedor pr ON p.id_proveedor = pr.id_proveedor
-            JOIN Categoria c ON p.id_categoria = c.id_categoria";
+                SELECT p.id_producto,
+                p.codigo_producto,
+                p.nombre_producto, 
+                p.descripcion_producto, 
+                p.precio_producto, 
+                p.costo_promedio,
+                p.costo_unitario,
+                p.id_proveedor, 
+                p.id_categoria,
+                pr.nombre_proveedor,
+                c.nombre_categoria
+                FROM Producto p
+                JOIN Proveedor pr ON p.id_proveedor = pr.id_proveedor
+                JOIN Categoria c ON p.id_categoria = c.id_categoria";
 
                 using var cmd = new SqlCommand(query, conn);
                 using var reader = cmd.ExecuteReader();
@@ -41,6 +43,8 @@ namespace FERCO.Data
                 int idCatIndex = reader.GetOrdinal("id_categoria");
                 int nomProvIndex = reader.GetOrdinal("nombre_proveedor");
                 int nomCatIndex = reader.GetOrdinal("nombre_categoria");
+                int costoPromIndex = reader.GetOrdinal("costo_promedio");
+                int costoUnitIndex = reader.GetOrdinal("costo_unitario");
 
                 while (reader.Read())
                 {
@@ -57,6 +61,8 @@ namespace FERCO.Data
                         IdCategoria = reader.GetInt32(idCatIndex),
                         NombreProveedor = reader.GetString(nomProvIndex),
                         NombreCategoria = reader.GetString(nomCatIndex),
+                        CostoPromedio = reader.IsDBNull(costoPromIndex) ? 0m : reader.GetDecimal(costoPromIndex),
+                        CostoUnitario = reader.IsDBNull(costoUnitIndex) ? 0m : reader.GetDecimal(costoUnitIndex),
                         UbicacionesConStock = InventarioProductoDAO.ObtenerUbicacionesPorProducto(idProducto)
                     };
 
@@ -69,6 +75,71 @@ namespace FERCO.Data
             }
 
             return productos;
+        }
+        public static bool AgregarConEntradaInventario(Producto producto, int idInventario, int cantidadInicial, decimal costoUnitario)
+        {
+            if (!Agregar(producto)) return false;
+
+            int idProducto = ObtenerUltimoId();
+
+            // Actualizar costo promedio antes de registrar la entrada
+            ActualizarCostoPromedio(idProducto, cantidadInicial, costoUnitario);
+
+            // Registrar entrada en inventario
+            return MovimientoInventarioDAO.RegistrarEntrada(idProducto, idInventario, cantidadInicial, costoUnitario);
+        }
+
+        public static bool ActualizarCostoPromedio(int idProducto, int cantidadEntrante, decimal costoUnitarioNuevo)
+        {
+            try
+            {
+                using var conn = DAOHelper.AbrirConexionSegura();
+
+                const string querySelect = @"
+            SELECT 
+                ISNULL(SUM(cantidad), 0) AS StockActual,
+                (SELECT costo_promedio FROM Producto WHERE id_producto = @idProducto) AS CostoPromedioActual
+            FROM InventarioProducto
+            WHERE id_producto = @idProducto";
+
+                int stockActual = 0;
+                decimal costoPromedioActual = 0;
+
+                using (var cmdSelect = new SqlCommand(querySelect, conn))
+                {
+                    cmdSelect.Parameters.AddWithValue("@idProducto", idProducto);
+                    using var reader = cmdSelect.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        stockActual = reader.GetInt32(0);
+                        costoPromedioActual = reader.IsDBNull(1) ? 0 : reader.GetDecimal(1);
+                    }
+                }
+
+                int nuevoStock = stockActual + cantidadEntrante;
+                if (nuevoStock == 0) return true; // evitar división por 0
+
+                decimal nuevoCostoPromedio = ((stockActual * costoPromedioActual) + (cantidadEntrante * costoUnitarioNuevo)) / nuevoStock;
+
+                const string queryUpdate = @"
+            UPDATE Producto 
+            SET 
+                costo_promedio = @nuevoCosto, 
+                costo_unitario = @ultimoCosto 
+            WHERE id_producto = @idProducto";
+
+                using var cmdUpdate = new SqlCommand(queryUpdate, conn);
+                cmdUpdate.Parameters.AddWithValue("@nuevoCosto", nuevoCostoPromedio);
+                cmdUpdate.Parameters.AddWithValue("@ultimoCosto", costoUnitarioNuevo);
+                cmdUpdate.Parameters.AddWithValue("@idProducto", idProducto);
+
+                return DAOHelper.EjecutarNoQuery(cmdUpdate);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"[ERROR][ProductoDAO.ActualizarCostoPromedio] {ex.Message}");
+                return false;
+            }
         }
 
         public static Producto? BuscarPorNombre(string nombre)

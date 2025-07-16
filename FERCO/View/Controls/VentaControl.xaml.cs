@@ -167,7 +167,7 @@ namespace FERCO.View
                 detalle.IdVenta = idVenta;
                 VentaDAO.RegistrarDetalle(detalle);
 
-                DescontarStock(detalle.IdProducto, detalle.CantidadDetalle);
+                DescontarStock(detalle.IdProducto, detalle.CantidadDetalle, idVenta);
             }
 
             lstVentas.Items.Add($"Venta registrada - Total: ${totalVenta}");
@@ -252,7 +252,7 @@ namespace FERCO.View
         }
 
 
-        private static void DescontarStock(int idProducto, int cantidad)
+        private static void DescontarStock(int idProducto, int cantidad, int idVenta)
         {
             var ubicaciones = InventarioProductoDAO.ObtenerUbicacionesPorProducto(idProducto);
             int cantidadARestar = cantidad;
@@ -265,9 +265,20 @@ namespace FERCO.View
                 u.Cantidad -= descontar;
                 cantidadARestar -= descontar;
 
+                // Actualizar stock en InventarioProducto
                 InventarioProductoDAO.Actualizar(u);
+
+                // Registrar salida en MovimientoInventario
+                MovimientoInventarioDAO.RegistrarSalida(
+                    idProducto: idProducto,
+                    idInventario: u.IdInventario,
+                    cantidad: descontar,
+                    motivo: "Venta",
+                    idReferencia: idVenta
+                );
             }
         }
+
         private void InicializarClientes()
         {
             var clientes = ClienteDAO.ObtenerTodos()

@@ -181,12 +181,22 @@ namespace FERCO.View
                 }
 
                 dgUbicaciones.ItemsSource = producto.UbicacionesConStock;
+
+                // Historial de movimientos
+                var movimientos = MovimientoInventarioDAO.ObtenerMovimientosPorProducto(producto.IdProducto);
+                foreach (var mov in movimientos)
+                {
+                    mov.DescripcionInventario = InventarioDAO.ObtenerDescripcionPorId(mov.IdInventario);
+                }
+
+                dgMovimientos.ItemsSource = movimientos;
             }
             else
             {
                 productoSeleccionado = null;
                 txtStockTotal.Text = "Stock total: -";
                 dgUbicaciones.ItemsSource = null;
+                dgMovimientos.ItemsSource = null;
             }
         }
 

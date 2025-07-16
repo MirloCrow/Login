@@ -26,7 +26,7 @@ namespace FERCO.Data
 
                 int idPedido = DAOHelper.EjecutarEscalar(cmdPedido);
 
-                // Insertar Detalles del Pedido
+                // Insertar Detalles y actualizar costos
                 foreach (var det in pedido.Detalles)
                 {
                     using var cmdDetalle = new SqlCommand(@"
@@ -40,6 +40,9 @@ namespace FERCO.Data
                     cmdDetalle.Parameters.AddWithValue("@subtotal", det.Subtotal);
 
                     DAOHelper.EjecutarNoQuery(cmdDetalle);
+
+                    // ⚠️ ACTUALIZAR COSTO PROMEDIO Y UNITARIO DESPUÉS DE INSERTAR
+                    ProductoDAO.ActualizarCostoPromedio(det.IdProducto, det.Cantidad, det.PrecioUnitario);
                 }
 
                 tran.Commit();
@@ -47,9 +50,9 @@ namespace FERCO.Data
             }
             catch (Exception ex)
             {
-                try { tran.Rollback(); } catch { /* opcional: log adicional */ }
+                try { tran.Rollback(); } catch { }
                 Console.Error.WriteLine($"[ERROR][CompraDAO.RegistrarPedido] {ex.Message}");
-                return 0; 
+                return 0;
             }
         }
 

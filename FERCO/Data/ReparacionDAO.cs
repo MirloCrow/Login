@@ -8,13 +8,14 @@ namespace FERCO.Data
 {
     public static class ReparacionDAO
     {
-        public static bool CrearReparacionConDetalle(int idCliente, List<TipoReparacionProductoEditable> productos, out string mensajeError)
+        public static bool CrearReparacionConDetalle(int idCliente, int idTipoReparacion, List<TipoReparacionProductoEditable> productos, out string mensajeError)
         {
             mensajeError = "";
 
             using var conn = DAOHelper.AbrirConexionSegura();
             using var trans = conn.BeginTransaction();
-            // Validación previa: stock suficiente para cada producto
+
+            // Validar stock suficiente
             foreach (var item in productos)
             {
                 int stockTotal = InventarioProductoDAO.ObtenerStockTotal(conn, trans, item.IdProducto);
@@ -27,28 +28,30 @@ namespace FERCO.Data
 
             try
             {
-                // 1. Insertar reparación base
-                SqlCommand cmdInsertReparacion = new(
-                    "INSERT INTO Reparacion (id_cliente, fecha_reparacion, costo_reparacion, estado) " +
-                    "OUTPUT INSERTED.id_reparacion " +
-                    "VALUES (@cliente, GETDATE(), @total, 'Pendiente')", conn, trans);
+                // Calcular costo total
+                int totalReparacion = productos.Sum(p => p.CantidadAUsar * ObtenerPrecioProducto(conn, trans, p.IdProducto));
 
-                int totalReparacion = 0;
-                foreach (var p in productos)
-                    totalReparacion += p.CantidadAUsar * ObtenerPrecioProducto(conn, trans, p.IdProducto);
+                // Insertar reparación con id_tipo_reparacion incluido
+                SqlCommand cmdInsertReparacion = new(
+                    "INSERT INTO Reparacion (id_cliente, id_tipo_reparacion, fecha_reparacion, costo_reparacion, estado) " +
+                    "OUTPUT INSERTED.id_reparacion " +
+                    "VALUES (@cliente, @tipo, GETDATE(), @total, 'Pendiente')", conn, trans);
 
                 cmdInsertReparacion.Parameters.AddWithValue("@cliente", idCliente);
+                cmdInsertReparacion.Parameters.AddWithValue("@tipo", idTipoReparacion); // ✅ Nuevo parámetro
                 cmdInsertReparacion.Parameters.AddWithValue("@total", totalReparacion);
 
                 int idReparacion = (int)cmdInsertReparacion.ExecuteScalar();
 
-                // 2. Insertar detalle y descontar stock
+                // ✅ Obtener nombre del tipo para movimiento
+                string motivoMovimiento = $"Uso en reparación: {TipoReparacionDAO.ObtenerNombrePorId(conn, trans, idTipoReparacion)}";
+
+                // Insertar detalles y descontar stock
                 foreach (var item in productos)
                 {
                     int stockRestante = item.CantidadAUsar;
                     int precio = ObtenerPrecioProducto(conn, trans, item.IdProducto);
 
-                    // Obtener inventarios con stock (mayor stock primero)
                     var inventarios = InventarioProductoDAO.ObtenerInventariosConStock(conn, trans, item.IdProducto);
 
                     foreach (var inv in inventarios)
@@ -59,8 +62,7 @@ namespace FERCO.Data
 
                         // Actualizar stock
                         SqlCommand cmdUpdateStock = new(
-                            "UPDATE InventarioProducto " +
-                            "SET cantidad = cantidad - @cant, fecha_actualizacion = GETDATE() " +
+                            "UPDATE InventarioProducto SET cantidad = cantidad - @cant, fecha_actualizacion = GETDATE() " +
                             "WHERE id_inventario = @inv AND id_producto = @prod", conn, trans);
                         cmdUpdateStock.Parameters.AddWithValue("@cant", aDescontar);
                         cmdUpdateStock.Parameters.AddWithValue("@inv", inv.IdInventario);
@@ -77,6 +79,15 @@ namespace FERCO.Data
                         cmdInsertDetalle.Parameters.AddWithValue("@precio", precio);
                         cmdInsertDetalle.Parameters.AddWithValue("@sub", precio * aDescontar);
                         cmdInsertDetalle.ExecuteNonQuery();
+
+                        // Registrar salida
+                        MovimientoInventarioDAO.RegistrarSalida(
+                            item.IdProducto,
+                            inv.IdInventario,
+                            aDescontar,
+                            motivoMovimiento,
+                            idReparacion
+                        );
 
                         stockRestante -= aDescontar;
                     }
@@ -197,5 +208,35 @@ namespace FERCO.Data
             return lista;
         }
 
+        public static Reparacion? ObtenerPorId(int idReparacion)
+        {
+            using var conn = DAOHelper.AbrirConexionSegura();
+
+            var cmd = new SqlCommand(@"
+        SELECT r.*, tr.nombre AS nombre_tipo, c.nombre_cliente
+        FROM Reparacion r
+        LEFT JOIN TipoReparacion tr ON r.id_tipo_reparacion = tr.id_tipo_reparacion
+        LEFT JOIN Cliente c ON r.id_cliente = c.id_cliente
+        WHERE r.id_reparacion = @id", conn);
+
+            cmd.Parameters.AddWithValue("@id", idReparacion);
+
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                return new Reparacion
+                {
+                    IdReparacion = (int)reader["id_reparacion"],
+                    IdCliente = (int)reader["id_cliente"],
+                    FechaReparacion = (DateTime)reader["fecha_reparacion"],
+                    Estado = reader["estado"].ToString() ?? "",
+                    CostoReparacion = (int)reader["costo_reparacion"],
+                    NombreCliente = reader["nombre_cliente"].ToString() ?? "",
+                    NombreTipoReparacion = reader["nombre_tipo"].ToString() ?? ""
+                };
+            }
+
+            return null;
+        }
     }
 }

@@ -50,14 +50,28 @@ namespace FERCO.ViewModel
                     return;
                 }
 
-                var usuarioValido = UsuarioDAO.ObtenerPorCredenciales(Usuario, Password);
+                // Aplica hash a la contraseña ingresada
+                string passwordHasheada = SecurityHelper.HashearSHA256(Password);
 
-                if (usuarioValido != null && usuarioValido.Rol == "admin")
+                // Verifica credenciales con contraseña hasheada
+                var usuarioValido = UsuarioDAO.ObtenerPorCredenciales(Usuario, passwordHasheada);
+
+                if (usuarioValido != null)
                 {
-                    var ventana = Application.Current.MainWindow;
+                    // Crea e inicia MainWindow
                     var main = new MainWindow();
+                    Application.Current.MainWindow = main;
                     main.Show();
-                    ventana.Close();
+
+                    // Cierra LoginWindow
+                    foreach (Window w in Application.Current.Windows)
+                    {
+                        if (w is Window win && win.GetType().Name == "LoginWindow")
+                        {
+                            win.Close();
+                            break;
+                        }
+                    }
                 }
                 else
                 {

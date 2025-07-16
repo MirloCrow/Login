@@ -116,6 +116,7 @@ namespace FERCO.ViewModel
 
             bool exito = ReparacionDAO.CrearReparacionConDetalle(
                 ClienteSeleccionado.IdCliente,
+                TipoSeleccionado.IdTipoReparacion,
                 [.. ProductosReparacion],
                 out string mensajeError
             );

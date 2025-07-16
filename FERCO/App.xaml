@@ -3,14 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:FERCO"
              xmlns:utils="clr-namespace:FERCO.Utilities"
-             StartupUri="View/Windows/LoginWindow.xaml">
+             ShutdownMode="OnMainWindowClose">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Themes/DarkTheme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- Convertidores globales -->
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <utils:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
             <utils:NullToBoolConverter x:Key="NullToBoolConverter"/>

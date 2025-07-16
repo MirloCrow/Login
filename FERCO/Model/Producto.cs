@@ -10,6 +10,8 @@
         public string DescripcionProducto { get; set; } = "";
 
         public int PrecioProducto { get; set; }
+        public decimal CostoPromedio { get; set; } // Costo promedio de compra
+        public decimal CostoUnitario { get; set; } // Ultimo costo de compra
 
         public int IdProveedor { get; set; }
         public int IdCategoria { get; set; }
