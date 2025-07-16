@@ -68,9 +68,10 @@ namespace FERCO.Data
             return RegistrarMovimiento(idProducto, idInventario, -Math.Abs(cantidad), "SALIDA", motivo, idReferencia);
         }
 
-        public static bool RegistrarAjuste(int idProducto, int idInventario, int cantidad, string motivo = "Ajuste manual", int? idReferencia = null)
+        public static bool RegistrarSalidaPorReparacion(int idProducto, int idInventario, int cantidad, string nombreTipoReparacion, int? idReparacion = null)
         {
-            return RegistrarMovimiento(idProducto, idInventario, cantidad, "AJUSTE", motivo, idReferencia);
+            string motivo = $"Uso en reparación: {nombreTipoReparacion}";
+            return RegistrarSalida(idProducto, idInventario, cantidad, motivo, idReparacion);
         }
 
         public static List<MovimientoInventario> ObtenerMovimientosPorProducto(int idProducto)

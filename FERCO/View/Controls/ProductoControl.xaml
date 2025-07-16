@@ -90,7 +90,8 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Nombre" Binding="{Binding NombreProducto}" Width="2*" />
                 <DataGridTextColumn Header="Descripción" Binding="{Binding DescripcionProducto}" Width="2.5*" />
-                <DataGridTextColumn Header="Precio" Binding="{Binding PrecioProducto}" Width="*" />
+                <DataGridTextColumn Header="Precio" Binding="{Binding PrecioProducto, StringFormat={}{0:C}}" Width="*" />
+                <DataGridTextColumn Header="Costo Promedio" Binding="{Binding CostoPromedio, StringFormat={}{0:C}}" Width="1.5*" />
                 <DataGridTextColumn Header="Categoría" Binding="{Binding NombreCategoria}" Width="1.5*" />
                 <DataGridTextColumn Header="Proveedor" Binding="{Binding NombreProveedor}" Width="1.5*" />
             </DataGrid.Columns>

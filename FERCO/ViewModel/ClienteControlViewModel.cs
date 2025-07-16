@@ -193,18 +193,26 @@ namespace FERCO.ViewModel
 
             try
             {
+                var reparacionConInfo = ReparacionDAO.ObtenerPorId(ReparacionSeleccionada.IdReparacion);
+
+                if (reparacionConInfo == null)
+                {
+                    MessageBox.Show("No se pudo encontrar la reparación.");
+                    return;
+                }
+
                 var detalles = ReparacionDAO.ObtenerDetalles(ReparacionSeleccionada.IdReparacion);
 
-                // Asegurarse de tener el nombre del cliente antes de generar la boleta
-                ReparacionSeleccionada.NombreCliente = ClienteSeleccionado?.NombreCliente ?? "Cliente sin nombre";
-
-                BoletaHTMLGenerator.GenerarBoleta(ReparacionSeleccionada, detalles);
+                BoletaHTMLGenerator.GenerarBoleta(reparacionConInfo, detalles);
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Error al generar orden de servicio: " + ex.Message);
             }
         }
+
+
+
 
         private void VerBoleta()
         {

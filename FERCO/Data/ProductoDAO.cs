@@ -16,18 +16,20 @@ namespace FERCO.Data
                 using var conn = DAOHelper.AbrirConexionSegura();
 
                 const string query = @"
-            SELECT p.id_producto,
-                   p.codigo_producto,
-                   p.nombre_producto, 
-                   p.descripcion_producto, 
-                   p.precio_producto, 
-                   p.id_proveedor, 
-                   p.id_categoria,
-                   pr.nombre_proveedor,
-                   c.nombre_categoria
-            FROM Producto p
-            JOIN Proveedor pr ON p.id_proveedor = pr.id_proveedor
-            JOIN Categoria c ON p.id_categoria = c.id_categoria";
+                SELECT p.id_producto,
+                p.codigo_producto,
+                p.nombre_producto, 
+                p.descripcion_producto, 
+                p.precio_producto, 
+                p.costo_promedio,
+                p.costo_unitario,
+                p.id_proveedor, 
+                p.id_categoria,
+                pr.nombre_proveedor,
+                c.nombre_categoria
+                FROM Producto p
+                JOIN Proveedor pr ON p.id_proveedor = pr.id_proveedor
+                JOIN Categoria c ON p.id_categoria = c.id_categoria";
 
                 using var cmd = new SqlCommand(query, conn);
                 using var reader = cmd.ExecuteReader();
@@ -41,6 +43,8 @@ namespace FERCO.Data
                 int idCatIndex = reader.GetOrdinal("id_categoria");
                 int nomProvIndex = reader.GetOrdinal("nombre_proveedor");
                 int nomCatIndex = reader.GetOrdinal("nombre_categoria");
+                int costoPromIndex = reader.GetOrdinal("costo_promedio");
+                int costoUnitIndex = reader.GetOrdinal("costo_unitario");
 
                 while (reader.Read())
                 {
@@ -57,6 +61,8 @@ namespace FERCO.Data
                         IdCategoria = reader.GetInt32(idCatIndex),
                         NombreProveedor = reader.GetString(nomProvIndex),
                         NombreCategoria = reader.GetString(nomCatIndex),
+                        CostoPromedio = reader.IsDBNull(costoPromIndex) ? 0m : reader.GetDecimal(costoPromIndex),
+                        CostoUnitario = reader.IsDBNull(costoUnitIndex) ? 0m : reader.GetDecimal(costoUnitIndex),
                         UbicacionesConStock = InventarioProductoDAO.ObtenerUbicacionesPorProducto(idProducto)
                     };
 

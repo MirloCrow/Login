@@ -97,6 +97,7 @@ namespace FERCO.Utilities
         public static void GenerarBoleta(Reparacion reparacion, List<DetalleReparacion> detalles)
         {
             string clienteNombre = string.IsNullOrEmpty(reparacion.NombreCliente) ? "Cliente sin nombre" : reparacion.NombreCliente;
+            string tipoReparacion = string.IsNullOrEmpty(reparacion.NombreTipoReparacion) ? "No especificado" : reparacion.NombreTipoReparacion;
 
             string html = $@"
 <!DOCTYPE html>
@@ -129,6 +130,7 @@ namespace FERCO.Utilities
     <div class='datos-venta'>
         <strong>Fecha:</strong> {reparacion.FechaReparacion:dd-MM-yyyy HH:mm}<br/>
         <strong>ID Reparación:</strong> {reparacion.IdReparacion}<br/>
+        <strong>Tipo de Reparación:</strong> {tipoReparacion}<br/>
         <strong>Estado:</strong> {reparacion.Estado}
     </div>
 

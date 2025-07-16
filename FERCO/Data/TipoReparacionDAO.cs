@@ -28,6 +28,15 @@ namespace FERCO.Data
 
             return lista;
         }
+
+        public static string ObtenerNombrePorId(SqlConnection conn, SqlTransaction trans, int idTipo)
+        {
+            using var cmd = new SqlCommand("SELECT nombre FROM TipoReparacion WHERE id_tipo_reparacion = @id", conn, trans);
+            cmd.Parameters.AddWithValue("@id", idTipo);
+            object? result = cmd.ExecuteScalar();
+            return result?.ToString() ?? "Reparación";
+        }
+
         public static int Insertar(TipoReparacion tipo)
         {
             using var conn = DAOHelper.AbrirConexionSegura();
