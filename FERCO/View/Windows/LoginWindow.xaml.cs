@@ -1,6 +1,6 @@
 ﻿using System.Windows;
-using FERCO.Data;
-using FERCO.Model;
+using System.Windows.Input;
+using FERCO.ViewModel;
 
 namespace FERCO
 {
@@ -11,24 +11,25 @@ namespace FERCO
             InitializeComponent();
         }
 
-        private void BtnLogin_Click(object sender, RoutedEventArgs e)
+        private void LoginWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            string usuario = txtUsuario.Text;
-            string password = txtPassword.Password;
+            txtUsuario.Focus();
+        }
 
-            var usuarioValido = UsuarioDAO.ObtenerPorCredenciales(usuario, password);
-
-            if (usuarioValido != null && usuarioValido.Rol == "admin")
+        private void TxtPassword_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is LoginViewModel vm)
             {
-                var menu = new MainWindow();
-                menu.Show();
-                this.Close();
+                vm.Password = txtPassword.Password;
             }
-            else
-            {
-                lblMensaje.Text = "Credenciales incorrectas.";
-            }
+        }
 
+        private void TxtPassword_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter && DataContext is LoginViewModel vm)
+            {
+                vm.LoginCommand.Execute(null);
+            }
         }
     }
 }

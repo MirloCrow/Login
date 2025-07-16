@@ -1,13 +1,23 @@
 ﻿<Window x:Class="FERCO.LoginWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:FERCO.ViewModel"
         Title="FERCO"
         Height="500"
         Width="350"
         WindowStartupLocation="CenterScreen"
         WindowStyle="None"
         AllowsTransparency="True"
+        Loaded="LoginWindow_Loaded"
         Background="Transparent">
+
+    <Window.Resources>
+        <vm:LoginViewModel x:Key="LoginVM"/>
+    </Window.Resources>
+
+    <Window.DataContext>
+        <StaticResource ResourceKey="LoginVM"/>
+    </Window.DataContext>
 
     <Border CornerRadius="10" Background="Transparent">
         <Grid>
@@ -37,6 +47,7 @@
                     <StackPanel Margin="0,0,0,25">
                         <TextBlock Text="Usuario" Foreground="{StaticResource PrimaryTextBrush}" FontSize="14"/>
                         <TextBox x:Name="txtUsuario"
+                                 Text="{Binding Usuario, UpdateSourceTrigger=PropertyChanged}"
                                  Height="30"
                                  Background="Transparent"
                                  Foreground="{StaticResource PrimaryTextBrush}"
@@ -49,6 +60,8 @@
                     <StackPanel Margin="0,0,0,25">
                         <TextBlock Text="Contraseña" Foreground="{StaticResource PrimaryTextBrush}" FontSize="14"/>
                         <PasswordBox x:Name="txtPassword"
+                                     PasswordChanged="TxtPassword_PasswordChanged"
+                                     KeyDown="TxtPassword_KeyDown"
                                      Height="30"
                                      Background="Transparent"
                                      Foreground="{StaticResource PrimaryTextBrush}"
@@ -59,16 +72,16 @@
 
                     <!-- Botón login -->
                     <Button Content="Iniciar"
+                            Command="{Binding LoginCommand}"
                             Height="40"
                             Background="{StaticResource AccentBrush}"
                             Foreground="White"
                             BorderThickness="0"
                             FontWeight="Bold"
                             FontFamily="Segoe UI"
-                            Cursor="Hand"
-                            Click="BtnLogin_Click"/>
+                            Cursor="Hand"/>
 
-                    <TextBlock x:Name="lblMensaje"
+                    <TextBlock Text="{Binding Mensaje}"
                                Foreground="OrangeRed"
                                FontSize="12"
                                Margin="0,15,0,0"
@@ -78,4 +91,3 @@
         </Grid>
     </Border>
 </Window>
-
